@@ -1,73 +1,69 @@
 import Link from "next/link";
-import { ArrowUpLeft, Search } from "lucide-react";
-import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
+import { ArrowUp } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { HeroHeadlineTextType } from "@/components/ui/HeroHeadlineTextType";
 
-const trustItems = ["بيانات موثوقة", "رؤى محلية", "دعم للملكية"];
-const quickActions = ["مقارنة السيارات", "تكلفة الشحن", "اسأل المساعد", "دليل السوق"];
+const quickActions = [
+  { label: "مقارنة السيارات", href: "/assistant" },
+  { label: "تكلفة الشحن", href: "/calculators" },
+  { label: "اسأل المساعد", href: "/assistant" },
+  { label: "دليل السوق", href: "/assistant" },
+];
 
 export function HeroSection() {
   return (
     <section className="px-4 pb-16 pt-12 sm:px-6 sm:pb-20 sm:pt-16 lg:px-8 lg:pb-28">
       <Container>
-        <div className="technical-panel mx-auto max-w-6xl rounded-[14px] border border-[var(--voltjo-border)] bg-white/50 px-2 py-10 text-center sm:px-8 lg:px-12">
+        <div className="technical-panel mx-auto max-w-5xl rounded-[14px] border border-[var(--voltjo-border)] bg-white/50 px-4 py-12 text-center sm:px-10 lg:px-16">
           <div className="fade-up">
-            <Badge>منصة أردنية للسيارات الكهربائية والهايبرد</Badge>
             <HeroHeadlineTextType />
-            <p className="mx-auto mt-5 max-w-3xl text-lg font-medium leading-9 text-[var(--voltjo-muted)] sm:text-xl">
-              قارن بين السيارات، احسب تكلفة الشحن، وافهم الدعم والضمان
-              والمواصفات قبل الشراء — كل ذلك في مكان واحد مصمم للسوق الأردني.
+            <p className="mx-auto mt-5 max-w-2xl text-lg font-medium leading-9 text-[var(--voltjo-muted)] sm:text-xl">
+              قارن بين السيارات الكهربائية والهايبرد، احسب تكلفة الشحن الحقيقية، وافهم الدعم والضمان في السوق الأردني — قبل أي قرار شراء.
             </p>
-
-            <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-              {trustItems.map((item) => (
-                <span
-                  key={item}
-                  className="inline-flex items-center rounded-[8px] border border-[var(--voltjo-border)] bg-white px-4 py-2 text-sm font-bold text-[var(--voltjo-muted)] shadow-[0_1px_0_rgba(13,13,13,0.02)]"
-                >
-                  {item}
-                </span>
-              ))}
-            </div>
           </div>
 
-          <div className="input-glow mx-auto mt-8 max-w-4xl rounded-[12px] border border-[var(--voltjo-border)] bg-white p-3 text-right shadow-[0_1px_2px_rgba(13,13,13,0.04)] sm:p-4">
-            <div className="flex flex-col gap-3 rounded-[10px] border border-[var(--voltjo-border-soft)] bg-[#FCFCFA] p-3 sm:flex-row sm:items-center">
-              <div className="flex min-h-[44px] flex-1 items-center gap-3 rounded-[8px] bg-white px-4 border border-[rgba(13,13,13,0.04)] shadow-[0_1px_0_rgba(13,13,13,0.02)]">
-                <Search className="text-[var(--voltjo-muted)]" size={18} />
-                <input
-                  aria-label="سؤال VoltJo"
-                  className="w-full bg-transparent text-sm font-bold text-[var(--voltjo-black)] outline-none placeholder:text-[var(--voltjo-muted)]"
-                  placeholder="اسأل عن سيارة، قارن بين موديلين، أو احسب تكلفة الشحن..."
-                />
-              </div>
-              <Button href="/assistant" className="min-h-[44px] px-6">
-                <span className="inline-flex items-center gap-2">
-                  ابدأ
-                  <ArrowUpLeft size={16} />
-                </span>
-              </Button>
-            </div>
+          {/* Chat-style composer box */}
+          <div className="mx-auto mt-10 max-w-3xl" dir="rtl">
+            <div className="rounded-[20px] border border-[rgba(13,13,13,0.12)] bg-[#FEFEFC] p-3 shadow-[0_4px_16px_rgba(13,13,13,0.04)] transition-shadow focus-within:shadow-[0_4px_20px_rgba(13,13,13,0.08)]">
+              {/* Textarea */}
+              <textarea
+                aria-label="سؤال VoltJo"
+                className="min-h-[72px] w-full resize-none bg-transparent px-2 py-2 text-right text-[15px] font-medium leading-7 text-[var(--voltjo-black)] outline-none placeholder:text-[var(--voltjo-muted)]"
+                placeholder="اسأل عن سيارة، قارن بين موديلين، أو احسب تكلفة الشحن..."
+                rows={2}
+              />
 
-            <div className="mt-4 flex flex-wrap gap-2">
-              {quickActions.map((action) => (
+              {/* Bottom row: quick chips + send button */}
+              <div className="flex flex-wrap items-center justify-between gap-2 px-1 pt-1">
+                {/* Quick actions as light chips */}
+                <div className="flex flex-wrap gap-1.5">
+                  {quickActions.map((action) => (
+                    <Link
+                      key={action.label}
+                      href={action.href}
+                      className="inline-flex items-center rounded-lg border border-[rgba(13,13,13,0.08)] bg-white px-3 py-1.5 text-[13px] font-semibold text-[var(--voltjo-muted)] transition hover:border-[rgba(13,13,13,0.16)] hover:text-[var(--voltjo-black)]"
+                    >
+                      {action.label}
+                    </Link>
+                  ))}
+                </div>
+
+                {/* Send button */}
                 <Link
-                  key={action}
-                  href={action === "تكلفة الشحن" ? "/calculators" : "/assistant"}
-                  className="inline-flex items-center rounded-[8px] border border-[var(--voltjo-border)] bg-[#FCFCFA] px-4 py-2 text-sm font-bold text-[var(--voltjo-muted)] transition hover:border-[var(--voltjo-border-strong)] hover:text-[var(--voltjo-black)] hover:bg-white"
+                  href="/assistant"
+                  aria-label="ابدأ"
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--voltjo-orange)] text-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md hover:bg-[#e85e00]"
                 >
-                  {action}
+                  <ArrowUp size={17} />
                 </Link>
-              ))}
+              </div>
             </div>
-          </div>
 
-          <p className="mx-auto mt-5 max-w-2xl text-xs font-bold leading-7 text-[var(--voltjo-muted)]">
-            ابدأ سؤالك الآن — وسيتم نقلك إلى حسابك أو إنشاء حساب لمتابعة داخل
-            المساعد الذكي.
-          </p>
+            {/* Helper text */}
+            <p className="mt-4 text-center text-[12px] font-medium leading-6 text-[var(--voltjo-muted)]/70">
+              ابدأ سؤالك الآن — وسيتم نقلك إلى حسابك أو إنشاء حساب لمتابعة داخل المساعد الذكي.
+            </p>
+          </div>
         </div>
       </Container>
     </section>

@@ -78,18 +78,20 @@ export function ChatSidebar({
 
   return (
     <aside
-      className={`fixed inset-y-0 right-0 z-50 flex h-full shrink-0 flex-col border-l border-[rgba(31,31,29,0.1)] bg-[#F4F3EF] px-3 py-4 transition-transform duration-200 lg:static lg:translate-x-0 ${
+      className={`fixed inset-y-0 right-0 z-50 flex h-full w-[288px] shrink-0 flex-col border-l border-[rgba(31,31,29,0.1)] bg-[#F4F3EF] px-3 py-4 transition-transform duration-200 lg:static lg:translate-x-0 lg:w-auto ${
         collapsed ? "lg:w-[76px]" : "lg:w-[304px]"
       } ${mobileOpen ? "translate-x-0" : "translate-x-full lg:translate-x-0"}`}
       dir="rtl"
     >
       <div className="flex items-center justify-between gap-3">
-        {collapsed ? <VoltJoLogo compact /> : <VoltJoLogo />}
+        {/* Always show full logo on mobile, respect collapsed on desktop */}
+        <div className="lg:hidden"><VoltJoLogo /></div>
+        <div className="hidden lg:block">{collapsed ? <VoltJoLogo compact /> : <VoltJoLogo />}</div>
         <button
           type="button"
           aria-label={collapsed ? "توسيع القائمة" : "طي القائمة"}
           onClick={onToggleCollapse}
-          className="flex h-9 w-9 items-center justify-center rounded-lg text-[#6F6A60] transition hover:bg-[rgba(31,31,29,0.055)] hover:text-[#1F1F1D]"
+          className="hidden lg:flex h-9 w-9 items-center justify-center rounded-lg text-[#6F6A60] transition hover:bg-[rgba(31,31,29,0.055)] hover:text-[#1F1F1D]"
         >
           <ChevronsRight
             size={17}
@@ -111,11 +113,11 @@ export function ChatSidebar({
           href="/"
           title={collapsed ? "الصفحة الرئيسية" : undefined}
           className={`flex h-9 items-center gap-3 rounded-lg px-3 text-right text-sm font-semibold text-[#3A3732] transition hover:bg-[rgba(31,31,29,0.055)] ${
-            collapsed ? "justify-center" : ""
+            collapsed ? "lg:justify-center" : ""
           }`}
         >
           <Home size={17} strokeWidth={1.8} className="text-[#6F6A60]" />
-          {!collapsed ? "الصفحة الرئيسية" : null}
+          <span className={collapsed ? "lg:hidden" : ""}>الصفحة الرئيسية</span>
         </Link>
 
         {navItems.map(({ label, icon: Icon }) => {
@@ -132,10 +134,10 @@ export function ChatSidebar({
                 isActive
                   ? "bg-[rgba(31,31,29,0.08)] text-[#1F1F1D]"
                   : "text-[#3A3732] hover:bg-[rgba(31,31,29,0.055)]"
-              } ${collapsed ? "justify-center" : ""}`}
+              } ${collapsed ? "lg:justify-center" : ""}`}
             >
               <Icon size={17} strokeWidth={1.8} className={isActive ? "text-[#1F1F1D]" : "text-[#6F6A60]"} />
-              {!collapsed ? label : null}
+              <span className={collapsed ? "lg:hidden" : ""}>{label}</span>
             </button>
           );
         })}
@@ -283,35 +285,28 @@ export function ChatSidebar({
         )}
         <div className="flex items-center justify-between rounded-xl px-2 py-2">
           <div className="flex items-center gap-3">
-            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1F1F1D] text-sm font-black text-white">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#1F1F1D] text-sm font-black text-white">
               V
             </span>
-            {!collapsed ? (
-              <span>
-                <span className="block text-sm font-bold text-[#1F1F1D]">
-                  حساب VoltJo
-                </span>
-                <span className="block text-xs font-semibold text-[#6F6A60]">
-                  نسخة تجريبية
-                </span>
-              </span>
-            ) : null}
+            {/* Always show account info on mobile, hide when collapsed on desktop */}
+            <span className={collapsed ? "lg:hidden" : ""}>
+              <span className="block text-sm font-bold text-[#1F1F1D]">حساب VoltJo</span>
+              <span className="block text-xs font-semibold text-[#6F6A60]">نسخة تجريبية</span>
+            </span>
           </div>
-          {!collapsed ? (
-            <button
-              type="button"
-              aria-label="إعدادات الحساب"
-              onClick={() => {
-                setAccountMenuOpen(!accountMenuOpen);
-                setConfirmingClearAll(false);
-              }}
-              className={`h-8 w-8 rounded-lg text-[#6F6A60] transition hover:bg-[rgba(31,31,29,0.055)] ${
-                accountMenuOpen ? "bg-[rgba(31,31,29,0.055)]" : ""
-              }`}
-            >
-              •••
-            </button>
-          ) : null}
+          <button
+            type="button"
+            aria-label="إعدادات الحساب"
+            onClick={() => {
+              setAccountMenuOpen(!accountMenuOpen);
+              setConfirmingClearAll(false);
+            }}
+            className={`flex h-8 w-8 items-center justify-center rounded-lg text-[#6F6A60] transition hover:bg-[rgba(31,31,29,0.055)] ${
+              accountMenuOpen ? "bg-[rgba(31,31,29,0.055)]" : ""
+            } ${collapsed ? "lg:hidden" : ""}`}
+          >
+            •••
+          </button>
         </div>
       </div>
     </aside>

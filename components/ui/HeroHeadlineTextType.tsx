@@ -3,8 +3,8 @@
 import { TextType } from "@/components/ui/TextType";
 
 const headlinePhrase = {
-  lineOne: "اعرف السيارة الأنسب لك في الأردن",
-  lineTwo: "بثقة وبمعلومات دقيقة",
+  lineOne: "مرجعك الذكي للسيارات الكهربائية",
+  lineTwo: "والهايبرد في الأردن",
 };
 
 const fullHeadline = `${headlinePhrase.lineOne}\n${headlinePhrase.lineTwo}`;

@@ -1,7 +1,6 @@
 "use client";
 
 import { Container } from "@/components/ui/Container";
-import { SectionLabel } from "@/components/ui/SectionLabel";
 import { Brain, HelpCircle, Car, MapPin, BarChart3, BellRing, CheckCircle2, LucideIcon } from "lucide-react";
 
 const leftCards = [
@@ -76,25 +75,77 @@ const BranchCard = ({ num, title, desc, icon: Icon, side }: BranchCardProps) => 
   );
 };
 
+// @ts-expect-error: TrueFocus is a JSX component without types
+import TrueFocus from "@/components/TrueFocus";
+
 export function AiAssistantSection() {
   return (
     <section className="relative overflow-hidden bg-[#fafafa] py-20 md:py-32 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:24px_24px]">
       <Container>
         {/* Header Area */}
-        <div className="mb-16 text-center lg:mb-24">
-          <SectionLabel>المساعد الذكي</SectionLabel>
-          <h2 className="mt-5 text-balance text-4xl font-bold leading-tight text-[var(--voltjo-black)] sm:text-[44px]">
-            مساعد يفهم سؤالك قبل أن يعطيك الإجابة
+        <div className="mb-16 text-center lg:mb-24 flex flex-col items-center">
+          <h2 className="text-balance text-4xl font-bold leading-tight text-[var(--voltjo-black)] sm:text-[44px]">
+            مساعد متخصص في
+            <div className="mt-5 flex flex-wrap items-center justify-center gap-[0.3em]" dir="rtl">
+              <span>السيارات</span>
+              <TrueFocus 
+                sentence="الكهربائية والهايبرد"
+                borderColor="#ff6a00"
+                glowColor="rgba(255, 106, 0, 0.4)"
+                animationDuration={0.6}
+                pauseBetweenAnimations={1.5}
+                blurAmount={2}
+              />
+            </div>
           </h2>
-          <p className="mx-auto mt-6 max-w-2xl text-base font-medium leading-8 text-[var(--voltjo-muted)] sm:text-lg">
-            يربط مساعد VoltJo سؤالك بمعلومات السيارة، تكلفة الشحن، المقارنة، والدعم المحلي في الأردن — ثم يحوّل ذلك إلى إجابة واضحة تساعدك على اتخاذ قرار أفضل.
+          <p className="mx-auto mt-8 max-w-3xl text-base font-medium leading-8 text-[var(--voltjo-muted)] sm:text-lg">
+            بعكس المساعدات العامة، صُمم VoltJo ليفهم أسئلة السيارات داخل السوق الأردني: الموديلات، البطاريات، تكلفة الشحن، المقارنة، الدعم، والضمان — ليحوّل التفاصيل المتفرقة إلى إجابة عملية تساعدك قبل الشراء.
           </p>
         </div>
 
         {/* AI Diagram Area */}
         <div className="relative mx-auto max-w-6xl">
+          
+          {/* --- Mobile Layout (< lg) --- */}
+          <div className="flex flex-col items-center gap-6 lg:hidden" dir="rtl">
+            {/* Top Cards (01, 02, 03) */}
+            <div className="flex w-full max-w-[420px] flex-col gap-4 px-4 sm:px-5">
+              {leftCards.map((card) => (
+                <BranchCard key={card.id} num={card.id} title={card.title} desc={card.desc} icon={card.icon} side="left" />
+              ))}
+            </div>
+
+            {/* Mobile Center Node */}
+            <div className="relative my-4 flex h-[180px] w-[180px] shrink-0 items-center justify-center">
+              {/* Vertical connector lines */}
+              <div className="absolute top-[-40px] bottom-[50%] w-px bg-gradient-to-t from-[var(--voltjo-orange)]/60 to-transparent" />
+              <div className="absolute top-[50%] bottom-[-40px] w-px bg-gradient-to-b from-[var(--voltjo-orange)]/60 to-transparent" />
+              
+              {/* Outer Glows - Less intense for mobile */}
+              <div className="absolute inset-0 rounded-full bg-[var(--voltjo-orange)]/10 blur-[20px] animate-pulse" />
+              <div className="absolute inset-3 rounded-full bg-[var(--voltjo-orange)]/15 blur-xl" />
+              
+              {/* Rings */}
+              <div className="absolute inset-5 rounded-full border border-[var(--voltjo-orange)]/30 bg-gradient-to-tr from-[var(--voltjo-orange)]/5 to-transparent" />
+              <div className="absolute inset-8 rounded-full border border-white/60 bg-white/40 shadow-[0_0_20px_rgba(255,106,0,0.1)] backdrop-blur-md" />
+              
+              {/* Core */}
+              <div className="absolute inset-11 z-10 flex flex-col items-center justify-center rounded-full border border-zinc-100 bg-white shadow-xl">
+                <Brain className="size-[40px] text-[var(--voltjo-black)] stroke-[1.5]" />
+              </div>
+            </div>
+
+            {/* Bottom Cards (04, 05, 06) */}
+            <div className="flex w-full max-w-[420px] flex-col gap-4 px-4 sm:px-5">
+              {rightCards.map((card) => (
+                <BranchCard key={card.id} num={card.id} title={card.title} desc={card.desc} icon={card.icon} side="left" />
+              ))}
+            </div>
+          </div>
+
+          {/* --- Desktop Layout (>= lg) --- */}
           {/* We force LTR on the grid container so columns 1 and 3 stay physical left and right. */}
-          <div className="grid grid-cols-1 items-center gap-8 lg:grid-cols-[1fr_300px_1fr] lg:gap-0 lg:h-[600px]" dir="ltr">
+          <div className="hidden lg:grid grid-cols-[1fr_300px_1fr] items-center gap-0 h-[600px]" dir="ltr">
             
             {/* Left Cards (01, 02, 03) */}
             <div className="flex flex-col gap-6 lg:h-full lg:justify-between z-10" dir="rtl">
@@ -104,7 +155,7 @@ export function AiAssistantSection() {
             </div>
 
             {/* Center Node & SVG Lines */}
-            <div className="relative flex h-64 w-full flex-col items-center justify-center lg:h-full z-0 ai-hub-core">
+            <div className="relative flex h-full w-full flex-col items-center justify-center z-0 ai-hub-core">
               <DesktopLinesSVG />
               
               {/* Glowing Core */}

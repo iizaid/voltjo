@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { Bell, ChevronDown, Menu, X } from "lucide-react";
+import { ChevronDown, Menu, X } from "lucide-react";
 import { VoltJoLogo } from "@/components/brand/VoltJoLogo";
 import { MegaMenu } from "@/components/layout/MegaMenu";
 import { megaMenus, navItems, type DropdownKey } from "@/data/navigation";
@@ -126,21 +126,20 @@ export function Navbar() {
             })}
           </div>
 
-          <div className="hidden shrink-0 items-center gap-3 lg:flex" dir="rtl">
+          <div className="hidden shrink-0 items-center gap-2 lg:flex" dir="rtl">
             <Link
-              href="/dashboard"
+              href="/login"
               onClick={() => setOpenMenu(null)}
-              className="flex h-10 items-center rounded-[8px] bg-[var(--voltjo-black)] px-4 text-sm font-bold text-white transition hover:bg-[rgba(13,13,13,0.8)]"
+              className="flex h-10 items-center justify-center rounded-[8px] px-4 text-sm font-bold text-[var(--voltjo-black)] transition hover:bg-[rgba(13,13,13,0.04)]"
             >
-              لوحة التحكم
+              تسجيل الدخول
             </Link>
             <Link
-              href="/resources"
-              aria-label="التنبيهات"
+              href="/signup"
               onClick={() => setOpenMenu(null)}
-              className="flex h-10 w-10 items-center justify-center rounded-[8px] border border-[var(--voltjo-border)] bg-white text-[var(--voltjo-black)] transition hover:bg-[rgba(13,13,13,0.04)]"
+              className="flex h-10 items-center justify-center rounded-[8px] bg-[var(--voltjo-orange)] px-5 text-sm font-bold text-[#FFFFFF] transition hover:bg-[#e85e00] hover:-translate-y-0.5 shadow-sm hover:shadow-md"
             >
-              <Bell size={18} />
+              إنشاء حساب
             </Link>
           </div>
 
@@ -161,19 +160,18 @@ export function Navbar() {
                   </Link>
                 ))}
               </div>
-              <div className="mt-2 flex gap-2 border-t border-[var(--voltjo-border-soft)] pt-2">
+              <div className="mt-2 flex flex-col gap-2 border-t border-[var(--voltjo-border-soft)] pt-3">
                 <Link
-                  href="/dashboard"
-                  className="flex flex-1 items-center justify-center rounded-[8px] bg-[var(--voltjo-black)] px-4 py-2.5 text-sm font-bold text-white"
+                  href="/signup"
+                  className="flex w-full items-center justify-center rounded-[8px] bg-[var(--voltjo-orange)] px-4 py-2.5 text-sm font-bold text-[#FFFFFF] transition hover:bg-[#e85e00]"
                 >
-                  لوحة التحكم
+                  إنشاء حساب
                 </Link>
                 <Link
-                  href="/resources"
-                  aria-label="التنبيهات"
-                  className="flex w-10 items-center justify-center rounded-[8px] border border-[var(--voltjo-border)]"
+                  href="/login"
+                  className="flex w-full items-center justify-center rounded-[8px] border border-[var(--voltjo-border)] bg-[#FCFCFA] px-4 py-2.5 text-sm font-bold text-[var(--voltjo-black)] transition hover:bg-white hover:border-[var(--voltjo-border-strong)]"
                 >
-                  <Bell size={18} />
+                  تسجيل الدخول
                 </Link>
               </div>
             </div>
