@@ -12,7 +12,7 @@ export function HeroSection() {
   return (
     <section className="px-4 pb-16 pt-12 sm:px-6 sm:pb-20 sm:pt-16 lg:px-8 lg:pb-28">
       <Container>
-        <div className="technical-panel mx-auto max-w-6xl rounded-[42px] px-2 py-10 text-center sm:px-8 lg:px-12">
+        <div className="technical-panel mx-auto max-w-6xl rounded-[14px] border border-[var(--voltjo-border)] bg-white/50 px-2 py-10 text-center sm:px-8 lg:px-12">
           <div className="fade-up">
             <Badge>منصة أردنية للسيارات الكهربائية والهايبرد</Badge>
             <HeroHeadlineTextType />
@@ -25,7 +25,7 @@ export function HeroSection() {
               {trustItems.map((item) => (
                 <span
                   key={item}
-                  className="inline-flex items-center rounded-full border border-[var(--voltjo-border)] bg-white/92 px-4 py-2 text-sm font-bold text-[var(--voltjo-muted)]"
+                  className="inline-flex items-center rounded-[8px] border border-[var(--voltjo-border)] bg-white px-4 py-2 text-sm font-bold text-[var(--voltjo-muted)] shadow-[0_1px_0_rgba(13,13,13,0.02)]"
                 >
                   {item}
                 </span>
@@ -33,20 +33,20 @@ export function HeroSection() {
             </div>
           </div>
 
-          <div className="input-glow mx-auto mt-8 max-w-4xl rounded-[34px] border border-[var(--voltjo-border)] bg-white p-3 text-right soft-shadow transition sm:p-4">
-            <div className="flex flex-col gap-3 rounded-[26px] border border-[var(--voltjo-border-soft)] bg-[var(--voltjo-bg-soft)] p-3 sm:flex-row sm:items-center">
-              <div className="flex min-h-14 flex-1 items-center gap-3 rounded-2xl bg-white px-4">
-                <Search className="text-[var(--voltjo-muted)]" size={21} />
+          <div className="input-glow mx-auto mt-8 max-w-4xl rounded-[12px] border border-[var(--voltjo-border)] bg-white p-3 text-right shadow-[0_1px_2px_rgba(13,13,13,0.04)] sm:p-4">
+            <div className="flex flex-col gap-3 rounded-[10px] border border-[var(--voltjo-border-soft)] bg-[#FCFCFA] p-3 sm:flex-row sm:items-center">
+              <div className="flex min-h-[44px] flex-1 items-center gap-3 rounded-[8px] bg-white px-4 border border-[rgba(13,13,13,0.04)] shadow-[0_1px_0_rgba(13,13,13,0.02)]">
+                <Search className="text-[var(--voltjo-muted)]" size={18} />
                 <input
                   aria-label="سؤال VoltJo"
-                  className="w-full bg-transparent text-base font-bold text-[var(--voltjo-black)] outline-none placeholder:text-[var(--voltjo-muted)]"
+                  className="w-full bg-transparent text-sm font-bold text-[var(--voltjo-black)] outline-none placeholder:text-[var(--voltjo-muted)]"
                   placeholder="اسأل عن سيارة، قارن بين موديلين، أو احسب تكلفة الشحن..."
                 />
               </div>
-              <Button href="/assistant" className="min-h-14 px-7">
+              <Button href="/assistant" className="min-h-[44px] px-6">
                 <span className="inline-flex items-center gap-2">
                   ابدأ
-                  <ArrowUpLeft size={18} />
+                  <ArrowUpLeft size={16} />
                 </span>
               </Button>
             </div>
@@ -56,7 +56,7 @@ export function HeroSection() {
                 <Link
                   key={action}
                   href={action === "تكلفة الشحن" ? "/calculators" : "/assistant"}
-                  className="inline-flex items-center rounded-full border border-[var(--voltjo-border)] bg-white px-4 py-2 text-sm font-bold text-[var(--voltjo-muted)] transition hover:border-[var(--voltjo-border-strong)] hover:text-[var(--voltjo-black)]"
+                  className="inline-flex items-center rounded-[8px] border border-[var(--voltjo-border)] bg-[#FCFCFA] px-4 py-2 text-sm font-bold text-[var(--voltjo-muted)] transition hover:border-[var(--voltjo-border-strong)] hover:text-[var(--voltjo-black)] hover:bg-white"
                 >
                   {action}
                 </Link>
@@ -64,7 +64,7 @@ export function HeroSection() {
             </div>
           </div>
 
-          <p className="mx-auto mt-5 max-w-2xl text-sm font-bold leading-7 text-[var(--voltjo-muted)]">
+          <p className="mx-auto mt-5 max-w-2xl text-xs font-bold leading-7 text-[var(--voltjo-muted)]">
             ابدأ سؤالك الآن — وسيتم نقلك إلى حسابك أو إنشاء حساب لمتابعة داخل
             المساعد الذكي.
           </p>

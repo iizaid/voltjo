@@ -9,7 +9,7 @@ export function SoftCard({
 }) {
   return (
     <div
-      className={`rounded-[30px] border border-[var(--voltjo-border)] bg-white soft-shadow ${className}`}
+      className={`rounded-[12px] border border-[var(--voltjo-border)] bg-white/88 shadow-[0_1px_0_rgba(13,13,13,0.04)] ${className}`}
     >
       {children}
     </div>

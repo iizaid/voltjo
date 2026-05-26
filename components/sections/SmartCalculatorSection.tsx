@@ -40,56 +40,56 @@ export function SmartCalculatorSection() {
         </div>
 
         <SoftCard className="technical-panel mx-auto mt-10 max-w-6xl p-4 sm:p-6 lg:p-8">
-          <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-px overflow-hidden rounded-[8px] border border-[var(--voltjo-border-soft)] bg-[var(--voltjo-border-soft)] sm:grid-cols-2 lg:grid-cols-4">
             {inputs.map(([label, value]) => (
               <div
                 key={label}
-                className="rounded-2xl border border-[var(--voltjo-border-soft)] bg-[var(--voltjo-bg-soft)] p-4 text-right"
+                className="bg-white p-4 text-right transition-colors hover:bg-[var(--voltjo-bg-soft)]"
               >
-                <p className="text-sm font-bold text-[var(--voltjo-muted)]">
+                <p className="text-xs font-semibold tracking-wide text-[var(--voltjo-muted)]">
                   {label}
                 </p>
-                <p className="mt-2 text-lg font-bold text-[var(--voltjo-black)]">
+                <p className="mt-1 text-base font-bold text-[var(--voltjo-black)]">
                   {value}
                 </p>
               </div>
             ))}
           </div>
 
-          <div className="mt-5 grid gap-3 lg:grid-cols-3">
+          <div className="mt-5 grid gap-4 lg:grid-cols-3">
             {results.map(([label, value], index) => (
               <div
                 key={label}
-                className={`rounded-[24px] border p-5 text-right ${
+                className={`rounded-[8px] border p-5 text-right transition-all ${
                   index === 0
-                    ? "border-[rgba(255,106,0,0.25)] bg-[var(--voltjo-orange-soft)]"
+                    ? "border-[rgba(255,106,0,0.3)] bg-[var(--voltjo-orange-soft)]/20 shadow-sm"
                     : "border-[var(--voltjo-border-soft)] bg-white"
                 }`}
               >
-                <p className="text-sm font-bold text-[var(--voltjo-muted)]">
+                <p className="text-xs font-semibold tracking-wide text-[var(--voltjo-muted)]">
                   {label}
                 </p>
-                <p className="mt-2 text-3xl font-bold text-[var(--voltjo-black)]">
+                <p className={`mt-2 text-2xl font-black ${index === 0 ? "text-[var(--voltjo-orange)]" : "text-[var(--voltjo-black)]"}`}>
                   {value}
                 </p>
               </div>
             ))}
           </div>
 
-          <div className="mt-5 rounded-[24px] border border-[var(--voltjo-border-soft)] bg-white p-4">
-            <div className="mb-4 text-right text-base font-bold text-[var(--voltjo-black)]">
+          <div className="mt-5 rounded-[8px] border border-[var(--voltjo-border-soft)] bg-white p-4">
+            <div className="mb-3 text-right text-xs font-bold uppercase tracking-wider text-[var(--voltjo-muted)]">
               مقارنة طرق الشحن
             </div>
-            <div className="grid gap-3 md:grid-cols-3">
+            <div className="grid gap-px overflow-hidden rounded-[6px] border border-[var(--voltjo-border-soft)] bg-[var(--voltjo-border-soft)] md:grid-cols-3">
               {comparisons.map(([label, value]) => (
                 <div
                   key={label}
-                  className="flex items-center justify-between rounded-2xl bg-[var(--voltjo-bg-soft)] px-4 py-3"
+                  className="flex items-center justify-between bg-white px-4 py-3"
                 >
-                  <span className="text-sm font-bold text-[var(--voltjo-muted)]">
+                  <span className="text-xs font-semibold text-[var(--voltjo-muted)]">
                     {label}
                   </span>
-                  <span className="text-lg font-bold text-[var(--voltjo-black)]">
+                  <span className="text-sm font-bold text-[var(--voltjo-black)]">
                     {value}
                   </span>
                 </div>
@@ -103,7 +103,7 @@ export function SmartCalculatorSection() {
             (feature) => (
               <div
                 key={feature}
-                className="rounded-2xl border border-[var(--voltjo-border)] bg-white/88 px-5 py-4 text-center text-base font-bold text-[var(--voltjo-black)]"
+                className="rounded-[8px] border border-[var(--voltjo-border)] bg-white/88 px-5 py-3 text-center text-sm font-bold text-[var(--voltjo-black)] shadow-sm"
               >
                 {feature}
               </div>

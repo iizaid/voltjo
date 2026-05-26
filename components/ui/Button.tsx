@@ -10,11 +10,11 @@ type ButtonProps = {
 
 const variants = {
   primary:
-    "bg-[var(--voltjo-orange)] on-dark-fg shadow-[0_14px_30px_rgba(255,106,0,0.22)] hover:bg-[var(--voltjo-orange-dark)]",
+    "bg-[var(--voltjo-orange)] text-white shadow-[0_1px_0_rgba(13,13,13,0.05)] hover:bg-[var(--voltjo-orange-dark)]",
   secondary:
-    "border border-[var(--voltjo-border)] bg-white text-[var(--voltjo-black)] hover:border-[rgba(255,106,0,0.38)] hover:text-[var(--voltjo-orange)]",
+    "border border-[var(--voltjo-border)] bg-white text-[var(--voltjo-black)] shadow-[0_1px_0_rgba(13,13,13,0.02)] hover:border-[rgba(255,106,0,0.38)]",
   ghost:
-    "bg-[var(--voltjo-orange-soft)] text-[var(--voltjo-orange-dark)] hover:bg-[#ffe5d4]",
+    "bg-[rgba(255,106,0,0.05)] text-[var(--voltjo-orange-dark)] hover:bg-[rgba(255,106,0,0.1)]",
 };
 
 export function Button({
@@ -23,7 +23,7 @@ export function Button({
   variant = "primary",
   className = "",
 }: ButtonProps) {
-  const classes = `inline-flex min-h-12 items-center justify-center rounded-full px-6 text-base font-extrabold transition duration-200 hover:-translate-y-0.5 ${variants[variant]} ${className}`;
+  const classes = `inline-flex min-h-[44px] items-center justify-center rounded-[8px] px-6 text-sm font-bold transition-colors duration-200 ${variants[variant]} ${className}`;
 
   if (href) {
     return (
