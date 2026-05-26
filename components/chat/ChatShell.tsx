@@ -13,22 +13,12 @@ const categoryPrompts: Record<string, string> = {
   "الدعم والضمان": "اشرح لي أهم نقاط الدعم والضمان التي يجب الانتباه لها.",
 };
 
-const conversationPrompts: Record<string, string> = {
-  "هل BYD Song Plus مناسبة للأردن؟":
-    "هل BYD Song Plus مناسبة للاستخدام اليومي في الأردن؟",
-  "تكلفة شحن سيارة كهربائية في العقبة":
-    "كم تكلفة شحن سيارة كهربائية في العقبة تقريبًا؟",
-  "مقارنة بين Changan و BYD": "قارن بين Changan و BYD للسوق الأردني.",
-  "أفضل هايبرد للاستخدام اليومي":
-    "ما أفضل سيارة هايبرد للاستخدام اليومي في الأردن؟",
-};
+
 
 export function ChatShell() {
   const [messages, setMessages] = useState<ChatMessageData[]>([]);
   const [composerValue, setComposerValue] = useState("");
-  const [searchQuery, setSearchQuery] = useState("");
   const [notice, setNotice] = useState<string | null>(null);
-  const [sourcesActive, setSourcesActive] = useState(true);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -53,11 +43,7 @@ export function ChatShell() {
     try {
       const response = await simulateChatResponse(trimmedPrompt);
       setMessages((prev) => [...prev, response]);
-      setNotice(
-        sourcesActive
-          ? "تم إنشاء رد تجريبي ثابت اعتمادًا على واجهة VoltJo فقط."
-          : "تم إنشاء رد تجريبي ثابت. مصادر VoltJo غير محددة في هذا النموذج.",
-      );
+      setNotice("تم إرسال الرد التجريبي بنجاح.");
     } catch (err) {
       setError(err instanceof Error ? err : new Error("حدث خطأ غير متوقع."));
     } finally {
@@ -74,14 +60,8 @@ export function ChatShell() {
       return;
     }
 
-    if (label === "بحث") {
-      setNotice("اكتب في مربع البحث داخل الشريط الجانبي لتصفية المحادثات.");
-      return;
-    }
-
-    if (label === "المحادثات") {
-      setSearchQuery("");
-      setNotice("تم عرض آخر المحادثات في الشريط الجانبي.");
+    if (label === "بحث" || label === "المحادثات") {
+      setNotice("هذه الميزة ستكون متاحة قريباً في النسخة الكاملة.");
       return;
     }
 
@@ -113,34 +93,20 @@ export function ChatShell() {
       <ChatSidebar
         collapsed={sidebarCollapsed}
         mobileOpen={mobileSidebarOpen}
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
         onToggleCollapse={() => setSidebarCollapsed((current) => !current)}
         onCloseMobile={() => setMobileSidebarOpen(false)}
         onNavAction={handleNavAction}
-        onConversationSelect={(conversation) =>
-          submitPrompt(conversationPrompts[conversation] ?? conversation)
-        }
       />
       <ChatThread
         messages={messages}
         composerValue={composerValue}
         notice={notice}
-        sourcesActive={sourcesActive}
         onComposerChange={setComposerValue}
         onSubmit={() => submitPrompt(composerValue)}
         onSuggestionSelect={submitPrompt}
         onAttach={() =>
           setNotice("رفع المرفقات غير مفعّل في هذه النسخة التجريبية.")
         }
-        onToggleSources={() => {
-          setSourcesActive((current) => !current);
-          setNotice(
-            sourcesActive
-              ? "تم إيقاف مؤشر مصادر VoltJo لهذه المحادثة التجريبية."
-              : "تم تفعيل مؤشر مصادر VoltJo لهذه المحادثة التجريبية.",
-          );
-        }}
         onOpenSidebar={() => setMobileSidebarOpen(true)}
         isLoading={isLoading}
         error={error}

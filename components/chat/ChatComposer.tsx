@@ -5,16 +5,12 @@ export function ChatComposer({
   onChange,
   onSubmit,
   onAttach,
-  onToggleSources,
-  sourcesActive,
   isLoading,
 }: {
   value: string;
   onChange: (value: string) => void;
   onSubmit: () => void;
   onAttach: () => void;
-  onToggleSources: () => void;
-  sourcesActive: boolean;
   isLoading?: boolean;
 }) {
   return (
@@ -49,17 +45,6 @@ export function ChatComposer({
             className="flex h-9 w-9 items-center justify-center rounded-full text-[#6F6A60] transition hover:bg-[rgba(31,31,29,0.055)] hover:text-[#1F1F1D]"
           >
             <Paperclip size={18} />
-          </button>
-          <button
-            type="button"
-            onClick={onToggleSources}
-            className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
-              sourcesActive
-                ? "border-[rgba(255,106,0,0.22)] bg-[rgba(255,106,0,0.08)] text-[#1F1F1D]"
-                : "border-[rgba(31,31,29,0.1)] bg-[#F8F7F4] text-[#6F6A60] hover:bg-white"
-            }`}
-          >
-            مصادر VoltJo
           </button>
           <button
             type="submit"

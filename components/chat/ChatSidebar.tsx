@@ -21,35 +21,22 @@ const navItems = [
   { label: "الدعم والضمان", icon: BadgeCheck },
 ];
 
-export const recentConversations = [
-  "هل BYD Song Plus مناسبة للأردن؟",
-  "تكلفة شحن سيارة كهربائية في العقبة",
-  "مقارنة بين Changan و BYD",
-  "أفضل هايبرد للاستخدام اليومي",
-];
+
 
 export function ChatSidebar({
   collapsed,
   mobileOpen,
-  searchQuery,
-  onSearchChange,
   onToggleCollapse,
   onCloseMobile,
   onNavAction,
-  onConversationSelect,
 }: {
   collapsed: boolean;
   mobileOpen: boolean;
-  searchQuery: string;
-  onSearchChange: (value: string) => void;
   onToggleCollapse: () => void;
   onCloseMobile: () => void;
   onNavAction: (label: string) => void;
-  onConversationSelect: (conversation: string) => void;
 }) {
-  const visibleConversations = recentConversations.filter((conversation) =>
-    conversation.includes(searchQuery.trim()),
-  );
+
 
   return (
     <aside
@@ -98,42 +85,7 @@ export function ChatSidebar({
         ))}
       </div>
 
-      {!collapsed ? (
-        <div className="mt-4 flex h-10 items-center gap-2 rounded-lg bg-white/55 px-3 text-[#6F6A60]">
-          <Search size={16} />
-          <input
-            value={searchQuery}
-            onChange={(event) => onSearchChange(event.target.value)}
-            className="min-w-0 flex-1 bg-transparent text-sm font-medium outline-none placeholder:text-[#6F6A60]"
-            placeholder="ابحث في المحادثات"
-          />
-        </div>
-      ) : null}
-
-      <div className="mt-8 min-h-0 flex-1 overflow-y-auto">
-        {!collapsed ? (
-          <>
-            <p className="px-3 text-xs font-bold text-[#6F6A60]">الأخيرة</p>
-            <div className="mt-3 grid gap-1">
-              {visibleConversations.map((conversation) => (
-                <button
-                  key={conversation}
-                  type="button"
-                  onClick={() => onConversationSelect(conversation)}
-                  className="rounded-lg px-3 py-2 text-right text-sm font-semibold leading-6 text-[#34302A] transition hover:bg-[rgba(255,255,255,0.72)]"
-                >
-                  {conversation}
-                </button>
-              ))}
-              {visibleConversations.length === 0 ? (
-                <p className="px-3 py-2 text-sm font-medium text-[#6F6A60]">
-                  لا توجد نتائج مطابقة.
-                </p>
-              ) : null}
-            </div>
-          </>
-        ) : null}
-      </div>
+      <div className="mt-8 min-h-0 flex-1 overflow-y-auto"></div>
 
       <div className="mt-5 flex items-center justify-between rounded-xl px-2 py-2">
         <div className="flex items-center gap-3">

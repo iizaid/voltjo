@@ -8,12 +8,10 @@ export function ChatThread({
   messages,
   composerValue,
   notice,
-  sourcesActive,
   onComposerChange,
   onSubmit,
   onSuggestionSelect,
   onAttach,
-  onToggleSources,
   onOpenSidebar,
   isLoading,
   error,
@@ -21,12 +19,10 @@ export function ChatThread({
   messages: ChatMessageData[];
   composerValue: string;
   notice: string | null;
-  sourcesActive: boolean;
   onComposerChange: (value: string) => void;
   onSubmit: () => void;
   onSuggestionSelect: (suggestion: string) => void;
   onAttach: () => void;
-  onToggleSources: () => void;
   onOpenSidebar: () => void;
   isLoading?: boolean;
   error?: Error | null;
@@ -72,8 +68,6 @@ export function ChatThread({
                 onChange={onComposerChange}
                 onSubmit={onSubmit}
                 onAttach={onAttach}
-                onToggleSources={onToggleSources}
-                sourcesActive={sourcesActive}
                 isLoading={isLoading}
               />
               {notice ? (
@@ -87,12 +81,10 @@ export function ChatThread({
           <ChatWelcome
             composerValue={composerValue}
             notice={notice}
-            sourcesActive={sourcesActive}
             onComposerChange={onComposerChange}
             onSubmit={onSubmit}
             onSuggestionSelect={onSuggestionSelect}
             onAttach={onAttach}
-            onToggleSources={onToggleSources}
           />
         )}
       </div>
