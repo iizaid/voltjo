@@ -1,7 +1,7 @@
 "use client";
 
-import { ArrowUp, Paperclip, X } from "lucide-react";
-import { useRef } from "react";
+import { ArrowUp, Image, Paperclip, FileText, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import type { ChatAttachment } from "@/lib/chat/types";
 
 export function ChatComposer({
@@ -20,6 +20,9 @@ export function ChatComposer({
   onAttachmentChange?: (att: ChatAttachment | null) => void;
 }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const handleSubmit = () => {
     onSubmit(value);
@@ -32,7 +35,19 @@ export function ChatComposer({
       size: file.size,
       type: file.type,
     });
+    setDropdownOpen(false);
   };
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setDropdownOpen(false);
+      }
+    };
+    if (dropdownOpen) document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [dropdownOpen]);
 
   return (
     <form
@@ -73,6 +88,19 @@ export function ChatComposer({
           rows={2}
         />
         <div className="flex items-center justify-between gap-3 px-1 pt-2">
+          {/* Hidden file inputs */}
+          <input
+            type="file"
+            accept="image/*"
+            ref={imageInputRef}
+            className="hidden"
+            onChange={(e) => {
+              if (e.target.files && e.target.files[0]) {
+                handleFileSelect(e.target.files[0]);
+                e.target.value = "";
+              }
+            }}
+          />
           <input
             type="file"
             ref={fileInputRef}
@@ -80,17 +108,55 @@ export function ChatComposer({
             onChange={(e) => {
               if (e.target.files && e.target.files[0]) {
                 handleFileSelect(e.target.files[0]);
+                e.target.value = "";
               }
             }}
           />
-          <button
-            type="button"
-            aria-label="إضافة مرفق"
-            onClick={() => fileInputRef.current?.click()}
-            className="flex h-9 w-9 items-center justify-center rounded-full text-[#6F6A60] transition hover:bg-[rgba(31,31,29,0.055)] hover:text-[#1F1F1D]"
-          >
-            <Paperclip size={18} />
-          </button>
+
+          {/* Attachment button with dropdown */}
+          <div className="relative" ref={dropdownRef}>
+            <button
+              type="button"
+              aria-label="إضافة مرفق"
+              aria-expanded={dropdownOpen}
+              onClick={() => setDropdownOpen((prev) => !prev)}
+              className={`flex h-9 w-9 items-center justify-center rounded-full transition hover:bg-[rgba(31,31,29,0.055)] ${
+                dropdownOpen
+                  ? "bg-[rgba(31,31,29,0.07)] text-[#1F1F1D]"
+                  : "text-[#6F6A60] hover:text-[#1F1F1D]"
+              }`}
+            >
+              <Paperclip size={18} />
+            </button>
+
+            {/* Dropdown menu */}
+            {dropdownOpen && (
+              <div
+                className="absolute bottom-full left-0 mb-2 min-w-[160px] overflow-hidden rounded-[14px] border border-[rgba(31,31,29,0.1)] bg-white shadow-[0_8px_28px_rgba(31,31,29,0.12)]"
+                dir="rtl"
+              >
+                <button
+                  type="button"
+                  onClick={() => imageInputRef.current?.click()}
+                  className="flex w-full items-center gap-3 px-4 py-3 text-right text-[14px] font-semibold text-[#1F1F1D] transition hover:bg-[rgba(31,31,29,0.04)]"
+                >
+                  <Image size={16} className="shrink-0 text-[#6F6A60]" />
+                  رفع صورة
+                </button>
+                <div className="mx-3 h-px bg-[rgba(31,31,29,0.07)]" />
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="flex w-full items-center gap-3 px-4 py-3 text-right text-[14px] font-semibold text-[#1F1F1D] transition hover:bg-[rgba(31,31,29,0.04)]"
+                >
+                  <FileText size={16} className="shrink-0 text-[#6F6A60]" />
+                  رفع ملف
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Send button */}
           <button
             type="submit"
             aria-label="إرسال"
