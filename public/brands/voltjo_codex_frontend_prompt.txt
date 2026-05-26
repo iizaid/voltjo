@@ -1,0 +1,850 @@
+# VoltJo Frontend Landing Page Build Prompt for Codex AI
+
+You are an expert senior frontend engineer and product designer. Your task is to build the first static frontend version of the VoltJo website.
+
+VoltJo is an Arabic-first Jordan-focused Micro SaaS platform for EV and hybrid vehicle intelligence. The platform helps people in Jordan choose the right electric or hybrid car, compare supported models, estimate charging/ownership costs, and use a specialized AI assistant trained/grounded on the cars and market information supported by the platform.
+
+IMPORTANT:
+This task is FRONTEND ONLY.
+Do NOT build backend logic.
+Do NOT build real AI logic.
+Do NOT connect to Supabase.
+Do NOT implement real authentication.
+Do NOT implement real calculator formulas yet.
+Do NOT call APIs.
+Do NOT create database schemas.
+Do NOT create payments.
+Do NOT add placeholder backend complexity.
+Only build the static website pages and UI sections based on the provided visual references.
+
+Use the uploaded reference images as the visual source of truth:
+- `visual identity(2).png` — VoltJo logo, brand identity, color palette, app icon direction.
+- `section 1(12).png` — final hero section with navigation bar and AI/search entry.
+- `section 2(9).png` — supported brands section.
+- `section 3(9).png` — smart calculator / charging cost preview section.
+- `section 4(4).png` — AI assistant explanation section.
+- `section 5(4).png` — final CTA + footer section.
+
+If there is any conflict between this written prompt and the visual references, follow the latest uploaded visual references first.
+
+---
+
+## 1. Project Goal
+
+Build a premium Arabic landing page for VoltJo that looks clean, technical, trustworthy, and highly polished.
+
+The website should feel like a serious Jordanian EV & hybrid intelligence product, not a generic AI-generated landing page.
+
+The design direction is inspired by the Firecrawl style system:
+- White technical SaaS background.
+- Subtle geometric/grid/circuit-like patterns.
+- Clean centered layout.
+- Premium spacing.
+- Strong dark typography.
+- Controlled orange accent.
+- Soft borders.
+- Rounded large containers.
+- Smooth UI details.
+- Minimal but highly intentional sections.
+- No noisy gradients.
+- No generic AI startup clichés.
+
+Do NOT copy Firecrawl branding, text, logos, or exact assets. Only use the structural and visual design language: white technical background, top announcement bar, navigation style, technical grid patterns, smooth cards, subtle borders, and premium SaaS rhythm.
+
+---
+
+## 2. Brand Identity
+
+Use VoltJo as the brand name.
+
+Use the provided visual identity reference:
+`visual identity(2).png`
+
+The logo shown in the visual identity image should be used as the primary navigation logo direction:
+- Black wordmark.
+- Orange accent mark.
+- Clean futuristic automotive-tech feeling.
+- Primary brand colors:
+  - Black: `#0D0D0D`
+  - Energy Orange: `#FF6A00`
+  - White: `#FFFFFF`
+
+Use orange as a controlled accent only. Avoid overusing it.
+
+Suggested extended palette:
+```css
+--voltjo-black: #0D0D0D;
+--voltjo-orange: #FF6A00;
+--voltjo-orange-dark: #D9480F;
+--voltjo-orange-soft: #FFF2EA;
+--voltjo-text: #111111;
+--voltjo-muted: #5F6673;
+--voltjo-border: #E9E9EA;
+--voltjo-border-soft: #F1F1F2;
+--voltjo-bg: #FFFFFF;
+--voltjo-bg-soft: #FAFAFA;
+```
+
+Use black and white as the dominant colors. Orange should guide attention, not dominate the page.
+
+---
+
+## 3. Typography
+
+The visual style should follow Firecrawl-like typography discipline.
+
+If the project already has a font system, use it consistently.
+
+Recommended:
+- For Arabic: use `IBM Plex Sans Arabic`, `Noto Sans Arabic`, or a similarly clean modern Arabic font.
+- For Latin/brand UI: use `Inter`, `SuisseIntl` if locally available, or a clean sans-serif fallback.
+- Do not use decorative Arabic fonts.
+- Do not use default browser fonts.
+- Do not mix too many fonts.
+
+Typography targets:
+- Hero headline on desktop: very large, bold, dark, around 64px–82px depending on viewport.
+- Arabic headline line-height should be tight but readable.
+- Section headlines: 42px–58px.
+- Body text: 17px–20px.
+- Navigation: 15px–17px.
+- Small badges: 13px–15px.
+
+All Arabic text must be RTL and visually balanced.
+
+Use large black text with orange highlights for key words only.
+
+---
+
+## 4. Layout Direction
+
+The public website is Arabic-first and should use RTL layout.
+
+Set:
+```html
+<html lang="ar" dir="rtl">
+```
+
+However, the navigation logo can remain visually on the left side if that matches the reference screenshots. The final visual target is the provided screenshots, not theoretical RTL conventions.
+
+Keep the page centered and spacious.
+
+Use a max-width container similar to Firecrawl:
+- Main page max width: around `1320px` to `1440px`.
+- Sections should not look stretched across the full browser width.
+- Use generous vertical spacing.
+- Use subtle container borders and very light shadows.
+
+---
+
+## 5. Global Background System
+
+Build a reusable background component inspired by the reference images.
+
+The page background should be white with very subtle technical details:
+- Faint grid lines.
+- Light rectangular panel outlines.
+- Small dot clusters.
+- Very faint circuit/charging line motifs.
+- Small orange spark/star accents.
+- Occasional low-opacity EV/charging icons in the background if needed.
+- Background should never distract from content.
+
+Rules:
+- Keep opacity extremely low.
+- Use only light gray and very soft orange.
+- Avoid heavy gradients.
+- Avoid visual noise.
+- Background should feel engineered, calm, and premium.
+- Make it work across all sections as one continuous visual system.
+
+Possible implementation:
+- CSS pseudo-elements.
+- Absolute positioned decorative divs.
+- SVG patterns.
+- Radial gradients with low opacity.
+- Reusable `<TechnicalBackground />` component.
+
+---
+
+## 6. Required Tech Stack
+
+Use:
+- Next.js App Router.
+- TypeScript.
+- Tailwind CSS.
+- React components.
+- shadcn/ui if available.
+- lucide-react for icons if needed.
+- Framer Motion only for subtle entrance/dropdown/marquee animations if already installed or easy to add.
+
+Do not add unnecessary libraries.
+
+The code should be clean, modular, and easy to edit later.
+
+---
+
+## 7. File / Component Structure
+
+Create a clean structure similar to this:
+
+```txt
+app/
+  page.tsx
+  layout.tsx
+  globals.css
+
+components/
+  layout/
+    SiteHeader.tsx
+    AnnouncementBar.tsx
+    SiteFooter.tsx
+    TechnicalBackground.tsx
+
+  sections/
+    HeroSection.tsx
+    SupportedBrandsSection.tsx
+    SmartCalculatorSection.tsx
+    AiAssistantSection.tsx
+    FinalCtaSection.tsx
+
+  ui/
+    Container.tsx
+    Button.tsx
+    Badge.tsx
+    SectionLabel.tsx
+    SoftCard.tsx
+    IconPill.tsx
+
+  brand/
+    VoltJoLogo.tsx
+```
+
+If the project already has a different structure, integrate cleanly without creating duplicate patterns.
+
+---
+
+## 8. Pages to Build Now
+
+Build the landing page at:
+```txt
+/
+```
+
+Also create simple static placeholder pages for navigation links, without full content logic:
+```txt
+/cars
+/compare
+/calculators
+/assistant
+/resources
+/pricing
+/dashboard
+```
+
+The placeholders should share the same header/footer and say that the page is coming soon or show a clean static heading.
+
+Do not implement real dashboard logic yet.
+
+---
+
+## 9. Navigation Bar
+
+Match the navigation style in `section 1(12).png`.
+
+Header structure:
+1. Top orange announcement bar.
+2. Main white navigation bar below it.
+3. Logo on the left side visually.
+4. Arabic nav links across the center.
+5. Bell icon and dashboard button on the right.
+
+Important modifications:
+- Do not include a globe/network icon.
+- Do not include extra random icons.
+- Keep only the bell icon and the dashboard button, as in the latest reference.
+- The dashboard button text should be:
+  `لوحة التحكم`
+- The navigation links should be:
+  - السيارات
+  - المقارنة
+  - الحاسبات
+  - المساعد الذكي
+  - المصادر
+  - الأسعار
+
+Announcement bar Arabic text:
+```txt
+دليل 2024 لامتلاك السيارات الكهربائية والهايبرد في الأردن أصبح متاحًا الآن — قارن تكاليف الشحن والدعم والضمانات.
+```
+
+Announcement bar CTA:
+```txt
+اطلع عليه ←
+```
+
+Navbar style:
+- White.
+- Large rounded rectangle feeling.
+- Very subtle border.
+- Soft shadow.
+- Integrated into background, not floating awkwardly.
+- Spacing should feel premium and exact.
+- Header height should match the visual reference.
+- Keep the navbar calm, clean, and highly readable.
+
+Dropdown behavior:
+For now, do not implement full dropdown logic unless simple static hover menus are easy.
+If implemented, keep it static frontend only.
+No backend.
+No data fetching.
+Dropdown style should follow Firecrawl-like mega-menu: smooth, white, subtle borders, icon + title + short description.
+
+---
+
+## 10. Section 1 — Hero Section
+
+Match `section 1(12).png`.
+
+Design:
+- Centered hero.
+- White technical background.
+- No car image.
+- Large Arabic headline centered.
+- A small pill above the headline.
+- Search/AI input box below.
+- Quick action chips inside the input panel.
+- Small trust indicators below or above the input.
+
+Top pill text:
+```txt
+منصة أردنية للسيارات الكهربائية والهايبريد
+```
+
+Hero headline:
+```txt
+اعرف السيارة الأنسب لك في الأردن
+بثقة وبمعلومات دقيقة
+```
+
+Important:
+- Make the headline large, dark, and premium.
+- The orange highlight should be on:
+  `بثقة وبمعلومات دقيقة`
+- Increase the visual weight of the main text.
+- Use a strong but elegant Arabic font.
+- Text should not look thin.
+
+Hero paragraph:
+```txt
+قارن بين السيارات، احسب تكلفة الشحن، وافهم الدعم والضمان
+والمواصفات قبل الشراء — كل ذلك في مكان واحد مصمم للسوق الأردني.
+```
+
+Trust row:
+```txt
+بيانات موثوقة
+رؤى محلية
+دعم الملكية
+```
+
+Search / AI box placeholder:
+```txt
+اسأل عن سيارة، قارن بين موديلين، أو احسب تكلفة الشحن...
+```
+
+Quick actions:
+```txt
+مقارنة السيارات
+تكلفة الشحن
+اسأل المساعد
+دليل السوق
+```
+
+Small note below:
+```txt
+ابدأ سؤالك الآن — وسيتم نقلك إلى حسابك أو إنشاء حساب لمتابعة داخل المساعد الذكي.
+```
+
+The input box should be visually close to the reference:
+- Large white rounded card.
+- Inner input.
+- Orange action button.
+- Soft shadow.
+- Clean chips.
+- Very subtle border.
+
+No real search logic. The input can be static.
+Clicking buttons can use `href="/assistant"` or `href="/dashboard"`.
+
+---
+
+## 11. Section 2 — Supported Brands
+
+Match `section 2(9).png`.
+
+Purpose:
+Show supported car brands in a small premium section.
+
+Section title:
+```txt
+العلامات المدعومة
+```
+
+Subtitle:
+```txt
+استكشف أشهر السيارات الكهربائية والهايبريد التي يدعمها الموقع في السوق الأردني.
+```
+
+Brands:
+- BYD
+- Dongfeng
+- Changan
+- Toyota
+- Nissan
+- MG
+- Geely
+- Hyundai
+- More support coming soon
+
+Design:
+- Centered compact container.
+- Rounded large white panel.
+- Technical faint background inside.
+- Logo/brand row in the middle.
+- Brand items separated by subtle borders.
+- Very light fade at row edges.
+- Orange tiny separators or dots.
+- Keep section smaller than others.
+- Do not make it full width.
+- Do not overcomplicate.
+
+If actual official logos are not available, use clean text-based brand marks for now.
+Do not use low-quality or distorted logos.
+Use black monochrome brand names if needed.
+
+Motion:
+- If adding animation, make the brand row slowly marquee horizontally.
+- Very subtle, slow, seamless.
+- Pause on hover if possible.
+- No aggressive movement.
+
+Bottom text:
+```txt
+ويتم توسيع الدعم باستمرار
+```
+
+---
+
+## 12. Section 3 — Smart Calculator Preview
+
+Match `section 3(9).png`.
+
+Purpose:
+Show the smart charging/ownership calculator as a real product moment, not as generic feature cards.
+
+Section label:
+```txt
+حاسبة ذكية للتكلفة والتشغيل
+```
+
+Headline:
+```txt
+اعرف التكلفة الحقيقية قبل القرار
+```
+
+Make `الحقيقية` orange.
+
+Subtitle:
+```txt
+اختر السيارة، وطريقة الشحن، وعدد الكيلومترات اليومية — وشاهد تكلفة الشحن،
+تكلفة 100 كم، والتكلفة الشهرية التقريبية حسب استخدامك داخل الأردن.
+```
+
+Main calculator card:
+- Large centered white card.
+- Rounded corners.
+- Soft shadow.
+- Very subtle borders.
+- Inputs row:
+  - السيارة: BYD Song Plus DM-i
+  - المسافة اليومية: 45 كم
+  - الشحن: منزلي
+  - الوقت: خارج الذروة
+
+Result row:
+- تكلفة 100 كم: `0.68 د.أ`
+- التكلفة الشهرية التقريبية: `9.20 د.أ`
+- أفضل خيار للشحن: `منزلي خارج الذروة`
+
+Comparison row:
+- منزلي خارج الذروة: `0.68 د.أ`
+- منزلي وقت الذروة: `1.28 د.أ`
+- محطة عامة: `2.35 د.أ`
+
+Bottom supporting features:
+```txt
+تكلفة 100 كم
+مقارنة بين طرق الشحن
+تقدير شهري واضح
+```
+
+CTA buttons:
+```txt
+جرّب الحاسبة
+قارن بين سيارتين
+```
+
+Important:
+- This is static UI.
+- No formulas.
+- No calculations.
+- No input functionality yet.
+- Make it look like a live product preview.
+- Avoid the generic 3-card SaaS layout.
+- Keep it refined and readable.
+
+---
+
+## 13. Section 4 — AI Assistant Explanation
+
+Match `section 4(4).png`.
+
+Purpose:
+Explain that VoltJo Assistant is not a generic AI chatbot. It is specialized for EV and hybrid cars supported by the platform and grounded in local Jordanian context.
+
+Design:
+- Arabic RTL.
+- Left side: headline + clear explanation + 3 value points.
+- Right side: simplified ChatGPT/Claude-Code-like chat interface preview.
+- The chat UI should feel familiar, calm, and useful.
+- Do NOT make the section too busy.
+- Do NOT add a messy right column.
+- Keep white space.
+- Use a large app-like chat card.
+
+Section label:
+```txt
+المساعد الذكي
+```
+
+Headline:
+```txt
+اسأل عن سيارتك
+بمساعد يفهم السوق الأردني
+```
+
+Paragraph:
+```txt
+ليس مساعدًا عامًا. مساعد VoltJo متخصص في السيارات الكهربائية والهايبريد التي يدعمها الموقع،
+ويعتمد على معلومات محلية تساعدك على فهم الشحن، المقارنة، الدعم، والملكية بثقة.
+```
+
+Value points:
+1.
+Title:
+```txt
+مدرّب على السيارات المدعومة
+```
+Text:
+```txt
+يفهم الموديلات والفئات المنتشرة في السوق الأردني.
+```
+
+2.
+Title:
+```txt
+إجابات مرتبطة بالأردن
+```
+Text:
+```txt
+يعتمد على معلومات محلية حول الشحن، الدعم، الضمان، والاستخدام.
+```
+
+3.
+Title:
+```txt
+أفضل من الذكاء العام لهذه المهمة
+```
+Text:
+```txt
+يركز على أسئلتك الخاصة بالسيارات بدل الإجابات العامة والمشتتة.
+```
+
+Chat preview:
+- Large white app card.
+- Sidebar on the left side inside the app preview if it matches the reference.
+- Top header:
+  - VoltJo logo.
+  - `VoltJo Assistant`
+  - Buttons: `إعدادات`, `مشاركة`, `محادثة جديدة`
+- Example user message:
+```txt
+هل سيارة BYD Song Plus DM-i مناسبة للاستخدام اليومي في الأردن؟
+```
+- Example assistant answer:
+```txt
+نعم، BYD Song Plus DM-i مناسبة جدًا للاستخدام اليومي في الأردن، خاصة إذا كان لديك إمكانية الشحن المنزلي.
+
+• مدى كهربائي مناسب للاستخدام داخل المدن.
+• نظام هايبريد يقلل استهلاك الوقود على الطرق الطويلة.
+• تكلفة تشغيل منخفضة مقارنة بسيارات البنزين.
+
+يمكنني أيضًا مقارنتها مع موديلات أخرى أو تقدير تكلفة الشحن الشهرية بناءً على مكانك.
+```
+
+Suggested chips:
+```txt
+تكلفة الشحن
+مقارنة
+الدعم والضمان
+المشاكل الشائعة
+```
+
+Input placeholder:
+```txt
+اسأل عن سيارتك، الشحن، التكلفة، الدعم...
+```
+
+Footer note:
+```txt
+قد تختلف النتائج حسب البيانات المتاحة — راجع التفاصيل داخل لوحة السيارة.
+```
+
+Critical visual instruction:
+The chat UI should look like a polished AI workspace similar in spirit to ChatGPT / Claude Code:
+- Clean sidebar.
+- Center conversation area.
+- Large input at bottom.
+- Minimal controls.
+- No messy side cards.
+- No excessive icons.
+- No fake futuristic graphics.
+- White, calm, and premium.
+
+---
+
+## 14. Section 5 — Final CTA + Footer
+
+Match `section 5(4).png`.
+
+This section combines a small CTA card and the footer.
+
+CTA card:
+Headline:
+```txt
+جاهز تختار سيارتك بثقة؟
+```
+
+Subtitle:
+```txt
+ابدأ مع مساعد VoltJo الذكي، قارن بين أي سيارتين، أو احسب تكلفة الشحن في الأردن خلال ثوانٍ.
+```
+
+Buttons:
+```txt
+ابدأ الآن
+جرّب الحاسبة
+```
+
+Small trust line:
+```txt
+معلومات محلية موثوقة • بيانات محدثة باستمرار • خصوصيتك محمية
+```
+
+Footer:
+Use VoltJo logo and Arabic description:
+```txt
+منصة أردنية ذكية لتبسيط قرارك في عالم السيارات الكهربائية والهايبريد.
+نقارن، نحسب، ونقدم لك معلومات محلية موثوقة تختار بثقة.
+```
+
+Footer columns:
+Column 1 — المنصة:
+```txt
+السيارات
+المقارنة
+الحاسبات
+المساعد الذكي
+```
+
+Column 2 — الدعم:
+```txt
+تواصل معنا
+الدعم الفني
+اقترح سيارة
+الإبلاغ عن خطأ
+```
+
+Column 3 — المصادر:
+```txt
+الأسعار
+الدليل
+الأسئلة الشائعة
+```
+
+Column 4 — قانوني:
+```txt
+سياسة الخصوصية
+الشروط والأحكام
+```
+
+Social icons:
+- Instagram
+- Facebook
+- LinkedIn
+- Email
+
+Footer bottom badges:
+```txt
+بيانات محلية موثوقة
+تحديثات مستمرة للأسعار والمواصفات
+دعم فريق محلي في الأردن
+```
+
+Legal disclaimer:
+```txt
+جميع الحسابات والمعلومات المعروضة تقديرية لأغراض الإرشاد فقط، وقد تختلف حسب الاستخدام الفعلي وتحديثات الشركات.
+يرجى التحقق من التفاصيل من المصادر الرسمية عند الحاجة.
+```
+
+Copyright:
+```txt
+© 2026 VoltJo. جميع الحقوق محفوظة.
+```
+
+Design:
+- White large rounded footer container.
+- Subtle top CTA card floating above or attached.
+- Same technical background.
+- No dark footer.
+- No heavy background.
+- Keep it elegant and clean.
+
+---
+
+## 15. Interaction & Animation Requirements
+
+Keep interactions subtle:
+- Header links hover: slight color change to orange.
+- Buttons: slight translate or shadow on hover.
+- Cards: very subtle lift.
+- Hero input: glow on focus.
+- Brand row: optional slow marquee.
+- Section entrance: subtle fade-up only.
+
+No exaggerated motion.
+No bouncy animations.
+No neon.
+No purple/blue AI gradients.
+No spinning 3D.
+
+Animation should feel product-grade, not template-like.
+
+---
+
+## 16. Responsiveness
+
+Desktop:
+- Match provided screenshots as closely as possible.
+- Large spacing, centered sections, strong typography.
+
+Tablet:
+- Keep sections stacked gracefully.
+- Hero text remains centered.
+- Calculator card may wrap inputs into two rows.
+- AI assistant section stacks text above chat preview.
+
+Mobile:
+- Arabic RTL.
+- Header becomes mobile menu.
+- Hero headline smaller but still bold.
+- Search box full width.
+- Brand row scrolls horizontally.
+- Calculator preview becomes vertical.
+- AI chat preview simplified.
+- Footer columns stack.
+
+Do not ignore mobile, but desktop visual match is the highest priority for now.
+
+---
+
+## 17. Strict Visual Quality Rules
+
+Do:
+- Use clean white backgrounds.
+- Use subtle borders.
+- Use exact spacing rhythm.
+- Use large confident typography.
+- Use orange only for emphasis.
+- Use RTL Arabic properly.
+- Build with reusable components.
+- Keep the layout premium and calm.
+- Match the uploaded images as closely as possible.
+
+Do NOT:
+- Do not create generic AI SaaS cards.
+- Do not add random gradients.
+- Do not use purple/blue AI colors.
+- Do not add stock illustrations.
+- Do not use a car image unless the section reference explicitly has one.
+- Do not make the website look like a template.
+- Do not use noisy 3D graphics.
+- Do not add backend logic.
+- Do not implement real calculations.
+- Do not implement real auth.
+- Do not connect to APIs.
+- Do not create extra sections beyond the provided ones.
+- Do not change the Arabic copy unless necessary for layout.
+- Do not replace VoltJo with another brand name.
+- Do not use Firecrawl logo or text.
+- Do not use English UI labels on the public Arabic landing page except the VoltJo brand name.
+
+---
+
+## 18. Data / Content Is Static for Now
+
+Use static mock data in arrays where needed.
+
+Example:
+```ts
+const brands = ["BYD", "Dongfeng", "Changan", "Toyota", "Nissan", "MG", "Geely", "Hyundai"];
+```
+
+Example:
+```ts
+const navItems = ["السيارات", "المقارنة", "الحاسبات", "المساعد الذكي", "المصادر", "الأسعار"];
+```
+
+Do not fetch anything.
+
+---
+
+## 19. Implementation Quality
+
+The final code should:
+- Compile successfully.
+- Be clean and readable.
+- Use TypeScript types.
+- Use semantic HTML.
+- Be accessible.
+- Have no console errors.
+- Have no broken imports.
+- Not rely on remote image URLs unless absolutely necessary.
+- Use local assets for the logo if available.
+- If logo assets do not exist yet, create a temporary SVG/text logo component that visually matches the reference until real assets are added.
+
+---
+
+## 20. Final Deliverable
+
+When finished:
+1. Provide a short summary of what you built.
+2. List the files created/changed.
+3. Explain how to run the project.
+4. Mention clearly that all logic is static/mock only.
+5. Do not add backend features.
+
+Your primary goal is visual accuracy and frontend structure.
+
+Build the static VoltJo landing page now, matching the uploaded references section by section.

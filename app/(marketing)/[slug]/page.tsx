@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
-import { Container } from "@/components/ui/Container";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { Container } from "@/components/ui/Container";
 
 const pages = {
   cars: "السيارات",

@@ -367,15 +367,6 @@ input {
   unicode-bidi: plaintext;
 }
 
-.chat-thread-grid {
-  opacity: 0.52;
-  background:
-    linear-gradient(rgba(13, 13, 13, 0.028) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(13, 13, 13, 0.028) 1px, transparent 1px);
-  background-size: 72px 72px;
-  mask-image: linear-gradient(to bottom, #000, transparent 72%);
-}
-
 .brand-marquee-viewport {
   position: relative;
   overflow: hidden;

@@ -1,27 +1,69 @@
 import { ArrowUp, Paperclip } from "lucide-react";
 
-export function ChatComposer() {
+export function ChatComposer({
+  value,
+  onChange,
+  onSubmit,
+  onAttach,
+  onToggleSources,
+  sourcesActive,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  onSubmit: () => void;
+  onAttach: () => void;
+  onToggleSources: () => void;
+  sourcesActive: boolean;
+}) {
   return (
-    <form className="mx-auto w-full max-w-3xl" aria-label="مربع رسالة VoltJo">
-      <div className="rounded-[28px] border border-[var(--voltjo-border)] bg-white p-3 shadow-[0_18px_55px_rgba(13,13,13,0.07)]">
+    <form
+      className="mx-auto w-full max-w-[820px]"
+      aria-label="مربع رسالة VoltJo"
+      onSubmit={(event) => {
+        event.preventDefault();
+        onSubmit();
+      }}
+    >
+      <div className="rounded-[24px] border border-[rgba(31,31,29,0.14)] bg-[#FEFEFC] p-3 shadow-[0_8px_22px_rgba(31,31,29,0.045)] transition focus-within:border-[rgba(31,31,29,0.22)]">
         <textarea
           aria-label="رسالة إلى VoltJo Assistant"
-          className="min-h-20 w-full resize-none bg-transparent px-3 py-2 text-right text-[15px] font-semibold leading-7 text-[var(--voltjo-black)] outline-none placeholder:text-[var(--voltjo-muted)]"
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" && !event.shiftKey) {
+              event.preventDefault();
+              onSubmit();
+            }
+          }}
+          className="min-h-[76px] w-full resize-none bg-transparent px-3 py-2 text-right text-[15px] font-medium leading-7 text-[#1F1F1D] outline-none placeholder:text-[#6F6A60]"
           placeholder="اسأل عن سيارة، تكلفة الشحن، المقارنة، الدعم أو الضمان..."
           rows={2}
         />
-        <div className="flex items-center justify-between gap-3 border-t border-[var(--voltjo-border-soft)] px-1 pt-3">
+        <div className="flex items-center justify-between gap-3 px-1 pt-2">
           <button
             type="button"
             aria-label="إضافة مرفق"
-            className="flex h-10 w-10 items-center justify-center rounded-full text-[var(--voltjo-muted)] transition hover:bg-[rgba(13,13,13,0.045)] hover:text-[var(--voltjo-black)]"
+            onClick={onAttach}
+            className="flex h-9 w-9 items-center justify-center rounded-full text-[#6F6A60] transition hover:bg-[rgba(31,31,29,0.055)] hover:text-[#1F1F1D]"
           >
             <Paperclip size={18} />
           </button>
           <button
             type="button"
+            onClick={onToggleSources}
+            className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+              sourcesActive
+                ? "border-[rgba(255,106,0,0.22)] bg-[rgba(255,106,0,0.08)] text-[#1F1F1D]"
+                : "border-[rgba(31,31,29,0.1)] bg-[#F8F7F4] text-[#6F6A60] hover:bg-white"
+            }`}
+          >
+            مصادر VoltJo
+          </button>
+          <button
+            type="submit"
             aria-label="إرسال"
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--voltjo-black)] text-white transition hover:-translate-y-0.5"
+            disabled={!value.trim()}
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1F1F1D] text-white transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:bg-[#C9C4BA]"
           >
             <ArrowUp size={18} />
           </button>

@@ -1,6 +1,7 @@
 type MessageRole = "assistant" | "user";
 
 export type ChatMessageData = {
+  id: string;
   role: MessageRole;
   content: string;
   bullets?: string[];
@@ -23,13 +24,13 @@ export function ChatMessage({ message }: { message: ChatMessageData }) {
       >
         <p
           className={`text-[15px] font-semibold leading-8 ${
-            isUser ? "text-white" : "text-[var(--voltjo-black)]"
+            isUser ? "text-white" : "text-[#1F1F1D]"
           }`}
         >
           {message.content}
         </p>
         {message.bullets ? (
-          <ul className="mt-4 space-y-2 text-[15px] font-semibold leading-8 text-[var(--voltjo-muted)]">
+          <ul className="mt-4 space-y-2 text-[15px] font-semibold leading-8 text-[#6F6A60]">
             {message.bullets.map((bullet) => (
               <li key={bullet} className="flex gap-2">
                 <span className="mt-3 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--voltjo-orange)]" />

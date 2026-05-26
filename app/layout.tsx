@@ -1,9 +1,6 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Sans_Arabic, Inter } from "next/font/google";
 import "./globals.css";
-import { SiteHeader } from "@/components/layout/SiteHeader";
-import { SiteFooter } from "@/components/layout/SiteFooter";
-import { TechnicalBackground } from "@/components/background/TechnicalBackground";
 
 const ibmPlexArabic = IBM_Plex_Sans_Arabic({
   subsets: ["arabic", "latin"],
@@ -35,16 +32,7 @@ export default function RootLayout({
       dir="rtl"
       className={`${ibmPlexArabic.variable} ${inter.variable}`}
     >
-      <body>
-        <div className="site-shell">
-          <TechnicalBackground />
-          <div className="site-content">
-            <SiteHeader />
-            <main>{children}</main>
-            <SiteFooter />
-          </div>
-        </div>
-      </body>
+      <body>{children}</body>
     </html>
   );
 }
