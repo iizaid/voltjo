@@ -61,7 +61,7 @@ export function Navbar() {
     <div className="px-4 pt-4 sm:px-6 lg:px-8">
       <div ref={navRef} className="relative z-40 mx-auto max-w-[1240px]">
         <nav
-          className="flex h-[72px] items-center justify-between gap-4 rounded-[14px] border border-[var(--voltjo-border)] bg-white/92 px-4 shadow-[0_1px_0_rgba(13,13,13,0.035)] backdrop-blur-xl lg:px-6"
+          className="flex h-[72px] items-center justify-between gap-4 rounded-[8px] border border-[var(--voltjo-border)] bg-white/95 px-4 shadow-none backdrop-blur-sm lg:px-6"
           aria-label="التنقل الرئيسي"
           dir="ltr"
           onMouseEnter={clearCloseTimeout}
@@ -95,8 +95,8 @@ export function Navbar() {
                         current === dropdown ? null : dropdown,
                       )
                     }
-                    className={`inline-flex items-center gap-1.5 rounded-[10px] px-4 py-2 text-[15px] font-bold text-[var(--voltjo-black)] transition hover:bg-[rgba(13,13,13,0.055)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(13,13,13,0.1)] ${
-                      openMenu === dropdown ? "bg-[rgba(13,13,13,0.055)]" : ""
+                    className={`inline-flex items-center gap-1.5 rounded-[6px] px-3 py-2 text-[14px] font-bold text-[var(--voltjo-black)] transition hover:bg-[rgba(13,13,13,0.04)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(13,13,13,0.1)] ${
+                      openMenu === dropdown ? "bg-[rgba(13,13,13,0.06)]" : ""
                     }`}
                   >
                     {item.label}
@@ -118,7 +118,7 @@ export function Navbar() {
                   onMouseEnter={() => setOpenMenu(null)}
                   onPointerEnter={() => setOpenMenu(null)}
                   onClick={() => setOpenMenu(null)}
-                  className="rounded-[10px] px-4 py-2 text-[15px] font-bold text-[var(--voltjo-black)] transition hover:bg-[rgba(13,13,13,0.055)]"
+                  className="rounded-[6px] px-3 py-2 text-[14px] font-bold text-[var(--voltjo-black)] transition hover:bg-[rgba(13,13,13,0.04)]"
                 >
                   {item.label}
                 </Link>
@@ -130,7 +130,7 @@ export function Navbar() {
             <Link
               href="/dashboard"
               onClick={() => setOpenMenu(null)}
-              className="flex h-11 items-center rounded-full bg-[var(--voltjo-black)] px-5 text-sm font-black on-dark-fg transition hover:-translate-y-0.5"
+              className="flex h-10 items-center rounded-[8px] bg-[var(--voltjo-black)] px-4 text-sm font-bold text-white transition hover:bg-[rgba(13,13,13,0.8)]"
             >
               لوحة التحكم
             </Link>
@@ -138,40 +138,40 @@ export function Navbar() {
               href="/resources"
               aria-label="التنبيهات"
               onClick={() => setOpenMenu(null)}
-              className="flex h-11 w-11 items-center justify-center rounded-full border border-[var(--voltjo-border)] bg-white text-[var(--voltjo-black)] transition hover:bg-[rgba(13,13,13,0.045)]"
+              className="flex h-10 w-10 items-center justify-center rounded-[8px] border border-[var(--voltjo-border)] bg-white text-[var(--voltjo-black)] transition hover:bg-[rgba(13,13,13,0.04)]"
             >
               <Bell size={18} />
             </Link>
           </div>
 
           <details className="group lg:hidden" dir="rtl">
-            <summary className="flex h-11 w-11 cursor-pointer list-none items-center justify-center rounded-full border border-[var(--voltjo-border)] bg-white text-[var(--voltjo-black)] marker:hidden">
-              <Menu className="group-open:hidden" size={21} />
-              <X className="hidden group-open:block" size={21} />
+            <summary className="flex h-10 w-10 cursor-pointer list-none items-center justify-center rounded-[8px] border border-[var(--voltjo-border)] bg-white text-[var(--voltjo-black)] marker:hidden">
+              <Menu className="group-open:hidden" size={20} />
+              <X className="hidden group-open:block" size={20} />
             </summary>
-            <div className="absolute left-4 right-4 top-[calc(100%+12px)] rounded-[26px] border border-[var(--voltjo-border)] bg-white p-3 shadow-[0_22px_70px_rgba(13,13,13,0.12)]">
+            <div className="absolute left-4 right-4 top-[calc(100%+8px)] rounded-[12px] border border-[var(--voltjo-border)] bg-white p-2 shadow-[0_12px_40px_rgba(13,13,13,0.1)]">
               <div className="grid gap-1">
                 {navItems.map((item) => (
                   <Link
                     key={item.href}
                     href={item.href}
-                    className="rounded-2xl px-4 py-3 text-base font-bold text-[var(--voltjo-black)] hover:bg-[rgba(13,13,13,0.045)]"
+                    className="rounded-[8px] px-4 py-3 text-sm font-bold text-[var(--voltjo-black)] hover:bg-[rgba(13,13,13,0.04)]"
                   >
                     {item.label}
                   </Link>
                 ))}
               </div>
-              <div className="mt-3 flex gap-2 border-t border-[var(--voltjo-border-soft)] pt-3">
+              <div className="mt-2 flex gap-2 border-t border-[var(--voltjo-border-soft)] pt-2">
                 <Link
                   href="/dashboard"
-                  className="flex flex-1 items-center justify-center rounded-full bg-[var(--voltjo-black)] px-5 py-3 text-sm font-black on-dark-fg"
+                  className="flex flex-1 items-center justify-center rounded-[8px] bg-[var(--voltjo-black)] px-4 py-2.5 text-sm font-bold text-white"
                 >
                   لوحة التحكم
                 </Link>
                 <Link
                   href="/resources"
                   aria-label="التنبيهات"
-                  className="flex h-12 w-12 items-center justify-center rounded-full border border-[var(--voltjo-border)]"
+                  className="flex w-10 items-center justify-center rounded-[8px] border border-[var(--voltjo-border)]"
                 >
                   <Bell size={18} />
                 </Link>
@@ -182,7 +182,7 @@ export function Navbar() {
 
         {activeColumns ? (
           <div
-            className="absolute left-0 right-0 top-full mt-1 hidden lg:block"
+            className="absolute left-0 right-0 top-full hidden lg:block"
             onMouseEnter={clearCloseTimeout}
             onMouseLeave={scheduleCloseDropdown}
             onPointerEnter={clearCloseTimeout}
