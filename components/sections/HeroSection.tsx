@@ -3,6 +3,7 @@ import { ArrowUpLeft, Search } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
+import { HeroHeadlineTextType } from "@/components/ui/HeroHeadlineTextType";
 
 const trustItems = ["بيانات موثوقة", "رؤى محلية", "دعم للملكية"];
 const quickActions = ["مقارنة السيارات", "تكلفة الشحن", "اسأل المساعد", "دليل السوق"];
@@ -14,13 +15,7 @@ export function HeroSection() {
         <div className="technical-panel mx-auto max-w-6xl rounded-[42px] px-2 py-10 text-center sm:px-8 lg:px-12">
           <div className="fade-up">
             <Badge>منصة أردنية للسيارات الكهربائية والهايبرد</Badge>
-            <h1 className="mx-auto mt-6 max-w-5xl text-balance text-[42px] font-bold leading-[1.28] tracking-normal text-[var(--voltjo-black)] sm:text-[62px] lg:text-[70px]">
-              اعرف السيارة الأنسب لك في الأردن
-              <br />
-              <span className="orange-highlight block pt-1 sm:pt-2">
-                بثقة وبمعلومات دقيقة
-              </span>
-            </h1>
+            <HeroHeadlineTextType />
             <p className="mx-auto mt-5 max-w-3xl text-lg font-medium leading-9 text-[var(--voltjo-muted)] sm:text-xl">
               قارن بين السيارات، احسب تكلفة الشحن، وافهم الدعم والضمان
               والمواصفات قبل الشراء — كل ذلك في مكان واحد مصمم للسوق الأردني.

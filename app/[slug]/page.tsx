@@ -7,7 +7,6 @@ const pages = {
   cars: "السيارات",
   compare: "المقارنة",
   calculators: "الحاسبات",
-  assistant: "المساعد الذكي",
   resources: "المصادر",
   pricing: "الأسعار",
   dashboard: "لوحة التحكم",

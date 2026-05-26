@@ -10,6 +10,27 @@ import { megaMenus, navItems, type DropdownKey } from "@/data/navigation";
 export function Navbar() {
   const [openMenu, setOpenMenu] = useState<DropdownKey | null>(null);
   const navRef = useRef<HTMLDivElement>(null);
+  const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const clearCloseTimeout = () => {
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current);
+      closeTimeoutRef.current = null;
+    }
+  };
+
+  const openDropdown = (dropdown: DropdownKey) => {
+    clearCloseTimeout();
+    setOpenMenu(dropdown);
+  };
+
+  const scheduleCloseDropdown = () => {
+    clearCloseTimeout();
+    closeTimeoutRef.current = setTimeout(() => {
+      setOpenMenu(null);
+      closeTimeoutRef.current = null;
+    }, 120);
+  };
 
   useEffect(() => {
     function handlePointerDown(event: PointerEvent) {
@@ -28,6 +49,7 @@ export function Navbar() {
     document.addEventListener("keydown", handleKeyDown);
 
     return () => {
+      clearCloseTimeout();
       document.removeEventListener("pointerdown", handlePointerDown);
       document.removeEventListener("keydown", handleKeyDown);
     };
@@ -39,9 +61,13 @@ export function Navbar() {
     <div className="px-4 pt-4 sm:px-6 lg:px-8">
       <div ref={navRef} className="relative z-40 mx-auto max-w-[1240px]">
         <nav
-          className="flex h-[76px] items-center justify-between gap-4 rounded-[28px] border border-[var(--voltjo-border)] bg-white/92 px-4 shadow-[0_18px_50px_rgba(13,13,13,0.07)] backdrop-blur-xl lg:h-[82px] lg:px-6"
+          className="flex h-[72px] items-center justify-between gap-4 rounded-[14px] border border-[var(--voltjo-border)] bg-white/92 px-4 shadow-[0_1px_0_rgba(13,13,13,0.035)] backdrop-blur-xl lg:px-6"
           aria-label="التنقل الرئيسي"
           dir="ltr"
+          onMouseEnter={clearCloseTimeout}
+          onMouseLeave={scheduleCloseDropdown}
+          onPointerEnter={clearCloseTimeout}
+          onPointerLeave={scheduleCloseDropdown}
         >
           <div className="shrink-0" dir="ltr">
             <VoltJoLogo />
@@ -61,6 +87,9 @@ export function Navbar() {
                     type="button"
                     aria-expanded={openMenu === dropdown}
                     aria-haspopup="true"
+                    onMouseEnter={() => openDropdown(dropdown)}
+                    onPointerEnter={() => openDropdown(dropdown)}
+                    onFocus={() => openDropdown(dropdown)}
                     onClick={() =>
                       setOpenMenu((current) =>
                         current === dropdown ? null : dropdown,
@@ -86,6 +115,8 @@ export function Navbar() {
                 <Link
                   key={item.href}
                   href={item.href}
+                  onMouseEnter={() => setOpenMenu(null)}
+                  onPointerEnter={() => setOpenMenu(null)}
                   onClick={() => setOpenMenu(null)}
                   className="rounded-[10px] px-4 py-2 text-[15px] font-bold text-[var(--voltjo-black)] transition hover:bg-[rgba(13,13,13,0.055)]"
                 >
@@ -150,7 +181,13 @@ export function Navbar() {
         </nav>
 
         {activeColumns ? (
-          <div className="absolute left-0 right-0 top-full mt-2 hidden lg:block">
+          <div
+            className="absolute left-0 right-0 top-full mt-1 hidden lg:block"
+            onMouseEnter={clearCloseTimeout}
+            onMouseLeave={scheduleCloseDropdown}
+            onPointerEnter={clearCloseTimeout}
+            onPointerLeave={scheduleCloseDropdown}
+          >
             <MegaMenu key={openMenu} columns={activeColumns} />
           </div>
         ) : null}
