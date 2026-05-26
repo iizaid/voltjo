@@ -79,17 +79,17 @@ input {
 .tech-grid {
   position: absolute;
   inset: 0;
-  opacity: 0.96;
+  opacity: 1;
   background:
-    linear-gradient(rgba(13, 13, 13, 0.048) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(13, 13, 13, 0.048) 1px, transparent 1px);
+    linear-gradient(rgba(13, 13, 13, 0.064) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(13, 13, 13, 0.064) 1px, transparent 1px);
   background-size: 104px 104px;
 }
 
 .tech-glow {
   position: absolute;
   border-radius: 999px;
-  background: radial-gradient(circle, rgba(255, 106, 0, 0.048), transparent 68%);
+  background: radial-gradient(circle, rgba(255, 106, 0, 0.062), transparent 68%);
 }
 
 .tech-glow-a {
@@ -108,10 +108,10 @@ input {
 
 .tech-bg-panel {
   position: absolute;
-  border: 1px solid rgba(13, 13, 13, 0.075);
+  border: 1px solid rgba(13, 13, 13, 0.095);
   border-radius: 24px;
-  opacity: 0.64;
-  background: rgba(255, 255, 255, 0.28);
+  opacity: 0.76;
+  background: rgba(255, 255, 255, 0.18);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
 }
 
@@ -119,7 +119,7 @@ input {
   content: "";
   position: absolute;
   inset: 18px 22px;
-  border: 1px solid rgba(13, 13, 13, 0.058);
+  border: 1px solid rgba(13, 13, 13, 0.075);
   border-radius: 16px;
 }
 
@@ -130,8 +130,8 @@ input {
   border-radius: inherit;
   opacity: 0.75;
   background:
-    linear-gradient(rgba(13, 13, 13, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(13, 13, 13, 0.032) 1px, transparent 1px);
+    linear-gradient(rgba(13, 13, 13, 0.046) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(13, 13, 13, 0.042) 1px, transparent 1px);
   background-size: 32px 32px;
 }
 
@@ -174,8 +174,8 @@ input {
   position: absolute;
   width: 174px;
   height: 104px;
-  opacity: 0.18;
-  background-image: radial-gradient(circle, rgba(13, 13, 13, 0.32) 1px, transparent 1.4px);
+  opacity: 0.25;
+  background-image: radial-gradient(circle, rgba(13, 13, 13, 0.36) 1px, transparent 1.4px);
   background-size: 14px 14px;
 }
 
@@ -203,7 +203,7 @@ input {
   position: absolute;
   width: 210px;
   height: 1px;
-  background: rgba(13, 13, 13, 0.062);
+  background: rgba(13, 13, 13, 0.082);
 }
 
 .tech-bg-circuit::before,
@@ -214,7 +214,7 @@ input {
   top: -3px;
   width: 7px;
   height: 7px;
-  border: 1px solid rgba(13, 13, 13, 0.09);
+  border: 1px solid rgba(13, 13, 13, 0.12);
   border-radius: 999px;
   background: #fff;
 }
@@ -258,14 +258,14 @@ input {
   position: absolute;
   width: 12px;
   height: 12px;
-  opacity: 0.68;
+  opacity: 0.78;
 }
 
 .tech-bg-marker::before,
 .tech-bg-marker::after {
   content: "";
   position: absolute;
-  background: rgba(255, 106, 0, 0.55);
+  background: rgba(255, 106, 0, 0.68);
   border-radius: 999px;
 }
 
@@ -319,10 +319,10 @@ input {
   inset: 0;
   z-index: -1;
   border-radius: inherit;
-  opacity: 0.56;
+  opacity: 0.68;
   background:
-    linear-gradient(to right, rgba(13, 13, 13, 0.035) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(13, 13, 13, 0.032) 1px, transparent 1px);
+    linear-gradient(to right, rgba(13, 13, 13, 0.048) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(13, 13, 13, 0.044) 1px, transparent 1px);
   background-size: 52px 52px;
   mask-image: radial-gradient(circle at center, #000 0%, transparent 78%);
 }

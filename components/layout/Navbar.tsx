@@ -128,18 +128,11 @@ export function Navbar() {
 
           <div className="hidden shrink-0 items-center gap-2 lg:flex" dir="rtl">
             <Link
-              href="/login"
-              onClick={() => setOpenMenu(null)}
-              className="flex h-10 items-center justify-center rounded-[8px] px-4 text-sm font-bold text-[var(--voltjo-black)] transition hover:bg-[rgba(13,13,13,0.04)]"
-            >
-              تسجيل الدخول
-            </Link>
-            <Link
-              href="/signup"
+              href="/start"
               onClick={() => setOpenMenu(null)}
               className="flex h-10 items-center justify-center rounded-[8px] bg-[var(--voltjo-orange)] px-5 text-sm font-bold text-[#FFFFFF] transition hover:bg-[#e85e00] hover:-translate-y-0.5 shadow-sm hover:shadow-md"
             >
-              إنشاء حساب
+              ابدأ الآن
             </Link>
           </div>
 
@@ -162,16 +155,10 @@ export function Navbar() {
               </div>
               <div className="mt-2 flex flex-col gap-2 border-t border-[var(--voltjo-border-soft)] pt-3">
                 <Link
-                  href="/signup"
+                  href="/start"
                   className="flex w-full items-center justify-center rounded-[8px] bg-[var(--voltjo-orange)] px-4 py-2.5 text-sm font-bold text-[#FFFFFF] transition hover:bg-[#e85e00]"
                 >
-                  إنشاء حساب
-                </Link>
-                <Link
-                  href="/login"
-                  className="flex w-full items-center justify-center rounded-[8px] border border-[var(--voltjo-border)] bg-[#FCFCFA] px-4 py-2.5 text-sm font-bold text-[var(--voltjo-black)] transition hover:bg-white hover:border-[var(--voltjo-border-strong)]"
-                >
-                  تسجيل الدخول
+                  ابدأ الآن
                 </Link>
               </div>
             </div>
