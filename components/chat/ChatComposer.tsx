@@ -7,6 +7,7 @@ export function ChatComposer({
   onAttach,
   onToggleSources,
   sourcesActive,
+  isLoading,
 }: {
   value: string;
   onChange: (value: string) => void;
@@ -14,6 +15,7 @@ export function ChatComposer({
   onAttach: () => void;
   onToggleSources: () => void;
   sourcesActive: boolean;
+  isLoading?: boolean;
 }) {
   return (
     <form
@@ -62,8 +64,8 @@ export function ChatComposer({
           <button
             type="submit"
             aria-label="إرسال"
-            disabled={!value.trim()}
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1F1F1D] text-white transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:bg-[#C9C4BA]"
+            disabled={!value.trim() || isLoading}
+            className={`flex h-9 w-9 items-center justify-center rounded-full bg-[#1F1F1D] text-white transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:bg-[#C9C4BA] ${isLoading ? "animate-pulse" : ""}`}
           >
             <ArrowUp size={18} />
           </button>

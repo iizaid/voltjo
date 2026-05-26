@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { ChatSidebar } from "@/components/chat/ChatSidebar";
 import { ChatThread } from "@/components/chat/ChatThread";
-import type { ChatMessageData } from "@/components/chat/ChatMessage";
+import { simulateChatResponse } from "@/lib/chat/mock-chat";
+import type { ChatMessageData } from "@/lib/chat/types";
 
 const categoryPrompts: Record<string, string> = {
   السيارات: "اعطني لمحة عن السيارات الكهربائية والهايبرد المناسبة للأردن.",
@@ -22,22 +23,6 @@ const conversationPrompts: Record<string, string> = {
     "ما أفضل سيارة هايبرد للاستخدام اليومي في الأردن؟",
 };
 
-function createAssistantReply(prompt: string): ChatMessageData {
-  return {
-    id: `assistant-${Date.now()}`,
-    role: "assistant",
-    content:
-      "نعم، أقدر أساعدك. أعطني اسم السيارة أو الموديل، وسأوضح لك تكلفة الشحن، مدى ملاءمتها للاستخدام اليومي، وأهم نقاط المقارنة داخل السوق الأردني.",
-    bullets: [
-      "أقارن لك التكلفة والمدى وطريقة الشحن.",
-      "أوضح نقاط الدعم والضمان حسب المعلومات المتاحة.",
-      prompt.includes("تكلفة") || prompt.includes("شحن")
-        ? "أستطيع تجهيز تقدير ثابت للتكلفة عند توفر بيانات الاستخدام."
-        : "الأفضل دائمًا مقارنة السعر والدعم والضمان قبل الشراء.",
-    ],
-  };
-}
-
 export function ChatShell() {
   const [messages, setMessages] = useState<ChatMessageData[]>([]);
   const [composerValue, setComposerValue] = useState("");
@@ -46,10 +31,12 @@ export function ChatShell() {
   const [sourcesActive, setSourcesActive] = useState(true);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
 
-  const submitPrompt = (prompt: string) => {
+  const submitPrompt = async (prompt: string) => {
     const trimmedPrompt = prompt.trim();
-    if (!trimmedPrompt) return;
+    if (!trimmedPrompt || isLoading) return;
 
     const userMessage: ChatMessageData = {
       id: `user-${Date.now()}`,
@@ -57,14 +44,25 @@ export function ChatShell() {
       content: trimmedPrompt,
     };
 
-    setMessages([userMessage, createAssistantReply(trimmedPrompt)]);
+    setMessages((prev) => [...prev, userMessage]);
     setComposerValue("");
-    setNotice(
-      sourcesActive
-        ? "تم إنشاء رد تجريبي ثابت اعتمادًا على واجهة VoltJo فقط."
-        : "تم إنشاء رد تجريبي ثابت. مصادر VoltJo غير محددة في هذا النموذج.",
-    );
+    setIsLoading(true);
+    setError(null);
     setMobileSidebarOpen(false);
+
+    try {
+      const response = await simulateChatResponse(trimmedPrompt);
+      setMessages((prev) => [...prev, response]);
+      setNotice(
+        sourcesActive
+          ? "تم إنشاء رد تجريبي ثابت اعتمادًا على واجهة VoltJo فقط."
+          : "تم إنشاء رد تجريبي ثابت. مصادر VoltJo غير محددة في هذا النموذج.",
+      );
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error("حدث خطأ غير متوقع."));
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleNavAction = (label: string) => {
@@ -144,6 +142,8 @@ export function ChatShell() {
           );
         }}
         onOpenSidebar={() => setMobileSidebarOpen(true)}
+        isLoading={isLoading}
+        error={error}
       />
     </div>
   );

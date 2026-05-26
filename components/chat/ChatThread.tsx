@@ -1,7 +1,8 @@
 import { ChatTopBar } from "@/components/chat/ChatTopBar";
 import { ChatWelcome } from "@/components/chat/ChatWelcome";
 import { ChatComposer } from "@/components/chat/ChatComposer";
-import { ChatMessage, type ChatMessageData } from "@/components/chat/ChatMessage";
+import { ChatMessage } from "@/components/chat/ChatMessage";
+import type { ChatMessageData } from "@/lib/chat/types";
 
 export function ChatThread({
   messages,
@@ -14,6 +15,8 @@ export function ChatThread({
   onAttach,
   onToggleSources,
   onOpenSidebar,
+  isLoading,
+  error,
 }: {
   messages: ChatMessageData[];
   composerValue: string;
@@ -25,6 +28,8 @@ export function ChatThread({
   onAttach: () => void;
   onToggleSources: () => void;
   onOpenSidebar: () => void;
+  isLoading?: boolean;
+  error?: Error | null;
 }) {
   const hasMessages = messages.length > 0;
 
@@ -45,6 +50,20 @@ export function ChatThread({
                 {messages.map((message) => (
                   <ChatMessage key={message.id} message={message} />
                 ))}
+                {isLoading && (
+                  <div className="flex w-full justify-start">
+                    <div className="max-w-[min(760px,92%)] px-2 py-2 text-right">
+                      <p className="animate-pulse text-[15px] font-semibold leading-8 text-[#6F6A60]">
+                        جاري التفكير...
+                      </p>
+                    </div>
+                  </div>
+                )}
+                {error && (
+                  <div className="mx-auto mt-2 max-w-md rounded-xl bg-red-50 p-4 text-center text-sm font-semibold text-red-600">
+                    {error.message}
+                  </div>
+                )}
               </div>
             </div>
             <div className="mx-auto w-full max-w-[920px] bg-gradient-to-t from-[#F8F7F4] via-[#F8F7F4] to-transparent pb-5 pt-5">
@@ -55,6 +74,7 @@ export function ChatThread({
                 onAttach={onAttach}
                 onToggleSources={onToggleSources}
                 sourcesActive={sourcesActive}
+                isLoading={isLoading}
               />
               {notice ? (
                 <p className="mx-auto mt-3 max-w-[820px] text-center text-xs font-medium text-[#6F6A60]">

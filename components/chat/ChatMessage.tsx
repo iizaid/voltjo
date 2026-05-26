@@ -1,11 +1,4 @@
-type MessageRole = "assistant" | "user";
-
-export type ChatMessageData = {
-  id: string;
-  role: MessageRole;
-  content: string;
-  bullets?: string[];
-};
+import type { ChatMessageData } from "@/lib/chat/types";
 
 export function ChatMessage({ message }: { message: ChatMessageData }) {
   const isUser = message.role === "user";
