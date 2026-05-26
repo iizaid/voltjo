@@ -1,5 +1,12 @@
 export type ChatRole = "user" | "assistant" | "system";
 
+export interface ChatAttachment {
+  id: string;
+  name: string;
+  size: number;
+  type: string;
+}
+
 export interface ChatMessage {
   id: string;
   role: ChatRole;
@@ -7,7 +14,7 @@ export interface ChatMessage {
   bullets?: string[];
   createdAt: string;
   status?: "sending" | "streaming" | "done" | "error";
-  attachmentName?: string;
+  attachment?: ChatAttachment;
 }
 
 export type ChatCategory = "السيارات" | "الشحن" | "المقارنة" | "الحاسبات" | "الدعم والضمان" | "عام";

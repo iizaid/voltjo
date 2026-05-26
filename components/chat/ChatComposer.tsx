@@ -1,25 +1,37 @@
 "use client";
 
 import { ArrowUp, Paperclip, X } from "lucide-react";
-import { useState, useRef } from "react";
+import { useRef } from "react";
+import type { ChatAttachment } from "@/lib/chat/types";
 
 export function ChatComposer({
   value,
   onChange,
   onSubmit,
   isLoading,
+  attachment,
+  onAttachmentChange,
 }: {
   value: string;
   onChange: (value: string) => void;
-  onSubmit: (text: string, attachmentName?: string) => void;
+  onSubmit: (text: string) => void;
   isLoading?: boolean;
+  attachment?: ChatAttachment | null;
+  onAttachmentChange?: (att: ChatAttachment | null) => void;
 }) {
-  const [attachment, setAttachment] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSubmit = () => {
-    onSubmit(value, attachment?.name);
-    setAttachment(null);
+    onSubmit(value);
+  };
+
+  const handleFileSelect = (file: File) => {
+    onAttachmentChange?.({
+      id: `att-${Date.now()}`,
+      name: file.name,
+      size: file.size,
+      type: file.type,
+    });
   };
 
   return (
@@ -38,7 +50,7 @@ export function ChatComposer({
             <span dir="ltr">{attachment.name}</span>
             <button
               type="button"
-              onClick={() => setAttachment(null)}
+              onClick={() => onAttachmentChange?.(null)}
               className="ml-1 rounded-full p-0.5 hover:bg-black/10"
               aria-label="إزالة المرفق"
             >
@@ -67,7 +79,7 @@ export function ChatComposer({
             className="hidden"
             onChange={(e) => {
               if (e.target.files && e.target.files[0]) {
-                setAttachment(e.target.files[0]);
+                handleFileSelect(e.target.files[0]);
               }
             }}
           />

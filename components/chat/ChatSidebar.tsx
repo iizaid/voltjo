@@ -8,15 +8,21 @@ import {
   MessageSquarePlus,
   Search,
   X,
+  BatteryCharging,
+  Trash2,
+  Download,
+  Settings,
 } from "lucide-react";
 import { VoltJoLogo } from "@/components/brand/VoltJoLogo";
 import type { ChatConversation, ChatCategory } from "@/lib/chat/types";
+import { useState } from "react";
 
 const navItems = [
   { label: "محادثة جديدة", icon: MessageSquarePlus },
   { label: "بحث", icon: Search },
   { label: "المحادثات", icon: Clock3 },
   { label: "السيارات", icon: Car },
+  { label: "الشحن", icon: BatteryCharging },
   { label: "المقارنة", icon: GitCompare },
   { label: "الحاسبات", icon: Calculator },
   { label: "الدعم والضمان", icon: BadgeCheck },
@@ -31,6 +37,10 @@ export function ChatSidebar({
   conversations,
   activeId,
   onSelectConversation,
+  onDeleteConversation,
+  onRenameConversation,
+  onClearConversations,
+  onExportConversations,
   searchQuery,
   onSearchChange,
   selectedCategory,
@@ -44,11 +54,17 @@ export function ChatSidebar({
   conversations: ChatConversation[];
   activeId: string | null;
   onSelectConversation: (id: string) => void;
+  onDeleteConversation: (id: string) => void;
+  onRenameConversation: (id: string) => void;
+  onClearConversations: () => void;
+  onExportConversations: () => void;
   searchQuery: string;
   onSearchChange: (q: string) => void;
   selectedCategory: ChatCategory | "all";
   searchInputRef: React.RefObject<HTMLInputElement | null>;
 }) {
+  const [accountMenuOpen, setAccountMenuOpen] = useState(false);
+
   const visibleConversations = conversations
     .filter((c) => selectedCategory === "all" || c.category === selectedCategory)
     .filter(
@@ -131,18 +147,31 @@ export function ChatSidebar({
             <p className="px-3 text-xs font-bold text-[#6F6A60] mb-3">الأخيرة</p>
             <div className="grid gap-1">
               {visibleConversations.map((conversation) => (
-                <button
-                  key={conversation.id}
-                  type="button"
-                  onClick={() => onSelectConversation(conversation.id)}
-                  className={`rounded-lg px-3 py-2 text-right text-sm font-semibold leading-6 transition ${
-                    activeId === conversation.id
-                      ? "bg-[rgba(31,31,29,0.08)] text-[#1F1F1D]"
-                      : "text-[#34302A] hover:bg-[rgba(255,255,255,0.72)]"
-                  }`}
-                >
-                  {conversation.title}
-                </button>
+                <div key={conversation.id} className="group relative flex items-center w-full">
+                  <button
+                    type="button"
+                    onDoubleClick={() => onRenameConversation(conversation.id)}
+                    onClick={() => onSelectConversation(conversation.id)}
+                    className={`flex-1 overflow-hidden truncate rounded-lg px-3 py-2 text-right text-sm font-semibold leading-6 transition ${
+                      activeId === conversation.id
+                        ? "bg-[rgba(31,31,29,0.08)] text-[#1F1F1D]"
+                        : "text-[#34302A] hover:bg-[rgba(255,255,255,0.72)]"
+                    }`}
+                  >
+                    {conversation.title}
+                  </button>
+                  <button
+                    type="button"
+                    aria-label="حذف المحادثة"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDeleteConversation(conversation.id);
+                    }}
+                    className="absolute left-2 hidden p-1 text-[#6F6A60] transition hover:text-red-500 group-hover:block"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
               ))}
             </div>
           </>
@@ -150,35 +179,74 @@ export function ChatSidebar({
           <p className="px-3 py-2 text-sm font-medium text-[#6F6A60]">
             لا توجد نتائج مطابقة.
           </p>
+        ) : !collapsed ? (
+          <p className="px-3 py-2 text-sm font-medium text-[#6F6A60]">
+            لا توجد محادثات ضمن هذا التصنيف بعد.
+          </p>
         ) : null}
       </div>
 
-      <div className="mt-5 flex items-center justify-between rounded-xl px-2 py-2">
-        <div className="flex items-center gap-3">
-          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1F1F1D] text-sm font-black text-white">
-            V
-          </span>
-          {!collapsed ? (
-            <span>
-              <span className="block text-sm font-bold text-[#1F1F1D]">
-                حساب VoltJo
-              </span>
-              <span className="block text-xs font-semibold text-[#6F6A60]">
-                نسخة تجريبية
-              </span>
+      <div className="relative mt-5">
+        {accountMenuOpen && !collapsed && (
+          <div className="absolute bottom-16 right-0 z-50 w-full rounded-xl border border-[rgba(31,31,29,0.1)] bg-[#FEFEFC] p-2 shadow-lg">
+            <button
+              onClick={() => {
+                setAccountMenuOpen(false);
+                onNavAction("الإعدادات");
+              }}
+              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-[#1F1F1D] hover:bg-[rgba(31,31,29,0.055)]"
+            >
+              <Settings size={15} /> الإعدادات
+            </button>
+            <button
+              onClick={() => {
+                setAccountMenuOpen(false);
+                onExportConversations();
+              }}
+              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-[#1F1F1D] hover:bg-[rgba(31,31,29,0.055)]"
+            >
+              <Download size={15} /> تصدير المحادثات
+            </button>
+            <button
+              onClick={() => {
+                setAccountMenuOpen(false);
+                onClearConversations();
+              }}
+              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50"
+            >
+              <Trash2 size={15} /> مسح المحادثات
+            </button>
+          </div>
+        )}
+        <div className="flex items-center justify-between rounded-xl px-2 py-2">
+          <div className="flex items-center gap-3">
+            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1F1F1D] text-sm font-black text-white">
+              V
             </span>
+            {!collapsed ? (
+              <span>
+                <span className="block text-sm font-bold text-[#1F1F1D]">
+                  حساب VoltJo
+                </span>
+                <span className="block text-xs font-semibold text-[#6F6A60]">
+                  نسخة تجريبية
+                </span>
+              </span>
+            ) : null}
+          </div>
+          {!collapsed ? (
+            <button
+              type="button"
+              aria-label="إعدادات الحساب"
+              onClick={() => setAccountMenuOpen(!accountMenuOpen)}
+              className={`h-8 w-8 rounded-lg text-[#6F6A60] transition hover:bg-[rgba(31,31,29,0.055)] ${
+                accountMenuOpen ? "bg-[rgba(31,31,29,0.055)]" : ""
+              }`}
+            >
+              •••
+            </button>
           ) : null}
         </div>
-        {!collapsed ? (
-          <button
-            type="button"
-            aria-label="إعدادات الحساب"
-            onClick={() => onNavAction("الإعدادات")}
-            className="h-8 w-8 rounded-lg text-[#6F6A60] transition hover:bg-[rgba(31,31,29,0.055)]"
-          >
-            •••
-          </button>
-        ) : null}
       </div>
     </aside>
   );
