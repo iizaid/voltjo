@@ -1,6 +1,7 @@
-import type { ChatMessageData } from "@/lib/chat/types";
+import { Paperclip } from "lucide-react";
+import type { ChatMessage as ChatMessageType } from "@/lib/chat/types";
 
-export function ChatMessage({ message }: { message: ChatMessageData }) {
+export function ChatMessage({ message }: { message: ChatMessageType }) {
   const isUser = message.role === "user";
 
   return (
@@ -15,6 +16,12 @@ export function ChatMessage({ message }: { message: ChatMessageData }) {
             : "px-2 py-2 text-[var(--voltjo-black)]"
         }`}
       >
+        {message.attachmentName && (
+          <div className={`mb-3 flex w-max items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold ${isUser ? "bg-white/10 text-white" : "bg-[rgba(31,31,29,0.06)] text-[#1F1F1D]"}`}>
+            <Paperclip size={14} />
+            <span dir="ltr">{message.attachmentName}</span>
+          </div>
+        )}
         <p
           className={`text-[15px] font-semibold leading-8 ${
             isUser ? "text-white" : "text-[#1F1F1D]"

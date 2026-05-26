@@ -2,7 +2,7 @@ import { ChatTopBar } from "@/components/chat/ChatTopBar";
 import { ChatWelcome } from "@/components/chat/ChatWelcome";
 import { ChatComposer } from "@/components/chat/ChatComposer";
 import { ChatMessage } from "@/components/chat/ChatMessage";
-import type { ChatMessageData } from "@/lib/chat/types";
+import type { ChatMessage as ChatMessageType } from "@/lib/chat/types";
 
 export function ChatThread({
   messages,
@@ -11,18 +11,16 @@ export function ChatThread({
   onComposerChange,
   onSubmit,
   onSuggestionSelect,
-  onAttach,
   onOpenSidebar,
   isLoading,
   error,
 }: {
-  messages: ChatMessageData[];
+  messages: ChatMessageType[];
   composerValue: string;
   notice: string | null;
   onComposerChange: (value: string) => void;
-  onSubmit: () => void;
+  onSubmit: (prompt: string, attachmentName?: string) => void;
   onSuggestionSelect: (suggestion: string) => void;
-  onAttach: () => void;
   onOpenSidebar: () => void;
   isLoading?: boolean;
   error?: Error | null;
@@ -67,7 +65,6 @@ export function ChatThread({
                 value={composerValue}
                 onChange={onComposerChange}
                 onSubmit={onSubmit}
-                onAttach={onAttach}
                 isLoading={isLoading}
               />
               {notice ? (
@@ -84,7 +81,6 @@ export function ChatThread({
             onComposerChange={onComposerChange}
             onSubmit={onSubmit}
             onSuggestionSelect={onSuggestionSelect}
-            onAttach={onAttach}
           />
         )}
       </div>

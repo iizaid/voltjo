@@ -1,6 +1,6 @@
-import { ChatMessageData } from "./types";
+import type { ChatMessage } from "./types";
 
-export async function simulateChatResponse(prompt: string): Promise<ChatMessageData> {
+export async function simulateChatResponse(prompt: string): Promise<ChatMessage> {
   // Simulate network delay
   await new Promise((resolve) => setTimeout(resolve, 800 + Math.random() * 1000));
 
@@ -15,5 +15,7 @@ export async function simulateChatResponse(prompt: string): Promise<ChatMessageD
         ? "أستطيع تجهيز تقدير ثابت للتكلفة عند توفر بيانات الاستخدام."
         : "الأفضل دائمًا مقارنة السعر والدعم والضمان قبل الشراء.",
     ],
+    createdAt: new Date().toISOString(),
+    status: "done",
   };
 }

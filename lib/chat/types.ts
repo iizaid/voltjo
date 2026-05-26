@@ -1,16 +1,22 @@
 export type ChatRole = "user" | "assistant" | "system";
 
-export interface ChatMessageData {
+export interface ChatMessage {
   id: string;
   role: ChatRole;
   content: string;
   bullets?: string[];
+  createdAt: string;
+  status?: "sending" | "streaming" | "done" | "error";
+  attachmentName?: string;
 }
 
-export interface ChatState {
-  messages: ChatMessageData[];
-  input: string;
-  isLoading: boolean;
-  error: Error | null;
-  activeConversationId?: string;
+export type ChatCategory = "السيارات" | "الشحن" | "المقارنة" | "الحاسبات" | "الدعم والضمان" | "عام";
+
+export interface ChatConversation {
+  id: string;
+  title: string;
+  category: ChatCategory;
+  messages: ChatMessage[];
+  createdAt: string;
+  updatedAt: string;
 }
