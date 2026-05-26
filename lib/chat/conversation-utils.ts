@@ -1,4 +1,4 @@
-import type { ChatCategory, ChatConversation, ChatMessage } from "./types";
+import type { ChatAttachment, ChatCategory, ChatConversation, ChatMessage } from "./types";
 
 /**
  * Infers the chat category based on the query text.
@@ -35,7 +35,7 @@ export function inferChatCategory(text: string): ChatCategory {
 
 /**
  * Trims whitespace, removes line breaks, truncates to 36 characters,
- * and appends an empty string if truncated as per instructions.
+ * and appends "…" if truncated.
  */
 export function generateConversationTitle(text: string): string {
   const trimmed = text.replace(/[\r\n]+/g, " ").trim();
@@ -43,7 +43,7 @@ export function generateConversationTitle(text: string): string {
     return "محادثة جديدة";
   }
   if (trimmed.length > 36) {
-    return trimmed.slice(0, 36) + "";
+    return trimmed.slice(0, 36) + "…";
   }
   return trimmed;
 }
@@ -54,12 +54,13 @@ export function generateConversationTitle(text: string): string {
 export function createConversation(options?: {
   title?: string;
   category?: ChatCategory;
+  messages?: ChatMessage[];
 }): ChatConversation {
   const now = new Date().toISOString();
   const title = options?.title || "محادثة جديدة";
   const category = options?.category || "عام";
-  
-  // Generating a lightweight safe unique ID
+  const messages = options?.messages || [];
+
   const randomSuffix = Math.random().toString(36).substring(2, 11);
   const id = `conv-${Date.now()}-${randomSuffix}`;
 
@@ -67,41 +68,30 @@ export function createConversation(options?: {
     id,
     title,
     category,
-    messages: [],
+    messages,
     createdAt: now,
     updatedAt: now,
   };
 }
 
 /**
- * Creates a new user message, trimming content and mapping attachments if provided.
+ * Creates a new user message with optional structured attachment metadata.
  */
-export function createUserMessage(content: string, attachmentName?: string): ChatMessage {
+export function createUserMessage(content: string, attachment?: ChatAttachment): ChatMessage {
   const randomSuffix = Math.random().toString(36).substring(2, 11);
   const id = `msg-${Date.now()}-${randomSuffix}`;
-  const now = new Date().toISOString();
 
-  const message: ChatMessage = {
+  return {
     id,
     role: "user",
     content: content.trim(),
-    createdAt: now,
+    createdAt: new Date().toISOString(),
+    attachment,
   };
-
-  if (attachmentName) {
-    message.attachment = {
-      id: `att-${Date.now()}-${randomSuffix}`,
-      name: attachmentName,
-      size: 0,
-      type: "unknown",
-    };
-  }
-
-  return message;
 }
 
 /**
- * Generates an assistant placeholder message.
+ * Generates an assistant placeholder message with "sending" status.
  */
 export function createAssistantPlaceholder(): ChatMessage {
   const randomSuffix = Math.random().toString(36).substring(2, 11);
@@ -117,7 +107,7 @@ export function createAssistantPlaceholder(): ChatMessage {
 }
 
 /**
- * Completes a placeholder assistant message with raw response payload content.
+ * Completes a placeholder assistant message with the real response content.
  */
 export function completeAssistantMessage(
   placeholderMessage: ChatMessage,
@@ -132,8 +122,21 @@ export function completeAssistantMessage(
 }
 
 /**
+ * Marks a placeholder assistant message as failed with an error status.
+ */
+export function failAssistantMessage(
+  placeholderMessage: ChatMessage,
+  errorMessage?: string
+): ChatMessage {
+  return {
+    ...placeholderMessage,
+    status: "error",
+    content: errorMessage || "حدث خطأ أثناء تجهيز الرد. حاول مرة أخرى.",
+  };
+}
+
+/**
  * Filters, searches, and sorts conversations.
- * Supports localized search matching in English and Arabic.
  */
 export function getVisibleConversations({
   conversations,
@@ -148,11 +151,9 @@ export function getVisibleConversations({
 
   return conversations
     .filter((c) => {
-      // 1. Filter by category
       if (selectedCategory !== "all" && c.category !== selectedCategory) {
         return false;
       }
-      // 2. Filter by search text (title or content matching)
       if (query) {
         const titleMatch = c.title.toLowerCase().includes(query);
         const messageMatch = c.messages.some((m) =>
@@ -162,29 +163,32 @@ export function getVisibleConversations({
       }
       return true;
     })
-    // 3. Sort by updatedAt in descending order
     .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
 }
 
 /**
  * Removes a conversation and resolves which ID should become next active.
+ * If the deleted conversation was active, picks the most recently updated remaining one.
+ * If it was not active, keeps activeId unchanged.
  */
 export function deleteConversationById(
   conversations: ChatConversation[],
-  id: string
+  id: string,
+  activeId: string | null
 ): {
   conversations: ChatConversation[];
   nextActiveId: string | null;
 } {
   const filtered = conversations.filter((c) => c.id !== id);
-  if (filtered.length === 0) {
-    return {
-      conversations: filtered,
-      nextActiveId: null,
-    };
+
+  if (activeId !== id) {
+    return { conversations: filtered, nextActiveId: activeId };
   }
 
-  // Next active ID should be the most recently updated one remaining
+  if (filtered.length === 0) {
+    return { conversations: filtered, nextActiveId: null };
+  }
+
   const sorted = [...filtered].sort(
     (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
   );
@@ -197,7 +201,6 @@ export function deleteConversationById(
 
 /**
  * Safely renames a conversation title and tags updatedAt time.
- * Ignores empty or blank values.
  */
 export function renameConversation(
   conversations: ChatConversation[],
@@ -243,8 +246,7 @@ export function safeParseConversations(value: string | null): ChatConversation[]
 
   try {
     const data = JSON.parse(value);
-    
-    // Support parsing direct exports or plain raw arrays
+
     if (
       data &&
       typeof data === "object" &&

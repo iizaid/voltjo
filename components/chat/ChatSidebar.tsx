@@ -5,6 +5,7 @@ import {
   ChevronsRight,
   Clock3,
   GitCompare,
+  Home,
   MessageSquarePlus,
   Search,
   X,
@@ -13,8 +14,10 @@ import {
   Download,
   Settings,
 } from "lucide-react";
+import Link from "next/link";
 import { VoltJoLogo } from "@/components/brand/VoltJoLogo";
 import type { ChatConversation, ChatCategory } from "@/lib/chat/types";
+import { getVisibleConversations } from "@/lib/chat/conversation-utils";
 import { useState } from "react";
 
 const navItems = [
@@ -64,15 +67,14 @@ export function ChatSidebar({
   searchInputRef: React.RefObject<HTMLInputElement | null>;
 }) {
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
+  const [confirmingDeleteId, setConfirmingDeleteId] = useState<string | null>(null);
+  const [confirmingClearAll, setConfirmingClearAll] = useState(false);
 
-  const visibleConversations = conversations
-    .filter((c) => selectedCategory === "all" || c.category === selectedCategory)
-    .filter(
-      (c) =>
-        c.title.includes(searchQuery) ||
-        c.messages.some((m) => m.content.includes(searchQuery))
-    )
-    .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+  const visibleConversations = getVisibleConversations({
+    conversations,
+    searchQuery,
+    selectedCategory,
+  });
 
   return (
     <aside
@@ -105,6 +107,17 @@ export function ChatSidebar({
       </div>
 
       <div className="mt-7 grid gap-1">
+        <Link
+          href="/"
+          title={collapsed ? "الصفحة الرئيسية" : undefined}
+          className={`flex h-9 items-center gap-3 rounded-lg px-3 text-right text-sm font-semibold text-[#3A3732] transition hover:bg-[rgba(31,31,29,0.055)] ${
+            collapsed ? "justify-center" : ""
+          }`}
+        >
+          <Home size={17} strokeWidth={1.8} className="text-[#6F6A60]" />
+          {!collapsed ? "الصفحة الرئيسية" : null}
+        </Link>
+
         {navItems.map(({ label, icon: Icon }) => {
           const isActive =
             label === selectedCategory ||
@@ -147,30 +160,57 @@ export function ChatSidebar({
             <p className="px-3 text-xs font-bold text-[#6F6A60] mb-3">الأخيرة</p>
             <div className="grid gap-1">
               {visibleConversations.map((conversation) => (
-                <div key={conversation.id} className="group relative flex items-center w-full">
-                  <button
-                    type="button"
-                    onDoubleClick={() => onRenameConversation(conversation.id)}
-                    onClick={() => onSelectConversation(conversation.id)}
-                    className={`flex-1 overflow-hidden truncate rounded-lg px-3 py-2 text-right text-sm font-semibold leading-6 transition ${
-                      activeId === conversation.id
-                        ? "bg-[rgba(31,31,29,0.08)] text-[#1F1F1D]"
-                        : "text-[#34302A] hover:bg-[rgba(255,255,255,0.72)]"
-                    }`}
-                  >
-                    {conversation.title}
-                  </button>
-                  <button
-                    type="button"
-                    aria-label="حذف المحادثة"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onDeleteConversation(conversation.id);
-                    }}
-                    className="absolute left-2 hidden p-1 text-[#6F6A60] transition hover:text-red-500 group-hover:block"
-                  >
-                    <Trash2 size={14} />
-                  </button>
+                <div key={conversation.id} className="group relative flex w-full items-center">
+                  {confirmingDeleteId === conversation.id ? (
+                    <div className="flex w-full items-center justify-between gap-2 rounded-lg bg-red-50 px-3 py-2">
+                      <span className="text-sm font-semibold text-red-600">حذف؟</span>
+                      <div className="flex gap-1">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            onDeleteConversation(conversation.id);
+                            setConfirmingDeleteId(null);
+                          }}
+                          className="rounded-md bg-red-600 px-3 py-1 text-xs font-bold text-white transition hover:bg-red-700"
+                        >
+                          نعم
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setConfirmingDeleteId(null)}
+                          className="rounded-md bg-[rgba(31,31,29,0.06)] px-3 py-1 text-xs font-bold text-[#1F1F1D] transition hover:bg-[rgba(31,31,29,0.12)]"
+                        >
+                          إلغاء
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <button
+                        type="button"
+                        onDoubleClick={() => onRenameConversation(conversation.id)}
+                        onClick={() => onSelectConversation(conversation.id)}
+                        className={`flex-1 overflow-hidden truncate rounded-lg px-3 py-2 text-right text-sm font-semibold leading-6 transition ${
+                          activeId === conversation.id
+                            ? "bg-[rgba(31,31,29,0.08)] text-[#1F1F1D]"
+                            : "text-[#34302A] hover:bg-[rgba(255,255,255,0.72)]"
+                        }`}
+                      >
+                        {conversation.title}
+                      </button>
+                      <button
+                        type="button"
+                        aria-label="حذف المحادثة"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setConfirmingDeleteId(conversation.id);
+                        }}
+                        className="absolute left-2 hidden p-1 text-[#6F6A60] transition hover:text-red-500 group-hover:block"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </>
+                  )}
                 </div>
               ))}
             </div>
@@ -207,15 +247,38 @@ export function ChatSidebar({
             >
               <Download size={15} /> تصدير المحادثات
             </button>
-            <button
-              onClick={() => {
-                setAccountMenuOpen(false);
-                onClearConversations();
-              }}
-              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50"
-            >
-              <Trash2 size={15} /> مسح المحادثات
-            </button>
+            {confirmingClearAll ? (
+              <div className="flex items-center justify-between gap-2 rounded-lg bg-red-50 px-3 py-2">
+                <span className="text-sm font-semibold text-red-600">متأكد؟</span>
+                <div className="flex gap-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onClearConversations();
+                      setConfirmingClearAll(false);
+                      setAccountMenuOpen(false);
+                    }}
+                    className="rounded-md bg-red-600 px-3 py-1 text-xs font-bold text-white transition hover:bg-red-700"
+                  >
+                    نعم
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setConfirmingClearAll(false)}
+                    className="rounded-md bg-[rgba(31,31,29,0.06)] px-3 py-1 text-xs font-bold text-[#1F1F1D] transition hover:bg-[rgba(31,31,29,0.12)]"
+                  >
+                    إلغاء
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button
+                onClick={() => setConfirmingClearAll(true)}
+                className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50"
+              >
+                <Trash2 size={15} /> مسح المحادثات
+              </button>
+            )}
           </div>
         )}
         <div className="flex items-center justify-between rounded-xl px-2 py-2">
@@ -238,7 +301,10 @@ export function ChatSidebar({
             <button
               type="button"
               aria-label="إعدادات الحساب"
-              onClick={() => setAccountMenuOpen(!accountMenuOpen)}
+              onClick={() => {
+                setAccountMenuOpen(!accountMenuOpen);
+                setConfirmingClearAll(false);
+              }}
               className={`h-8 w-8 rounded-lg text-[#6F6A60] transition hover:bg-[rgba(31,31,29,0.055)] ${
                 accountMenuOpen ? "bg-[rgba(31,31,29,0.055)]" : ""
               }`}

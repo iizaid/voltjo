@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { ChatSidebar } from "@/components/chat/ChatSidebar";
 import { ChatThread } from "@/components/chat/ChatThread";
 import { simulateChatResponse } from "@/lib/chat/mock-chat";
-import type { ChatConversation, ChatMessage, ChatCategory, ChatAttachment } from "@/lib/chat/types";
+import type { ChatConversation, ChatCategory, ChatAttachment } from "@/lib/chat/types";
 import {
   loadConversations,
   saveConversations,
@@ -13,22 +13,18 @@ import {
   loadSidebarCollapsed,
   saveSidebarCollapsed,
 } from "@/lib/chat/storage";
-
-function inferCategory(prompt: string): ChatCategory {
-  if (prompt.includes("تكلفة") || prompt.includes("شحن")) return "الشحن";
-  if (prompt.includes("قارن") || prompt.includes("مقارنة")) return "المقارنة";
-  if (prompt.includes("ضمان") || prompt.includes("دعم")) return "الدعم والضمان";
-  if (
-    prompt.includes("سيارة") ||
-    prompt.includes("BYD") ||
-    prompt.includes("Toyota") ||
-    prompt.includes("Changan") ||
-    prompt.includes("كهربائية") ||
-    prompt.includes("هايبرد")
-  )
-    return "السيارات";
-  return "عام";
-}
+import {
+  inferChatCategory,
+  generateConversationTitle,
+  createConversation,
+  createUserMessage,
+  createAssistantPlaceholder,
+  completeAssistantMessage,
+  failAssistantMessage,
+  deleteConversationById,
+  renameConversation as renameConversationUtil,
+  serializeConversationsForExport,
+} from "@/lib/chat/conversation-utils";
 
 export function ChatShell() {
   const [conversations, setConversations] = useState<ChatConversation[]>([]);
@@ -49,17 +45,17 @@ export function ChatShell() {
     const loadedConversations = loadConversations();
     const loadedActiveId = loadActiveConversationId();
     setConversations(loadedConversations);
-    
-    if (loadedActiveId && loadedConversations.find(c => c.id === loadedActiveId)) {
+
+    if (loadedActiveId && loadedConversations.find((c) => c.id === loadedActiveId)) {
       setActiveId(loadedActiveId);
     } else {
       setActiveId(null);
     }
-    
+
     setSidebarCollapsed(loadSidebarCollapsed());
   }, []);
 
-  // Save to local storage on change
+  // Persist to local storage on change
   useEffect(() => {
     saveConversations(conversations);
   }, [conversations]);
@@ -80,17 +76,9 @@ export function ChatShell() {
       setMobileSidebarOpen(false);
       return;
     }
-    const newId = `conv-${Date.now()}`;
-    const newConv: ChatConversation = {
-      id: newId,
-      title: "محادثة جديدة",
-      category: "عام",
-      messages: [],
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
+    const newConv = createConversation();
     setConversations((prev) => [newConv, ...prev]);
-    setActiveId(newId);
+    setActiveId(newConv.id);
     setComposerValue("");
     setAttachment(null);
     setNotice(null);
@@ -99,31 +87,27 @@ export function ChatShell() {
   };
 
   const handleClearConversations = () => {
-    if (window.confirm("هل أنت متأكد من مسح جميع المحادثات المحلية؟")) {
-      setConversations([]);
-      setActiveId(null);
-      setComposerValue("");
-      setAttachment(null);
-    }
+    setConversations([]);
+    setActiveId(null);
+    setComposerValue("");
+    setAttachment(null);
   };
 
   const handleExportConversations = () => {
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(conversations));
-    const downloadAnchorNode = document.createElement("a");
-    downloadAnchorNode.setAttribute("href", dataStr);
-    downloadAnchorNode.setAttribute("download", "voltjo-conversations.json");
-    document.body.appendChild(downloadAnchorNode);
-    downloadAnchorNode.click();
-    downloadAnchorNode.remove();
+    const jsonStr = serializeConversationsForExport(conversations);
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(jsonStr);
+    const anchor = document.createElement("a");
+    anchor.setAttribute("href", dataStr);
+    anchor.setAttribute("download", "voltjo-conversations.json");
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
   };
 
   const handleDeleteConversation = (id: string) => {
-    if (window.confirm("هل تريد بالتأكيد حذف هذه المحادثة؟")) {
-      setConversations((prev) => prev.filter((c) => c.id !== id));
-      if (activeId === id) {
-        setActiveId(null);
-      }
-    }
+    const result = deleteConversationById(conversations, id, activeId);
+    setConversations(result.conversations);
+    setActiveId(result.nextActiveId);
   };
 
   const handleRenameConversation = (id: string) => {
@@ -131,9 +115,7 @@ export function ChatShell() {
     if (!conv) return;
     const newTitle = window.prompt("أدخل الاسم الجديد للمحادثة:", conv.title);
     if (newTitle && newTitle.trim()) {
-      setConversations((prev) =>
-        prev.map((c) => (c.id === id ? { ...c, title: newTitle.trim(), updatedAt: new Date().toISOString() } : c))
-      );
+      setConversations(renameConversationUtil(conversations, id, newTitle));
     }
   };
 
@@ -144,34 +126,17 @@ export function ChatShell() {
     let targetId = activeId;
     let newConversations = [...conversations];
 
-    const userMessage: ChatMessage = {
-      id: `user-${Date.now()}`,
-      role: "user",
-      content: trimmedPrompt,
-      createdAt: new Date().toISOString(),
-      attachment: att,
-    };
-    
-    const sendingMessage: ChatMessage = {
-      id: `assistant-${Date.now()}`,
-      role: "assistant",
-      content: "",
-      status: "sending",
-      createdAt: new Date().toISOString(),
-    };
-
-    const newTitle = trimmedPrompt.slice(0, 30) || (att ? att.name : "محادثة جديدة");
+    const userMessage = createUserMessage(trimmedPrompt, att);
+    const placeholder = createAssistantPlaceholder();
+    const title = generateConversationTitle(trimmedPrompt) || (att ? att.name : "محادثة جديدة");
 
     if (!targetId || !conversations.find((c) => c.id === targetId)) {
-      targetId = `conv-${Date.now()}`;
-      const newConv: ChatConversation = {
-        id: targetId,
-        title: newTitle,
-        category: inferCategory(trimmedPrompt),
-        messages: [userMessage, sendingMessage],
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
+      const newConv = createConversation({
+        title,
+        category: inferChatCategory(trimmedPrompt),
+        messages: [userMessage, placeholder],
+      });
+      targetId = newConv.id;
       newConversations = [newConv, ...newConversations];
       setActiveId(targetId);
     } else {
@@ -179,9 +144,9 @@ export function ChatShell() {
         if (c.id === targetId) {
           return {
             ...c,
-            title: c.messages.length === 0 ? newTitle : c.title,
-            category: c.messages.length === 0 ? inferCategory(trimmedPrompt) : c.category,
-            messages: [...c.messages, userMessage, sendingMessage],
+            title: c.messages.length === 0 ? title : c.title,
+            category: c.messages.length === 0 ? inferChatCategory(trimmedPrompt) : c.category,
+            messages: [...c.messages, userMessage, placeholder],
             updatedAt: new Date().toISOString(),
           };
         }
@@ -197,12 +162,13 @@ export function ChatShell() {
 
     try {
       const response = await simulateChatResponse(trimmedPrompt);
+      const completed = completeAssistantMessage(placeholder, response);
       setConversations((prev) =>
         prev.map((c) => {
           if (c.id === targetId) {
             return {
               ...c,
-              messages: c.messages.map((m) => (m.id === sendingMessage.id ? { ...response, id: sendingMessage.id, status: "done" } : m)),
+              messages: c.messages.map((m) => (m.id === placeholder.id ? completed : m)),
               updatedAt: new Date().toISOString(),
             };
           }
@@ -210,13 +176,14 @@ export function ChatShell() {
         })
       );
     } catch (err) {
-      const errMsg = err instanceof Error ? err.message : "حدث خطأ غير متوقع.";
+      const errMsg = err instanceof Error ? err.message : undefined;
+      const failed = failAssistantMessage(placeholder, errMsg);
       setConversations((prev) =>
         prev.map((c) => {
           if (c.id === targetId) {
             return {
               ...c,
-              messages: c.messages.map((m) => (m.id === sendingMessage.id ? { ...m, status: "error", content: errMsg } : m)),
+              messages: c.messages.map((m) => (m.id === placeholder.id ? failed : m)),
               updatedAt: new Date().toISOString(),
             };
           }

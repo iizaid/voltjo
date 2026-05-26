@@ -1,4 +1,5 @@
 import type { ChatConversation } from "./types";
+import { safeParseConversations } from "./conversation-utils";
 
 const IS_SERVER = typeof window === "undefined";
 
@@ -16,12 +17,8 @@ const LEGACY_KEYS = {
 
 export function loadConversations(): ChatConversation[] {
   if (IS_SERVER) return [];
-  try {
-    const data = localStorage.getItem(KEYS.CONVERSATIONS) || localStorage.getItem(LEGACY_KEYS.CONVERSATIONS);
-    return data ? JSON.parse(data) : [];
-  } catch {
-    return [];
-  }
+  const data = localStorage.getItem(KEYS.CONVERSATIONS) || localStorage.getItem(LEGACY_KEYS.CONVERSATIONS);
+  return safeParseConversations(data);
 }
 
 export function saveConversations(conversations: ChatConversation[]) {
