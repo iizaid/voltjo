@@ -2,9 +2,11 @@
 
 import { FormEvent, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { FileCheck2 } from "lucide-react";
 import { motion } from "motion/react";
 import Folder from "@/components/Folder";
 import { VoltJoLogo } from "@/components/brand/VoltJoLogo";
+import { onboardingQuestions } from "@/lib/onboarding/questions";
 import {
   clearOnboardingDraft,
   saveOnboardingDraft,
@@ -13,12 +15,23 @@ import type { CustomerProfileDraft } from "@/lib/onboarding/types";
 
 type AuthMode = "signup" | "login";
 
+function getAnswerLabel(questionId: keyof CustomerProfileDraft, value: string) {
+  const question = onboardingQuestions.find((item) => item.id === questionId);
+  return question?.options.find((option) => option.value === value)?.label ?? value;
+}
+
 function getProfileHighlights(answers: CustomerProfileDraft) {
-  return [
-    answers.mainGoal,
-    answers.drivingPattern,
-    Array.isArray(answers.priorities) ? answers.priorities[0] : undefined,
-  ].filter(Boolean) as string[];
+  const highlights = [
+    answers.mainGoal ? getAnswerLabel("mainGoal", answers.mainGoal) : undefined,
+    answers.drivingPattern
+      ? getAnswerLabel("drivingPattern", answers.drivingPattern)
+      : undefined,
+    Array.isArray(answers.priorities) && answers.priorities[0]
+      ? getAnswerLabel("priorities", answers.priorities[0])
+      : undefined,
+  ];
+
+  return highlights.filter(Boolean) as string[];
 }
 
 export function OnboardingAuthPanel({
@@ -73,43 +86,26 @@ export function OnboardingAuthPanel({
           </p>
 
           <motion.div
-            className="mt-8 w-full max-w-md rounded-[24px] border border-[rgba(13,13,13,0.08)] bg-white/72 p-6"
+            className="mt-8 flex w-full max-w-[360px] flex-col items-center rounded-3xl border border-[rgba(13,13,13,0.06)] bg-white p-8 shadow-sm"
             whileHover={{ y: -3 }}
             transition={{ duration: 0.18, ease: "easeOut" }}
           >
-            <div className="flex flex-col items-center">
-              <Folder
-                color="#FF6A00"
-                size={0.78}
-                className="mb-4 flex h-[92px] items-center justify-center"
-                items={[
-                  <span key="goal" className="text-[10px] font-bold text-[#111]">
-                    هدف
-                  </span>,
-                  <span key="city" className="text-[10px] font-bold text-[#111]">
-                    موقع
-                  </span>,
-                  <span
-                    key="cost"
-                    className="text-[10px] font-bold text-[#111]"
-                  >
-                    تكلفة
-                  </span>,
-                ]}
-              />
-              <p className="text-base font-bold text-[var(--voltjo-black)]">
-                ملفك الشخصي جاهز
-              </p>
-              <p className="mt-2 text-sm font-medium leading-6 text-[var(--voltjo-muted)]">
-                تم تجهيز تفضيلاتك لتخصيص تجربة المساعد والمقارنات.
-              </p>
-            </div>
-            <div className="mt-5 flex flex-wrap justify-center gap-2">
+            <Folder color="#ff6a00" size={0.8} className="mb-8 mt-2" />
+            
+            <h3 className="text-[22px] font-bold text-[var(--voltjo-black)]">
+              ملفك الشخصي جاهز
+            </h3>
+            
+            <p className="mt-3 text-center text-[15px] font-medium leading-[1.6] text-[#6F6673]">
+              تم تجهيز تفضيلاتك لتخصيص تجربة المساعد والمقارنات.
+            </p>
+            
+            <div className="mt-6 flex flex-wrap justify-center gap-2.5">
               {(highlights.length ? highlights : ["تجربة مخصصة"]).map(
                 (highlight) => (
                   <span
                     key={highlight}
-                    className="rounded-full border border-[rgba(255,106,0,0.22)] bg-white px-3 py-1.5 text-xs font-bold text-[var(--voltjo-black)]"
+                    className="rounded-full border border-[#FFD5C0] bg-white px-4 py-1.5 text-[14px] font-bold text-[var(--voltjo-black)] transition-colors hover:bg-[#FFF5EF]"
                   >
                     {highlight}
                   </span>

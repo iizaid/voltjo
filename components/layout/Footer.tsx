@@ -20,8 +20,8 @@ export function Footer() {
         
         {/* Logo & Tagline */}
         <div className="mb-10 flex flex-col items-center text-center">
-          <div className="mb-6 flex h-14 items-center justify-center rounded-xl bg-white px-6 shadow-lg">
-            <VoltJoLogo />
+          <div className="mb-6 flex h-14 items-center justify-center rounded-xl bg-white px-6 shadow-lg transition-transform duration-200 hover:-translate-y-0.5">
+            <VoltJoLogo scrollToTop />
           </div>
           <p className="max-w-md text-[15px] font-medium text-white/60">
             منصة أردنية ذكية للسيارات الكهربائية والهايبرد.

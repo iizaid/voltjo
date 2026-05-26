@@ -9,6 +9,8 @@ import { onboardingQuestions } from "@/lib/onboarding/questions";
 import {
   loadOnboardingDraft,
   saveOnboardingDraft,
+  loadOnboardingProgress,
+  saveOnboardingProgress,
 } from "@/lib/onboarding/storage";
 import type {
   CustomerProfileDraft,
@@ -25,22 +27,28 @@ function getMotionDelay(duration: number) {
 }
 
 function ownsEvOrHybrid(ownershipStatus: string | undefined) {
-  return ownershipStatus === "نعم، كهربائية" || ownershipStatus === "نعم، هايبرد";
+  return ownershipStatus === "owns_ev" || ownershipStatus === "owns_hybrid";
 }
 
 function getVisibleQuestions(
   answers: CustomerProfileDraft,
 ): OnboardingQuestionData[] {
   return onboardingQuestions.filter((question) => {
+    if (question.id === "city") return answers.country === "jordan";
     if (question.id !== "hasDrivenEvOrHybrid") return true;
     return !ownsEvOrHybrid(answers.ownershipStatus);
   });
+}
+
+function hasDraftAnswers(answers: CustomerProfileDraft) {
+  return Object.keys(answers).length > 0;
 }
 
 export function OnboardingFlow() {
   const [flowState, setFlowState] = useState<FlowState>("intro");
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<CustomerProfileDraft>({});
+  const [hasHydrated, setHasHydrated] = useState(false);
   const nextTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const visibleQuestions = useMemo(() => getVisibleQuestions(answers), [answers]);
@@ -107,10 +115,14 @@ export function OnboardingFlow() {
 
       if (currentQuestion.id === "ownershipStatus") {
         if (ownsEvOrHybrid(value)) {
-          nextAnswers.hasDrivenEvOrHybrid = "نعم";
+          nextAnswers.hasDrivenEvOrHybrid = "yes";
         } else {
           delete nextAnswers.hasDrivenEvOrHybrid;
         }
+      }
+
+      if (currentQuestion.id === "country" && value !== "jordan") {
+        delete nextAnswers.city;
       }
 
       return nextAnswers;
@@ -119,24 +131,44 @@ export function OnboardingFlow() {
 
   useEffect(() => {
     const storedDraft = loadOnboardingDraft();
+    const storedProgress = loadOnboardingProgress();
+
     if (storedDraft) {
       setAnswers(storedDraft);
     }
 
-    const introTimeout = setTimeout(
-      () => setFlowState("questions"),
-      getMotionDelay(1050),
-    );
+    if (storedProgress) {
+      setFlowState(storedProgress.flowState);
+      setCurrentQuestionIndex(storedProgress.currentQuestionIndex);
+      
+      if (storedProgress.flowState === "intro") {
+        const introTimeout = setTimeout(
+          () => setFlowState("questions"),
+          getMotionDelay(1050),
+        );
+        setHasHydrated(true);
+        return () => { clearTimeout(introTimeout); clearNextTimeout(); };
+      }
+    } else {
+      const introTimeout = setTimeout(
+        () => setFlowState("questions"),
+        getMotionDelay(1050),
+      );
+      setHasHydrated(true);
+      return () => { clearTimeout(introTimeout); clearNextTimeout(); };
+    }
 
-    return () => {
-      clearTimeout(introTimeout);
-      clearNextTimeout();
-    };
+    setHasHydrated(true);
+    return () => { clearNextTimeout(); };
   }, []);
 
   useEffect(() => {
-    saveOnboardingDraft(answers);
-  }, [answers]);
+    if (!hasHydrated) return;
+    if (hasDraftAnswers(answers)) {
+      saveOnboardingDraft(answers);
+    }
+    saveOnboardingProgress({ flowState, currentQuestionIndex });
+  }, [answers, flowState, currentQuestionIndex, hasHydrated]);
 
   useEffect(() => {
     if (currentQuestionIndex > visibleQuestions.length - 1) {

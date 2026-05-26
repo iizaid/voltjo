@@ -46,7 +46,7 @@ export const navItems: NavItemData[] = [
   { label: "الحاسبات", href: "/calculators", dropdown: "calculators" },
   { label: "المساعد الذكي", href: "/assistant" },
   { label: "المصادر", href: "/resources", dropdown: "resources" },
-  { label: "الأسعار", href: "/pricing" },
+  { label: "الأسعار", href: "/#pricing" },
 ];
 
 export const megaMenus: Record<DropdownKey, MegaMenuColumnData[]> = {

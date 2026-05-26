@@ -1,17 +1,25 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import type { ReactNode } from "react";
 
 const MARK_SRC = "/brands/logo%201.png";
 const WORDMARK_SRC = "/brands/typo%201.png";
 
-export function VoltJoLogo({ compact = false }: { compact?: boolean }) {
-  return (
-    <Link
-      href="/"
-      aria-label="VoltJo"
-      className="inline-flex items-center gap-3"
-      dir="ltr"
-    >
+type VoltJoLogoProps = {
+  compact?: boolean;
+  scrollToTop?: boolean;
+  className?: string;
+};
+
+export function VoltJoLogo({
+  compact = false,
+  scrollToTop = false,
+  className = "",
+}: VoltJoLogoProps) {
+  const content: ReactNode = (
+    <>
       <span className="relative flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden">
         <Image
           src={MARK_SRC}
@@ -32,6 +40,31 @@ export function VoltJoLogo({ compact = false }: { compact?: boolean }) {
           priority
         />
       ) : null}
+    </>
+  );
+
+  if (scrollToTop) {
+    return (
+      <a
+        href="#site-top"
+        aria-label="العودة إلى أعلى الصفحة"
+        className={`inline-flex items-center gap-3 ${className}`}
+        dir="ltr"
+        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+      >
+        {content}
+      </a>
+    );
+  }
+
+  return (
+    <Link
+      href="/"
+      aria-label="VoltJo"
+      className={`inline-flex items-center gap-3 ${className}`}
+      dir="ltr"
+    >
+      {content}
     </Link>
   );
 }

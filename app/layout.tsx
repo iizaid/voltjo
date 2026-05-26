@@ -1,18 +1,20 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Sans_Arabic, Inter } from "next/font/google";
+import { Readex_Pro, Changa } from "next/font/google";
+import { InitialSiteLoader } from "@/components/layout/InitialSiteLoader";
 import "./globals.css";
 
-const ibmPlexArabic = IBM_Plex_Sans_Arabic({
+const readexPro = Readex_Pro({
   subsets: ["arabic", "latin"],
   weight: ["400", "500", "600", "700"],
   display: "swap",
-  variable: "--font-arabic",
+  variable: "--font-primary",
 });
 
-const inter = Inter({
-  subsets: ["latin"],
+const displayFont = Changa({
+  subsets: ["arabic", "latin"],
+  weight: ["700", "800"],
   display: "swap",
-  variable: "--font-latin",
+  variable: "--font-display",
 });
 
 export const metadata: Metadata = {
@@ -30,9 +32,12 @@ export default function RootLayout({
     <html
       lang="ar"
       dir="rtl"
-      className={`${ibmPlexArabic.variable} ${inter.variable}`}
+      className={`${readexPro.variable} ${displayFont.variable}`}
     >
-      <body>{children}</body>
+      <body>
+        {children}
+        <InitialSiteLoader />
+      </body>
     </html>
   );
 }

@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from 'react';
 import './Folder.css';
 
@@ -57,7 +55,7 @@ const Folder = ({ color = '#5227FF', size = 1, items = [], className = '' }) => 
     });
   };
 
-  const handlePaperMouseLeave = (_, index) => {
+  const handlePaperMouseLeave = (e, index) => {
     setPaperOffsets(prev => {
       const newOffsets = [...prev];
       newOffsets[index] = { x: 0, y: 0 };

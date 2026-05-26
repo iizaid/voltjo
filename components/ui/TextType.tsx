@@ -43,6 +43,7 @@ type TextTypeProps = Omit<HTMLAttributes<HTMLElement>, "children"> & {
   onSentenceComplete?: (sentence: string, index: number) => void;
   startOnVisible?: boolean;
   reducedMotionText?: string;
+  start?: boolean;
   render?: (state: TextTypeRenderState) => ReactNode;
 };
 
@@ -89,6 +90,7 @@ export function TextType({
   onSentenceComplete,
   startOnVisible = false,
   reducedMotionText,
+  start = true,
   render,
   ...props
 }: TextTypeProps) {
@@ -137,7 +139,7 @@ export function TextType({
   }, [prefersReducedMotion, reducedMotionText, textArray]);
 
   useEffect(() => {
-    if (!isVisible || prefersReducedMotion || isComplete) return;
+    if (!start || !isVisible || prefersReducedMotion || isComplete) return;
 
     const currentText = textArray[currentTextIndex] ?? "";
     const processedSegments = segmentText(currentText);
@@ -208,6 +210,7 @@ export function TextType({
     textArray,
     typingSpeed,
     variableSpeed,
+    start,
   ]);
 
   const shouldHideCursor =

@@ -6,7 +6,7 @@ export default function OnboardingLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="relative min-h-dvh overflow-hidden bg-white text-[var(--voltjo-black)]">
+    <div className="relative min-h-dvh overflow-x-hidden bg-white text-[var(--voltjo-black)]">
       <TechnicalBackground />
       <div className="relative z-10">{children}</div>
     </div>

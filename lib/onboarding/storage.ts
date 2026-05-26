@@ -1,6 +1,12 @@
 import type { CustomerProfileDraft } from "@/lib/onboarding/types";
 
 export const ONBOARDING_STORAGE_KEY = "voltjo:onboarding:draft";
+export const ONBOARDING_PROGRESS_KEY = "voltjo:onboarding:progress";
+
+export interface OnboardingProgress {
+  flowState: "intro" | "questions" | "auth";
+  currentQuestionIndex: number;
+}
 
 function getLocalStorage() {
   if (typeof window === "undefined") return null;
@@ -35,9 +41,31 @@ export function loadOnboardingDraft(): CustomerProfileDraft | null {
   }
 }
 
+export function saveOnboardingProgress(data: OnboardingProgress) {
+  const storage = getLocalStorage();
+  if (!storage) return;
+
+  storage.setItem(ONBOARDING_PROGRESS_KEY, JSON.stringify(data));
+}
+
+export function loadOnboardingProgress(): OnboardingProgress | null {
+  const storage = getLocalStorage();
+  if (!storage) return null;
+
+  const raw = storage.getItem(ONBOARDING_PROGRESS_KEY);
+  if (!raw) return null;
+
+  try {
+    return JSON.parse(raw) as OnboardingProgress;
+  } catch {
+    return null;
+  }
+}
+
 export function clearOnboardingDraft() {
   const storage = getLocalStorage();
   if (!storage) return;
 
   storage.removeItem(ONBOARDING_STORAGE_KEY);
+  storage.removeItem(ONBOARDING_PROGRESS_KEY);
 }

@@ -33,8 +33,17 @@ body {
   overflow-x: hidden;
   color: var(--voltjo-text);
   background: #fff;
-  font-family: var(--font-arabic), var(--font-latin), system-ui, sans-serif;
-  text-rendering: geometricPrecision;
+  font-family: var(--font-primary), Arial, "Helvetica Neue", system-ui, sans-serif;
+  font-weight: 500;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-synthesis: none;
+  font-kerning: normal;
+}
+
+html[lang="ar"] body {
+  letter-spacing: 0;
 }
 
 .site-shell {
@@ -64,7 +73,16 @@ input {
 }
 
 .latin {
-  font-family: var(--font-latin), system-ui, sans-serif;
+  font-family: var(--font-primary), Arial, "Helvetica Neue", system-ui, sans-serif;
+}
+
+/* Display / headline font — Changa (heavy Arabic display, replaces Milligram) */
+.font-display,
+.display-heading {
+  font-family: var(--font-display), var(--font-primary), Arial, "Helvetica Neue", system-ui, sans-serif;
+  font-weight: 800;
+  line-height: 1.18;
+  letter-spacing: -0.01em;
 }
 
 .page-bg {
@@ -432,6 +450,19 @@ input {
   transform-origin: top center;
 }
 
+.voltjo-loading-scan span {
+  animation: voltjo-loading-scan 1.65s ease-in-out infinite;
+}
+
+.voltjo-initial-loader-enter {
+  animation: voltjo-initial-loader-enter 360ms ease-out both;
+}
+
+.voltjo-initial-loader-exit {
+  pointer-events: none;
+  animation: voltjo-initial-loader-exit 920ms cubic-bezier(0.7, 0, 0.25, 1) both;
+}
+
 @keyframes mega-menu-in {
   from {
     opacity: 0;
@@ -452,6 +483,50 @@ input {
   46%,
   100% {
     opacity: 0;
+  }
+}
+
+@keyframes voltjo-loading-scan {
+  0% {
+    transform: translateX(260px);
+    opacity: 0;
+  }
+
+  18% {
+    opacity: 1;
+  }
+
+  82% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateX(-80px);
+    opacity: 0;
+  }
+}
+
+@keyframes voltjo-initial-loader-enter {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes voltjo-initial-loader-exit {
+  0% {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+    transform: translateY(0);
+  }
+
+  100% {
+    opacity: 0;
+    clip-path: inset(0 0 100% 0);
+    transform: translateY(-2.5rem);
   }
 }
 

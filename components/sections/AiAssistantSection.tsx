@@ -84,7 +84,7 @@ export function AiAssistantSection() {
       <Container>
         {/* Header Area */}
         <div className="mb-16 text-center lg:mb-24 flex flex-col items-center">
-          <h2 className="text-balance text-4xl font-bold leading-tight text-[var(--voltjo-black)] sm:text-[44px]">
+          <h2 className="display-heading text-balance text-4xl font-bold leading-tight text-[var(--voltjo-black)] sm:text-[44px]">
             مساعد متخصص في
             <div className="mt-5 flex flex-wrap items-center justify-center gap-[0.3em]" dir="rtl">
               <span>السيارات</span>
