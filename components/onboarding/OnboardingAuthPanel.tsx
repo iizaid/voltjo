@@ -2,8 +2,8 @@
 
 import { FormEvent, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { FileCheck2 } from "lucide-react";
 import { motion } from "motion/react";
+// @ts-expect-error untyped component from React Bits
 import Folder from "@/components/Folder";
 import { VoltJoLogo } from "@/components/brand/VoltJoLogo";
 import { onboardingQuestions } from "@/lib/onboarding/questions";

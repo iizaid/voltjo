@@ -30,7 +30,7 @@ html {
 body {
   margin: 0;
   min-height: 100%;
-  overflow-x: hidden;
+  overflow-x: clip;
   color: var(--voltjo-text);
   background: #fff;
   font-family: var(--font-primary), Arial, "Helvetica Neue", system-ui, sans-serif;
@@ -48,7 +48,7 @@ html[lang="ar"] body {
 
 .site-shell {
   position: relative;
-  overflow-x: hidden;
+  overflow-x: clip;
   background: #fff;
 }
 

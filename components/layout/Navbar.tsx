@@ -58,7 +58,7 @@ export function Navbar() {
   const activeColumns = openMenu ? megaMenus[openMenu] : null;
 
   return (
-    <div className="px-4 pt-4 sm:px-6 lg:px-8">
+    <div className="px-4 py-4 sm:px-6 lg:px-8">
       <div ref={navRef} className="relative z-40 mx-auto max-w-[1240px]">
         <nav
           className="flex h-[72px] items-center justify-between gap-4 rounded-[8px] border border-[var(--voltjo-border)] bg-white/95 px-4 shadow-none backdrop-blur-sm lg:px-6"

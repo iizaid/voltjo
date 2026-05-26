@@ -45,31 +45,36 @@ export const navItems: NavItemData[] = [
   { label: "المقارنة", href: "/compare" },
   { label: "الحاسبات", href: "/calculators", dropdown: "calculators" },
   { label: "المساعد الذكي", href: "/assistant" },
-  { label: "المصادر", href: "/resources", dropdown: "resources" },
   { label: "الأسعار", href: "/#pricing" },
 ];
 
 export const megaMenus: Record<DropdownKey, MegaMenuColumnData[]> = {
   cars: [
     {
-      title: "أنواع السيارات",
+      title: "استكشف السيارات",
       items: [
         {
-          title: "سيارات كهربائية",
-          description: "استكشف السيارات الكهربائية المتوفرة في السوق الأردني.",
+          title: "كل السيارات",
+          description: "تصفح قاعدة السيارات المتوفرة في VoltJo.",
           href: "/cars",
+          icon: List,
+        },
+        {
+          title: "كهربائية بالكامل",
+          description: "سيارات تعتمد على الكهرباء فقط.",
+          href: "/cars?type=electric",
           icon: BatteryCharging,
         },
         {
-          title: "سيارات هايبرد",
-          description: "قارن السيارات الهجينة المناسبة للاستخدام اليومي.",
-          href: "/cars",
+          title: "هايبرد",
+          description: "سيارات تجمع بين الوقود والكهرباء.",
+          href: "/cars?type=hybrid",
           icon: Leaf,
         },
         {
           title: "Plug-in Hybrid",
-          description: "افهم الفرق بين الهايبرد القابل للشحن والكهربائي الكامل.",
-          href: "/cars",
+          description: "هايبرد قابل للشحن الخارجي.",
+          href: "/cars?type=phev",
           icon: Plug,
         },
       ],
@@ -78,22 +83,22 @@ export const megaMenus: Record<DropdownKey, MegaMenuColumnData[]> = {
       title: "حسب السوق",
       items: [
         {
-          title: "السيارات الصينية",
-          description: "تعرف على أشهر الموديلات الصينية المنتشرة في الأردن.",
-          href: "/cars",
-          icon: Globe2,
-        },
-        {
-          title: "سيارات الوكالة",
-          description: "موديلات بدعم أوضح من الوكلاء والموزعين.",
-          href: "/cars",
+          title: "خيارات بدعم محلي",
+          description: "موديلات قد تتوفر عبر وكلاء أو موزعين محليين.",
+          href: "/cars?source=local-support",
           icon: ShieldCheck,
         },
         {
-          title: "السيارات المستوردة",
-          description: "افهم مخاطر النسخ والفئات والضمان قبل الشراء.",
-          href: "/cars",
+          title: "سيارات مستوردة",
+          description: "معلومات تساعدك على فهم الفروقات قبل الشراء.",
+          href: "/cars?source=imported",
           icon: FileText,
+        },
+        {
+          title: "وارد الصين",
+          description: "نسخ وموديلات تحتاج مقارنة دقيقة قبل القرار.",
+          href: "/cars?source=china-import",
+          icon: Globe2,
         },
       ],
     },
@@ -101,21 +106,15 @@ export const megaMenus: Record<DropdownKey, MegaMenuColumnData[]> = {
       title: "ابدأ بسرعة",
       items: [
         {
-          title: "كل السيارات المدعومة",
-          description: "تصفح قائمة السيارات التي تغطيها المنصة.",
-          href: "/cars",
-          icon: List,
-        },
-        {
           title: "اقترح سيارة",
-          description: "اطلب إضافة موديل جديد للمنصة.",
-          href: "/resources",
+          description: "اطلب إضافة موديل غير موجود.",
+          href: "/cars?intent=suggest",
           icon: Plus,
         },
         {
-          title: "دليل السوق الأردني",
-          description: "معلومات مبسطة قبل شراء سيارة كهربائية أو هايبرد.",
-          href: "/resources",
+          title: "دليل شراء مختصر",
+          description: "نقاط مهمة قبل اختيار كهرباء أو هايبرد.",
+          href: "/resources?topic=buying-guide",
           icon: BookOpen,
         },
       ],
