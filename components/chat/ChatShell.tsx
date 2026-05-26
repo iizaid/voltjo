@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { ChatSidebar } from "@/components/chat/ChatSidebar";
 import { ChatThread } from "@/components/chat/ChatThread";
 import { simulateChatResponse } from "@/lib/chat/mock-chat";
-import type { ChatConversation, ChatCategory, ChatAttachment } from "@/lib/chat/types";
+import type { ChatConversation, ChatAttachment } from "@/lib/chat/types";
 import {
   loadConversations,
   saveConversations,
@@ -32,7 +32,6 @@ export function ChatShell() {
   const [composerValue, setComposerValue] = useState("");
   const [attachment, setAttachment] = useState<ChatAttachment | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<ChatCategory | "all">("all");
   const [notice, setNotice] = useState<string | null>(null);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
@@ -83,7 +82,6 @@ export function ChatShell() {
     setAttachment(null);
     setNotice(null);
     setMobileSidebarOpen(false);
-    setSelectedCategory("all");
   };
 
   const handleClearConversations = () => {
@@ -195,40 +193,9 @@ export function ChatShell() {
     }
   };
 
-  const handleNavAction = (label: string) => {
-    if (label === "محادثة جديدة") {
-      handleCreateNew();
-      return;
-    }
-
-    if (label === "بحث") {
-      if (sidebarCollapsed) {
-        setSidebarCollapsed(false);
-      }
-      setTimeout(() => {
-        searchInputRef.current?.focus();
-      }, 100);
-      return;
-    }
-
-    if (label === "المحادثات") {
-      setSelectedCategory("all");
-      setSearchQuery("");
-      setMobileSidebarOpen(false);
-      return;
-    }
-
-    if (label === "الإعدادات") {
-      setNotice("إعدادات الحساب ستكون متاحة لاحقًا.");
-      setTimeout(() => setNotice(null), 3000);
-      return;
-    }
-
-    if (["السيارات", "الشحن", "المقارنة", "الحاسبات", "الدعم والضمان"].includes(label)) {
-      setSelectedCategory(label as ChatCategory);
-      setMobileSidebarOpen(false);
-      return;
-    }
+  const handleSettingsAction = () => {
+    setNotice("إعدادات الحساب ستكون متاحة لاحقًا.");
+    setTimeout(() => setNotice(null), 3000);
   };
 
   return (
@@ -246,7 +213,7 @@ export function ChatShell() {
         mobileOpen={mobileSidebarOpen}
         onToggleCollapse={() => setSidebarCollapsed((current) => !current)}
         onCloseMobile={() => setMobileSidebarOpen(false)}
-        onNavAction={handleNavAction}
+        onNewChat={handleCreateNew}
         conversations={conversations}
         activeId={activeId}
         onSelectConversation={(id) => {
@@ -259,8 +226,8 @@ export function ChatShell() {
         onExportConversations={handleExportConversations}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
-        selectedCategory={selectedCategory}
         searchInputRef={searchInputRef}
+        onSettingsAction={handleSettingsAction}
       />
       <ChatThread
         messages={messages}

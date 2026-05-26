@@ -450,6 +450,33 @@ input {
   transform-origin: top center;
 }
 
+.smart-calculator-energy {
+  fill: none;
+  stroke: rgba(255, 106, 0, 0.92);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-dasharray: 22 190;
+  stroke-dashoffset: 212;
+  filter: drop-shadow(0 0 6px rgba(255, 106, 0, 0.42));
+  animation: smart-calculator-energy-flow 2.8s ease-in-out infinite;
+}
+
+.smart-calculator-energy-output {
+  stroke-width: 3.2;
+  stroke-dasharray: 28 180;
+  animation-duration: 2.25s;
+}
+
+.smart-calculator-node {
+  animation: smart-calculator-node-pulse 2.6s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.smart-calculator-node-core {
+  animation-delay: 0.35s;
+}
+
 /* ─── Uiverse Loader (andrew-manzyk / young-walrus-64) ─── */
 .voltjo-uiverse-loader {
   --color-one: #ff6a00;
@@ -599,6 +626,39 @@ input {
   46%,
   100% {
     opacity: 0;
+  }
+}
+
+@keyframes smart-calculator-energy-flow {
+  0% {
+    stroke-dashoffset: 212;
+    opacity: 0;
+  }
+
+  12% {
+    opacity: 1;
+  }
+
+  72% {
+    opacity: 1;
+  }
+
+  100% {
+    stroke-dashoffset: -212;
+    opacity: 0;
+  }
+}
+
+@keyframes smart-calculator-node-pulse {
+  0%,
+  100% {
+    opacity: 0.48;
+    transform: scale(1);
+  }
+
+  48% {
+    opacity: 0.95;
+    transform: scale(1.35);
   }
 }
 
