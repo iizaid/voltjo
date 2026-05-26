@@ -4,12 +4,12 @@ export type SupportedBrand = {
 };
 
 export const supportedBrands: SupportedBrand[] = [
-  { name: "BYD", logo: "/brands/BYD.png" },
+  { name: "BYD", logo: "/brands/byd.png" },
   { name: "Dongfeng", logo: "/brands/dongfeng.png" },
-  { name: "Changan", logo: "/brands/Changan-Logo.png" },
+  { name: "Changan", logo: "/brands/changan.png" },
   { name: "Toyota", logo: "/brands/toyota.svg" },
   { name: "Nissan", logo: "/brands/nissan.svg" },
   { name: "MG", logo: "/brands/mg.png" },
-  { name: "Geely", logo: "/brands/Geely-Auto-Logo.png" },
+  { name: "Geely", logo: "/brands/geely.png" },
   { name: "Hyundai", logo: "/brands/hyundai.svg" },
 ];

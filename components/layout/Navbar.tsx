@@ -150,7 +150,7 @@ export function Navbar() {
         </nav>
 
         {activeColumns ? (
-          <div className="absolute left-0 right-0 top-full mt-3 hidden lg:block">
+          <div className="absolute left-0 right-0 top-full mt-2 hidden lg:block">
             <MegaMenu key={openMenu} columns={activeColumns} />
           </div>
         ) : null}

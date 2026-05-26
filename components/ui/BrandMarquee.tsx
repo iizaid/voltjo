@@ -13,18 +13,23 @@ function BrandLogo({
   const [failed, setFailed] = useState(false);
 
   return (
-    <div className="brand-logo-cell" aria-hidden={duplicate || undefined}>
+    <div
+      className="brand-logo-cell"
+      aria-hidden={duplicate || undefined}
+      aria-label={!duplicate && failed ? `${brand.name} logo missing` : undefined}
+    >
       {failed ? (
-        <span className="latin text-sm font-bold text-[rgba(13,13,13,0.4)]">
-          {brand.name}
-        </span>
+        <span className="brand-logo-missing" />
       ) : (
         <img
           src={brand.logo}
           alt={duplicate ? "" : `${brand.name} logo`}
           className="max-h-[42px] max-w-[130px] object-contain grayscale"
           loading="lazy"
-          onError={() => setFailed(true)}
+          onError={() => {
+            console.warn(`Missing brand logo asset: ${brand.logo}`);
+            setFailed(true);
+          }}
         />
       )}
     </div>

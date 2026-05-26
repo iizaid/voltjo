@@ -79,43 +79,43 @@ input {
 .tech-grid {
   position: absolute;
   inset: 0;
-  opacity: 1;
+  opacity: 0.96;
   background:
-    linear-gradient(rgba(13, 13, 13, 0.052) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(13, 13, 13, 0.052) 1px, transparent 1px);
+    linear-gradient(rgba(13, 13, 13, 0.048) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(13, 13, 13, 0.048) 1px, transparent 1px);
   background-size: 104px 104px;
 }
 
 .tech-glow {
   position: absolute;
   border-radius: 999px;
-  background: radial-gradient(circle, rgba(255, 106, 0, 0.055), transparent 68%);
+  background: radial-gradient(circle, rgba(255, 106, 0, 0.048), transparent 68%);
 }
 
 .tech-glow-a {
-  left: 4%;
-  top: 7rem;
+  left: 3%;
+  top: 4%;
   width: 36rem;
   height: 36rem;
 }
 
 .tech-glow-b {
   right: 2%;
-  top: 82rem;
+  top: 40%;
   width: 34rem;
   height: 34rem;
 }
 
-.tech-panel-float {
+.tech-bg-panel {
   position: absolute;
   border: 1px solid rgba(13, 13, 13, 0.075);
   border-radius: 24px;
-  opacity: 0.72;
+  opacity: 0.64;
   background: rgba(255, 255, 255, 0.28);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
 }
 
-.tech-panel-float::after {
+.tech-bg-panel::after {
   content: "";
   position: absolute;
   inset: 18px 22px;
@@ -123,7 +123,7 @@ input {
   border-radius: 16px;
 }
 
-.tech-panel-float::before {
+.tech-bg-panel::before {
   content: "";
   position: absolute;
   inset: 0;
@@ -135,94 +135,80 @@ input {
   background-size: 32px 32px;
 }
 
-.tech-panel-hero-left {
+.tech-bg-panel-a {
   left: -7rem;
-  top: 11rem;
+  top: 4%;
   width: 34rem;
   height: 19rem;
 }
 
-.tech-panel-hero-right {
+.tech-bg-panel-b {
   right: -8rem;
-  top: 18rem;
+  top: 10%;
   width: 32rem;
   height: 22rem;
 }
 
-.tech-panel-brands {
-  left: 9%;
-  top: 50rem;
-  width: 28rem;
-  height: 15rem;
-}
-
-.tech-panel-calculator-left {
+.tech-bg-panel-c {
   right: 6%;
-  top: 86rem;
+  top: 34%;
   width: 36rem;
   height: 22rem;
 }
 
-.tech-panel-calculator-right {
+.tech-bg-panel-d {
   left: -4rem;
-  top: 118rem;
+  top: 52%;
   width: 30rem;
   height: 18rem;
 }
 
-.tech-panel-assistant {
+.tech-bg-panel-e {
   left: 11%;
-  top: 163rem;
+  top: 72%;
   width: 38rem;
   height: 24rem;
 }
 
-.tech-panel-footer {
-  right: -6rem;
-  top: 223rem;
-  width: 36rem;
-  height: 20rem;
-}
-
-.tech-dots {
+.tech-bg-dots {
   position: absolute;
   width: 174px;
   height: 104px;
-  opacity: 0.2;
+  opacity: 0.18;
   background-image: radial-gradient(circle, rgba(13, 13, 13, 0.32) 1px, transparent 1.4px);
   background-size: 14px 14px;
 }
 
-.tech-dots-hero {
+.tech-bg-dots-a {
   left: 14%;
-  top: 25rem;
+  top: 10%;
 }
 
-.tech-dots-brands {
+.tech-bg-dots-b {
   right: 12%;
-  top: 62rem;
+  top: 26%;
 }
 
-.tech-dots-calculator {
+.tech-bg-dots-c {
   left: 8%;
-  top: 108rem;
+  top: 46%;
 }
 
-.tech-dots-assistant {
+.tech-bg-dots-d {
   right: 10%;
-  top: 176rem;
+  top: 68%;
 }
 
-.tech-circuit {
+.tech-bg-circuit {
   position: absolute;
   width: 210px;
   height: 1px;
   background: rgba(13, 13, 13, 0.062);
 }
 
-.tech-circuit::before,
-.tech-circuit::after,
-.tech-circuit span {
+.tech-bg-circuit::before,
+.tech-bg-circuit::after,
+.tech-bg-circuit span {
   content: "";
   position: absolute;
   top: -3px;
@@ -233,126 +219,93 @@ input {
   background: #fff;
 }
 
-.tech-circuit::before {
+.tech-bg-circuit::before {
   left: 0;
 }
 
-.tech-circuit::after {
+.tech-bg-circuit::after {
   right: 0;
 }
 
-.tech-circuit span {
+.tech-bg-circuit span {
   left: 48%;
 }
 
-.tech-circuit-vertical {
-  width: 1px;
-  height: 180px;
-}
-
-.tech-circuit-vertical::before,
-.tech-circuit-vertical::after,
-.tech-circuit-vertical span {
-  left: -3px;
-  top: auto;
-}
-
-.tech-circuit-vertical::before {
-  top: 0;
-}
-
-.tech-circuit-vertical::after {
-  bottom: 0;
-}
-
-.tech-circuit-vertical span {
-  top: 48%;
-}
-
-.tech-circuit-a {
+.tech-bg-circuit-a {
   left: 18%;
-  top: 18rem;
+  top: 8%;
 }
 
-.tech-circuit-b {
+.tech-bg-circuit-b {
   right: 16%;
-  top: 55rem;
+  top: 24%;
   width: 260px;
 }
 
-.tech-circuit-c {
+.tech-bg-circuit-c {
   left: 12%;
-  top: 145rem;
+  top: 56%;
   width: 230px;
 }
 
-.tech-circuit-d {
+.tech-bg-circuit-d {
   right: 24%;
-  top: 96rem;
+  top: 82%;
+  width: 240px;
 }
 
-.tech-circuit-e {
-  left: 26%;
-  top: 205rem;
-}
-
-.tech-marker {
+.tech-bg-marker {
   position: absolute;
   width: 12px;
   height: 12px;
-  opacity: 0.72;
+  opacity: 0.68;
 }
 
-.tech-marker::before,
-.tech-marker::after {
+.tech-bg-marker::before,
+.tech-bg-marker::after {
   content: "";
   position: absolute;
   background: rgba(255, 106, 0, 0.55);
   border-radius: 999px;
 }
 
-.tech-marker::before {
+.tech-bg-marker::before {
   left: 5px;
   top: 0;
   width: 2px;
   height: 12px;
 }
 
-.tech-marker::after {
+.tech-bg-marker::after {
   left: 0;
   top: 5px;
   width: 12px;
   height: 2px;
 }
 
-.tech-marker-a {
+.tech-bg-marker-a {
   left: 24%;
-  top: 14rem;
+  top: 7%;
 }
 
-.tech-marker-b {
+.tech-bg-marker-b {
   right: 20%;
-  top: 37rem;
+  top: 18%;
 }
 
-.tech-marker-c {
+.tech-bg-marker-c {
   left: 15%;
-  top: 77rem;
+  top: 33%;
 }
 
-.tech-marker-d {
+.tech-bg-marker-d {
   right: 13%;
-  top: 124rem;
+  top: 55%;
 }
 
-.tech-marker-e {
+.tech-bg-marker-e {
   left: 21%;
-  top: 178rem;
-}
-
-.tech-marker-f {
-  right: 24%;
-  top: 224rem;
+  top: 77%;
 }
 
 .technical-panel {
@@ -400,12 +353,12 @@ input {
   overflow: hidden;
   border-top: 1px solid var(--voltjo-border-soft);
   border-bottom: 1px solid var(--voltjo-border-soft);
-  background: rgba(255, 255, 255, 0.64);
+  background: rgba(255, 255, 255, 0.58);
   mask-image: linear-gradient(to right, transparent, #000 12%, #000 88%, transparent);
 }
 
 .brand-marquee {
-  animation: brand-marquee 44s linear infinite;
+  animation: brand-marquee 52s linear infinite;
 }
 
 .brand-marquee-viewport:hover .brand-marquee {
@@ -415,7 +368,7 @@ input {
 .brand-logo-cell {
   display: flex;
   width: 166px;
-  height: 96px;
+  height: 92px;
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
@@ -430,6 +383,15 @@ input {
 .brand-logo-cell:hover {
   background: rgba(255, 255, 255, 0.82);
   opacity: 1;
+}
+
+.brand-logo-missing {
+  display: block;
+  width: 76px;
+  height: 18px;
+  border-radius: 999px;
+  border: 1px dashed rgba(13, 13, 13, 0.16);
+  background: rgba(13, 13, 13, 0.025);
 }
 
 @keyframes brand-marquee {
