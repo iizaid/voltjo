@@ -2,7 +2,7 @@
 
 import { Container } from "@/components/ui/Container";
 import { SectionLabel } from "@/components/ui/SectionLabel";
-import { Bot, MessageSquare, HelpCircle, Car, MapPin, BarChart3, BellRing, CheckCircle2, LucideIcon } from "lucide-react";
+import { Brain, HelpCircle, Car, MapPin, BarChart3, BellRing, CheckCircle2, LucideIcon } from "lucide-react";
 
 const leftCards = [
   { id: "01", title: "يفهم نوع السؤال", desc: "سيارة، شحن، مقارنة، أو مشكلة شائعة.", icon: HelpCircle },
@@ -22,32 +22,15 @@ const DesktopLinesSVG = () => (
     viewBox="0 0 300 600" 
     preserveAspectRatio="none"
   >
-    <defs>
-      <marker id="arrow-left" viewBox="0 0 10 10" refX="0" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
-        <path d="M 10 0 L 0 5 L 10 10 z" fill="var(--voltjo-orange)" />
-      </marker>
-      <marker id="arrow-right" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="5" markerHeight="5" orient="auto">
-        <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--voltjo-orange)" />
-      </marker>
-    </defs>
-
     {/* Left lines (point to left cards) */}
-    <path d="M 70 200 C 35 200, 35 60, 0 60" fill="none" stroke="var(--voltjo-orange)" strokeWidth="1.5" markerEnd="url(#arrow-left)" />
-    <path d="M 50 300 L 0 300" fill="none" stroke="var(--voltjo-orange)" strokeWidth="1.5" markerEnd="url(#arrow-left)" />
-    <path d="M 70 400 C 35 400, 35 540, 0 540" fill="none" stroke="var(--voltjo-orange)" strokeWidth="1.5" markerEnd="url(#arrow-left)" />
+    <path d="M 70 200 C 35 200, 35 60, 0 60" fill="none" stroke="var(--voltjo-orange)" strokeWidth="1.5" />
+    <path d="M 50 300 L 0 300" fill="none" stroke="var(--voltjo-orange)" strokeWidth="1.5" />
+    <path d="M 70 400 C 35 400, 35 540, 0 540" fill="none" stroke="var(--voltjo-orange)" strokeWidth="1.5" />
 
     {/* Right lines (point to right cards) */}
-    <path d="M 230 200 C 265 200, 265 60, 300 60" fill="none" stroke="var(--voltjo-orange)" strokeWidth="1.5" markerEnd="url(#arrow-right)" />
-    <path d="M 250 300 L 300 300" fill="none" stroke="var(--voltjo-orange)" strokeWidth="1.5" markerEnd="url(#arrow-right)" />
-    <path d="M 230 400 C 265 400, 265 540, 300 540" fill="none" stroke="var(--voltjo-orange)" strokeWidth="1.5" markerEnd="url(#arrow-right)" />
-
-    {/* Dots */}
-    <circle cx="70" cy="200" r="3" fill="var(--voltjo-orange)" />
-    <circle cx="50" cy="300" r="3" fill="var(--voltjo-orange)" />
-    <circle cx="70" cy="400" r="3" fill="var(--voltjo-orange)" />
-    <circle cx="230" cy="200" r="3" fill="var(--voltjo-orange)" />
-    <circle cx="250" cy="300" r="3" fill="var(--voltjo-orange)" />
-    <circle cx="230" cy="400" r="3" fill="var(--voltjo-orange)" />
+    <path d="M 230 200 C 265 200, 265 60, 300 60" fill="none" stroke="var(--voltjo-orange)" strokeWidth="1.5" />
+    <path d="M 250 300 L 300 300" fill="none" stroke="var(--voltjo-orange)" strokeWidth="1.5" />
+    <path d="M 230 400 C 265 400, 265 540, 300 540" fill="none" stroke="var(--voltjo-orange)" strokeWidth="1.5" />
   </svg>
 );
 
@@ -135,12 +118,7 @@ export function AiAssistantSection() {
                 
                 {/* Center Icon Plate */}
                 <div className="absolute inset-10 z-10 flex flex-col items-center justify-center rounded-full border border-zinc-100 bg-white shadow-xl">
-                  <div className="relative flex items-center justify-center">
-                    <Bot className="size-[52px] text-[var(--voltjo-black)] stroke-[1.5]" />
-                    <div className="absolute -bottom-2 -right-3 rounded-full bg-white p-1 shadow-sm">
-                      <MessageSquare className="size-5 text-[var(--voltjo-orange)] fill-[var(--voltjo-orange)]/20" />
-                    </div>
-                  </div>
+                  <Brain className="size-[48px] text-[var(--voltjo-black)] stroke-[1.5]" />
                 </div>
               </div>
             </div>

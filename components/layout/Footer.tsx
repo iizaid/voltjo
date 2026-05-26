@@ -1,125 +1,70 @@
 import Link from "next/link";
-import { Facebook, Instagram, Linkedin, Mail } from "lucide-react";
+import { Mail } from "lucide-react";
 import { VoltJoLogo } from "@/components/brand/VoltJoLogo";
 
-const footerColumns = [
-  {
-    title: "المنصة",
-    links: [
-      ["السيارات", "/cars"],
-      ["المقارنة", "/compare"],
-      ["الحاسبات", "/calculators"],
-      ["المساعد الذكي", "/assistant"],
-    ],
-  },
-  {
-    title: "الدعم",
-    links: [
-      ["تواصل معنا", "/resources"],
-      ["الدعم الفني", "/resources"],
-      ["اقترح سيارة", "/resources"],
-      ["الإبلاغ عن خطأ", "/resources"],
-    ],
-  },
-  {
-    title: "المصادر",
-    links: [
-      ["الأسعار", "/pricing"],
-      ["الدليل", "/resources"],
-      ["الأسئلة الشائعة", "/resources"],
-    ],
-  },
-  {
-    title: "قانوني",
-    links: [
-      ["سياسة الخصوصية", "/resources"],
-      ["الشروط والأحكام", "/resources"],
-    ],
-  },
-];
-
-const socialLinks = [
-  { label: "Instagram", icon: Instagram, href: "mailto:hello@voltjo.com" },
-  { label: "Facebook", icon: Facebook, href: "mailto:hello@voltjo.com" },
-  { label: "LinkedIn", icon: Linkedin, href: "mailto:hello@voltjo.com" },
-  { label: "Email", icon: Mail, href: "mailto:hello@voltjo.com" },
+const navLinks = [
+  { label: "الرئيسية", href: "/" },
+  { label: "السيارات", href: "/cars" },
+  { label: "المقارنة", href: "/compare" },
+  { label: "المساعد الذكي", href: "/assistant" },
+  { label: "الأسعار", href: "/pricing" },
 ];
 
 export function Footer() {
   return (
-    <footer className="relative z-10 w-full border-t border-[var(--voltjo-border)] bg-[var(--voltjo-bg-soft)]">
-      <div className="mx-auto grid max-w-[1180px] gap-10 px-6 py-16 lg:grid-cols-[1.35fr_2fr] lg:px-8 lg:py-20">
-        <div>
-          <VoltJoLogo />
-          <p className="mt-5 max-w-md text-base leading-8 text-[var(--voltjo-muted)]">
-            منصة أردنية ذكية لتبسيط قرارك في عالم السيارات الكهربائية
-            والهايبرد. نقارن، نحسب، ونقدم لك معلومات محلية موثوقة تختار بثقة.
+    <footer className="relative z-10 mt-16 bg-[#050505] text-white">
+      {/* Subtle top accent border */}
+      <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[var(--voltjo-orange)] to-transparent opacity-30" />
+      
+      <div className="mx-auto flex max-w-5xl flex-col items-center px-6 py-12 lg:px-8">
+        
+        {/* Logo & Tagline */}
+        <div className="mb-10 flex flex-col items-center text-center">
+          <div className="mb-6 flex h-14 items-center justify-center rounded-xl bg-white px-6 shadow-lg">
+            <VoltJoLogo />
+          </div>
+          <p className="max-w-md text-[15px] font-medium text-white/60">
+            منصة أردنية ذكية للسيارات الكهربائية والهايبرد.
           </p>
-          <div className="mt-6 flex flex-wrap gap-2">
-            {socialLinks.map(({ label, icon: Icon, href }) => (
-              <Link
-                key={label}
-                href={href}
-                aria-label={label}
-                className="flex h-11 w-11 items-center justify-center rounded-full border border-[var(--voltjo-border)] bg-white text-[var(--voltjo-black)] transition hover:border-[rgba(255,106,0,0.35)] hover:text-[var(--voltjo-orange)]"
-              >
-                <Icon size={18} />
-              </Link>
+        </div>
+
+        {/* Navigation */}
+        <nav className="mb-10 w-full" dir="rtl">
+          <ul className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4">
+            {navLinks.map((link) => (
+              <li key={link.label}>
+                <Link
+                  href={link.href}
+                  className="text-[15px] font-semibold text-white/80 transition-colors hover:text-[var(--voltjo-orange)]"
+                >
+                  {link.label}
+                </Link>
+              </li>
             ))}
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
-          {footerColumns.map((column) => (
-            <div key={column.title}>
-              <h3 className="text-base font-black text-[var(--voltjo-black)]">
-                {column.title}
-              </h3>
-              <ul className="mt-4 space-y-3">
-                {column.links.map(([label, href]) => (
-                  <li key={label}>
-                    <Link
-                      href={href}
-                      className="text-sm font-bold text-[var(--voltjo-muted)] transition hover:text-[var(--voltjo-orange)]"
-                    >
-                      {label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="border-t border-[var(--voltjo-border)]">
-        <div className="mx-auto max-w-[1180px] px-6 py-6 lg:px-8">
-          <div className="flex flex-wrap gap-2">
-            {[
-              "بيانات محلية موثوقة",
-              "تحديثات مستمرة للأسعار والمواصفات",
-              "دعم فريق محلي في الأردن",
-            ].map((badge) => (
-              <span
-                key={badge}
-                className="rounded-full border border-[var(--voltjo-border)] bg-white px-4 py-2 text-sm font-extrabold text-[var(--voltjo-muted)]"
+            <li>
+              <a
+                href="mailto:hello@voltjo.com"
+                className="text-[15px] font-semibold text-white/80 transition-colors hover:text-[var(--voltjo-orange)]"
               >
-                {badge}
-              </span>
-            ))}
-          </div>
+                تواصل معنا
+              </a>
+            </li>
+          </ul>
+        </nav>
 
-          <div className="mt-6 grid gap-4 border-t border-[var(--voltjo-border-soft)] pt-6 text-sm leading-7 text-[var(--voltjo-muted)] lg:grid-cols-[1fr_auto]">
-            <p>
-              جميع الحسابات والمعلومات المعروضة تقديرية لأغراض الإرشاد فقط، وقد
-              تختلف حسب الاستخدام الفعلي وتحديثات الشركات. يرجى التحقق من
-              التفاصيل من المصادر الرسمية عند الحاجة.
-            </p>
-            <p className="latin text-right font-semibold" dir="ltr">
-              © 2026 VoltJo. جميع الحقوق محفوظة.
-            </p>
-          </div>
+        {/* Contact Button */}
+        <div>
+          <a
+            href="mailto:hello@voltjo.com"
+            className="group flex items-center gap-2.5 rounded-full border border-[var(--voltjo-orange)]/40 bg-[var(--voltjo-orange)]/10 px-7 py-3 transition-all hover:bg-[var(--voltjo-orange)]/20"
+          >
+            <Mail className="size-[18px] text-[var(--voltjo-orange)]" />
+            <span className="text-[15px] font-bold tracking-wide text-[var(--voltjo-orange)]" dir="ltr">
+              hello@voltjo.com
+            </span>
+          </a>
         </div>
+
       </div>
     </footer>
   );
