@@ -37,13 +37,13 @@ function formatDate(value: string | undefined) {
 }
 
 export default async function AccountPage() {
-  const { user: maybeUser, profile } = await getCurrentUserAndProfile();
+  const { user, profile } = await getCurrentUserAndProfile();
 
-  if (!maybeUser) {
+  if (!user) {
     redirect("/start");
+    return null;
   }
 
-  const user = maybeUser;
   const displayName = profile?.full_name || "مستخدم VoltJo";
   const accountCreatedAt = formatDate(user.created_at);
   const priorityLabels = getPriorityLabels(profile?.priorities);
