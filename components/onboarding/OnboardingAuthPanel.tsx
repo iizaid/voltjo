@@ -34,16 +34,18 @@ function getProfileHighlights(answers: CustomerProfileDraft) {
 
 export function OnboardingAuthPanel({
   answers,
+  notice,
   onBack,
 }: {
   answers: CustomerProfileDraft;
+  notice?: string | null;
   onBack: () => void;
 }) {
   const router = useRouter();
   const [mode, setMode] = useState<AuthMode>("signup");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [authMessage, setAuthMessage] = useState<string | null>(null);
-  const [authError, setAuthError] = useState<string | null>(null);
+  const [authError, setAuthError] = useState<string | null>(notice || null);
   const highlights = useMemo(() => getProfileHighlights(answers), [answers]);
   const serializedAnswers = useMemo(() => JSON.stringify(answers), [answers]);
 

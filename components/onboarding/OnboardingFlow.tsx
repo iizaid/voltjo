@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { AnimatePresence } from "motion/react";
 import { OnboardingAuthPanel } from "@/components/onboarding/OnboardingAuthPanel";
 import { OnboardingIntro } from "@/components/onboarding/OnboardingIntro";
@@ -49,12 +49,18 @@ function hasDraftAnswers(answers: CustomerProfileDraft) {
 
 export function OnboardingFlow({ isAuthenticated }: { isAuthenticated?: boolean }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const isOAuthReturn = searchParams.get("auth") === "oauth-success";
+
   const [flowState, setFlowState] = useState<FlowState>("intro");
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<CustomerProfileDraft>({});
   const [hasHydrated, setHasHydrated] = useState(false);
-  const [isSavingProfile, setIsSavingProfile] = useState(false);
+  const [, setIsSavingProfile] = useState(false);
+  const [flowNotice, setFlowNotice] = useState<string | null>(null);
+
   const nextTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const hasAttemptedOAuthProfileSaveRef = useRef(false);
 
   const visibleQuestions = useMemo(() => getVisibleQuestions(answers), [answers]);
   const currentQuestion = visibleQuestions[currentQuestionIndex];
@@ -195,25 +201,25 @@ export function OnboardingFlow({ isAuthenticated }: { isAuthenticated?: boolean 
   }, [currentQuestionIndex, visibleQuestions.length]);
 
   useEffect(() => {
-    if (
-      hasHydrated &&
-      isAuthenticated &&
-      flowState === "auth" &&
-      hasDraftAnswers(answers) &&
-      !isSavingProfile
-    ) {
-      setIsSavingProfile(true);
-      saveOnboardingProfileAction(answers).then((result) => {
-        if (result.ok) {
-          clearOnboardingDraft();
-          router.push("/assistant");
-          router.refresh();
-        } else {
-          setIsSavingProfile(false);
-        }
-      });
-    }
-  }, [hasHydrated, isAuthenticated, flowState, answers, isSavingProfile, router]);
+    if (!hasHydrated || !isAuthenticated || !isOAuthReturn) return;
+    if (hasAttemptedOAuthProfileSaveRef.current) return;
+    if (!hasDraftAnswers(answers)) return;
+
+    hasAttemptedOAuthProfileSaveRef.current = true;
+    setIsSavingProfile(true);
+
+    saveOnboardingProfileAction(answers).then((result) => {
+      if (result.ok) {
+        clearOnboardingDraft();
+        router.push("/assistant");
+        router.refresh();
+      } else {
+        setIsSavingProfile(false);
+        setFlowNotice("تم تسجيل الدخول، لكن تعذر حفظ ملفك الذكي. حاول مرة أخرى.");
+        setFlowState("auth");
+      }
+    });
+  }, [hasHydrated, isAuthenticated, isOAuthReturn, answers, router]);
 
   return (
     <AnimatePresence mode="wait">
@@ -235,7 +241,7 @@ export function OnboardingFlow({ isAuthenticated }: { isAuthenticated?: boolean 
       ) : null}
 
       {flowState === "auth" ? (
-        <OnboardingAuthPanel key="auth" answers={answers} onBack={goBack} />
+        <OnboardingAuthPanel key="auth" answers={answers} notice={flowNotice} onBack={goBack} />
       ) : null}
     </AnimatePresence>
   );
