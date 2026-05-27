@@ -240,12 +240,12 @@ export function ChatShell({
   }, [hasHydratedConversations, initialPrompt]);
 
   return (
-    <div className="flex h-dvh w-full overflow-hidden bg-[#F8F7F4] text-[#1F1F1D]" dir="rtl">
+    <div className="flex h-dvh w-full overflow-hidden bg-[#161614] text-white" dir="rtl">
       {mobileSidebarOpen ? (
         <button
           type="button"
           aria-label="إغلاق القائمة"
-          className="fixed inset-0 z-40 bg-black/10 lg:hidden"
+          className="fixed inset-0 z-40 bg-black/40 lg:hidden"
           onClick={() => setMobileSidebarOpen(false)}
         />
       ) : null}
@@ -272,6 +272,10 @@ export function ChatShell({
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         searchInputRef={searchInputRef}
+        onQuickPrompt={(prompt) => {
+          handleCreateNew();
+          void submitPrompt(prompt, undefined, { forceNew: true });
+        }}
       />
       <ChatThread
         messages={messages}
