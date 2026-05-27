@@ -37,7 +37,13 @@ export type ChatAccount = {
   initial: string;
 };
 
-export function ChatShell({ account }: { account?: ChatAccount | null }) {
+export function ChatShell({
+  account,
+  initialPrompt,
+}: {
+  account?: ChatAccount | null;
+  initialPrompt?: string | null;
+}) {
   const [conversations, setConversations] = useState<ChatConversation[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [composerValue, setComposerValue] = useState("");
@@ -47,8 +53,11 @@ export function ChatShell({ account }: { account?: ChatAccount | null }) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [hasHydratedConversations, setHasHydratedConversations] = useState(false);
 
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const hasSubmittedInitialPromptRef = useRef(false);
+  const submitPromptRef = useRef<((prompt: string, att?: ChatAttachment) => Promise<void>) | null>(null);
 
   // Load from local storage on mount
   useEffect(() => {
@@ -63,6 +72,7 @@ export function ChatShell({ account }: { account?: ChatAccount | null }) {
     }
 
     setSidebarCollapsed(loadSidebarCollapsed());
+    setHasHydratedConversations(true);
   }, []);
 
   // Persist to local storage on change
@@ -209,6 +219,17 @@ export function ChatShell({ account }: { account?: ChatAccount | null }) {
       setIsLoading(false);
     }
   };
+
+  submitPromptRef.current = submitPrompt;
+
+  useEffect(() => {
+    if (!hasHydratedConversations) return;
+    if (!initialPrompt?.trim()) return;
+    if (hasSubmittedInitialPromptRef.current) return;
+
+    hasSubmittedInitialPromptRef.current = true;
+    void submitPromptRef.current?.(initialPrompt);
+  }, [hasHydratedConversations, initialPrompt]);
 
   return (
     <div className="flex h-dvh w-full overflow-hidden bg-[#F8F7F4] text-[#1F1F1D]" dir="rtl">
