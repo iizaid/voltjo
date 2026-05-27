@@ -3,7 +3,6 @@
 import { FormEvent, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "motion/react";
-// @ts-expect-error untyped component from React Bits
 import Folder from "@/components/Folder";
 import { VoltJoLogo } from "@/components/brand/VoltJoLogo";
 import { onboardingQuestions } from "@/lib/onboarding/questions";
@@ -51,6 +50,7 @@ export function OnboardingAuthPanel({
     setIsSubmitting(true);
 
     // TODO: Replace this fake success with backend auth and profile persistence.
+    // Do not persist email/password in the local demo flow.
     saveOnboardingDraft(answers);
 
     window.setTimeout(() => {
@@ -142,6 +142,10 @@ export function OnboardingAuthPanel({
           </div>
 
           <form className="mt-7 grid gap-4" onSubmit={handleSubmit}>
+            <p className="rounded-[16px] border border-[rgba(255,106,0,0.18)] bg-[rgba(255,106,0,0.055)] px-4 py-3 text-sm font-semibold leading-7 text-[var(--voltjo-muted)]">
+              هذه نسخة تجريبية محلية. لن يتم إنشاء حساب حقيقي الآن، وسيتم استخدام
+              إجاباتك فقط لتخصيص التجربة داخل المتصفح.
+            </p>
             {mode === "signup" ? (
               <label className="grid gap-2 text-sm font-bold text-[var(--voltjo-black)]">
                 الاسم

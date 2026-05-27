@@ -1,8 +1,6 @@
 import type { ChatConversation } from "./types";
 import { safeParseConversations } from "./conversation-utils";
 
-const IS_SERVER = typeof window === "undefined";
-
 const KEYS = {
   CONVERSATIONS: "voltjo:chat:conversations",
   ACTIVE_ID: "voltjo:chat:activeConversationId",
@@ -15,35 +13,77 @@ const LEGACY_KEYS = {
   SIDEBAR_COLLAPSED: "voltjo_sidebar_collapsed",
 };
 
+function getStorage() {
+  if (typeof window === "undefined") return null;
+
+  try {
+    return window.localStorage;
+  } catch {
+    return null;
+  }
+}
+
+function getItem(storage: Storage, primaryKey: string, legacyKey?: string) {
+  try {
+    return storage.getItem(primaryKey) || (legacyKey ? storage.getItem(legacyKey) : null);
+  } catch {
+    return null;
+  }
+}
+
 export function loadConversations(): ChatConversation[] {
-  if (IS_SERVER) return [];
-  const data = localStorage.getItem(KEYS.CONVERSATIONS) || localStorage.getItem(LEGACY_KEYS.CONVERSATIONS);
+  const storage = getStorage();
+  if (!storage) return [];
+
+  const data = getItem(storage, KEYS.CONVERSATIONS, LEGACY_KEYS.CONVERSATIONS);
   return safeParseConversations(data);
 }
 
 export function saveConversations(conversations: ChatConversation[]) {
-  if (IS_SERVER) return;
-  localStorage.setItem(KEYS.CONVERSATIONS, JSON.stringify(conversations));
+  const storage = getStorage();
+  if (!storage) return;
+
+  try {
+    storage.setItem(KEYS.CONVERSATIONS, JSON.stringify(conversations));
+  } catch {
+    // Local chat persistence is best-effort only.
+  }
 }
 
 export function loadActiveConversationId(): string | null {
-  if (IS_SERVER) return null;
-  return localStorage.getItem(KEYS.ACTIVE_ID) || localStorage.getItem(LEGACY_KEYS.ACTIVE_ID);
+  const storage = getStorage();
+  if (!storage) return null;
+
+  return getItem(storage, KEYS.ACTIVE_ID, LEGACY_KEYS.ACTIVE_ID);
 }
 
 export function saveActiveConversationId(id: string | null) {
-  if (IS_SERVER) return;
-  if (id) localStorage.setItem(KEYS.ACTIVE_ID, id);
-  else localStorage.removeItem(KEYS.ACTIVE_ID);
+  const storage = getStorage();
+  if (!storage) return;
+
+  try {
+    if (id) storage.setItem(KEYS.ACTIVE_ID, id);
+    else storage.removeItem(KEYS.ACTIVE_ID);
+  } catch {
+    // Local chat persistence is best-effort only.
+  }
 }
 
 export function loadSidebarCollapsed(): boolean {
-  if (IS_SERVER) return false;
-  const val = localStorage.getItem(KEYS.SIDEBAR_COLLAPSED) || localStorage.getItem(LEGACY_KEYS.SIDEBAR_COLLAPSED);
+  const storage = getStorage();
+  if (!storage) return false;
+
+  const val = getItem(storage, KEYS.SIDEBAR_COLLAPSED, LEGACY_KEYS.SIDEBAR_COLLAPSED);
   return val === "true";
 }
 
 export function saveSidebarCollapsed(value: boolean) {
-  if (IS_SERVER) return;
-  localStorage.setItem(KEYS.SIDEBAR_COLLAPSED, String(value));
+  const storage = getStorage();
+  if (!storage) return;
+
+  try {
+    storage.setItem(KEYS.SIDEBAR_COLLAPSED, String(value));
+  } catch {
+    // Local chat persistence is best-effort only.
+  }
 }

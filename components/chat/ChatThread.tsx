@@ -15,6 +15,7 @@ export function ChatThread({
   isLoading,
   attachment,
   onAttachmentChange,
+  onNotice,
 }: {
   messages: ChatMessageType[];
   composerValue: string;
@@ -26,6 +27,7 @@ export function ChatThread({
   isLoading?: boolean;
   attachment: ChatAttachment | null;
   onAttachmentChange: (att: ChatAttachment | null) => void;
+  onNotice: (message: string) => void;
 }) {
   const hasMessages = messages.length > 0;
 
@@ -56,6 +58,7 @@ export function ChatThread({
                 isLoading={isLoading}
                 attachment={attachment}
                 onAttachmentChange={onAttachmentChange}
+                onNotice={onNotice}
               />
               {notice ? (
                 <p className="mx-auto mt-3 max-w-[820px] text-center text-xs font-medium text-[#6F6A60]">
@@ -73,6 +76,7 @@ export function ChatThread({
             onSuggestionSelect={onSuggestionSelect}
             attachment={attachment}
             onAttachmentChange={onAttachmentChange}
+            onNotice={onNotice}
           />
         )}
       </div>

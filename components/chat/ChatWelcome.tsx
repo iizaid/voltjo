@@ -10,6 +10,7 @@ export function ChatWelcome({
   onSuggestionSelect,
   attachment,
   onAttachmentChange,
+  onNotice,
 }: {
   composerValue: string;
   notice: string | null;
@@ -18,6 +19,7 @@ export function ChatWelcome({
   onSuggestionSelect: (suggestion: string) => void;
   attachment: ChatAttachment | null;
   onAttachmentChange: (att: ChatAttachment | null) => void;
+  onNotice: (message: string) => void;
 }) {
   return (
     <section className="mx-auto flex w-full max-w-[920px] flex-col items-center px-4 text-center">
@@ -35,6 +37,7 @@ export function ChatWelcome({
           onSubmit={onSubmit}
           attachment={attachment}
           onAttachmentChange={onAttachmentChange}
+          onNotice={onNotice}
         />
         {notice ? (
           <p className="mx-auto mt-3 max-w-[820px] text-center text-xs font-medium text-[#6F6A60]">

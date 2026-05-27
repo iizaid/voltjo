@@ -8,7 +8,7 @@ export function ChatMessage({ message }: { message: ChatMessageType }) {
     return (
       <article className="flex w-full justify-start" data-role="assistant">
         <div className="max-w-[min(760px,92%)] px-2 py-2 text-right">
-          <p className="animate-pulse text-[15px] font-semibold leading-8 text-[#6F6A60]">
+          <p className="animate-pulse text-[15px] font-semibold leading-8 text-[#6F6A60]" dir="rtl">
             جاري التفكير...
           </p>
         </div>
@@ -19,7 +19,7 @@ export function ChatMessage({ message }: { message: ChatMessageType }) {
   if (!isUser && message.status === "error") {
     return (
       <article className="flex w-full justify-start" data-role="assistant">
-        <div className="max-w-[min(760px,92%)] rounded-xl bg-red-50 px-4 py-3 text-right text-sm font-semibold text-red-600">
+        <div className="max-w-[min(760px,92%)] rounded-xl bg-red-50 px-4 py-3 text-right text-sm font-semibold leading-7 text-red-600" dir="rtl">
           {message.content || "حدث خطأ غير متوقع."}
         </div>
       </article>
@@ -45,18 +45,19 @@ export function ChatMessage({ message }: { message: ChatMessageType }) {
           </div>
         )}
         <p
-          className={`text-[15px] font-semibold leading-8 ${
+          dir="rtl"
+          className={`whitespace-pre-wrap break-words text-[15px] font-semibold leading-8 [unicode-bidi:plaintext] ${
             isUser ? "text-white" : "text-[#1F1F1D]"
           }`}
         >
           {message.content}
         </p>
         {message.bullets ? (
-          <ul className="mt-4 space-y-2 text-[15px] font-semibold leading-8 text-[#6F6A60]">
+          <ul className="mt-4 space-y-2 text-right text-[15px] font-semibold leading-8 text-[#6F6A60]" dir="rtl">
             {message.bullets.map((bullet) => (
-              <li key={bullet} className="flex gap-2">
-                <span className="mt-3 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--voltjo-orange)]" />
-                <span>{bullet}</span>
+              <li key={bullet} className="flex items-start gap-2">
+                <span className="mt-3 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--voltjo-orange)]" aria-hidden="true" />
+                <span className="min-w-0 break-words [unicode-bidi:plaintext]">{bullet}</span>
               </li>
             ))}
           </ul>

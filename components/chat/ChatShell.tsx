@@ -25,6 +25,11 @@ import {
   renameConversation as renameConversationUtil,
   serializeConversationsForExport,
 } from "@/lib/chat/conversation-utils";
+import {
+  ATTACHMENT_DEMO_NOTICE,
+  LONG_MESSAGE_NOTICE,
+  MAX_CHAT_MESSAGE_LENGTH,
+} from "@/lib/chat/constants";
 
 export function ChatShell() {
   const [conversations, setConversations] = useState<ChatConversation[]>([]);
@@ -71,13 +76,7 @@ export function ChatShell() {
   const messages = activeConversation?.messages ?? [];
 
   const handleCreateNew = () => {
-    if (activeConversation && activeConversation.messages.length === 0) {
-      setMobileSidebarOpen(false);
-      return;
-    }
-    const newConv = createConversation();
-    setConversations((prev) => [newConv, ...prev]);
-    setActiveId(newConv.id);
+    setActiveId(null);
     setComposerValue("");
     setAttachment(null);
     setNotice(null);
@@ -89,6 +88,7 @@ export function ChatShell() {
     setActiveId(null);
     setComposerValue("");
     setAttachment(null);
+    setNotice(null);
   };
 
   const handleExportConversations = () => {
@@ -120,6 +120,17 @@ export function ChatShell() {
   const submitPrompt = async (prompt: string, att?: ChatAttachment) => {
     const trimmedPrompt = prompt.trim();
     if ((!trimmedPrompt && !att) || isLoading) return;
+
+    if (trimmedPrompt.length > MAX_CHAT_MESSAGE_LENGTH) {
+      setNotice(LONG_MESSAGE_NOTICE);
+      return;
+    }
+
+    if (att) {
+      setNotice(ATTACHMENT_DEMO_NOTICE);
+    } else {
+      setNotice(null);
+    }
 
     let targetId = activeId;
     let newConversations = [...conversations];
@@ -159,7 +170,7 @@ export function ChatShell() {
     setMobileSidebarOpen(false);
 
     try {
-      const response = await simulateChatResponse(trimmedPrompt);
+      const response = await simulateChatResponse(trimmedPrompt || att?.name || "مرفق");
       const completed = completeAssistantMessage(placeholder, response);
       setConversations((prev) =>
         prev.map((c) => {
@@ -218,6 +229,9 @@ export function ChatShell() {
         activeId={activeId}
         onSelectConversation={(id) => {
           setActiveId(id);
+          setComposerValue("");
+          setAttachment(null);
+          setNotice(null);
           setMobileSidebarOpen(false);
         }}
         onDeleteConversation={handleDeleteConversation}
@@ -240,6 +254,7 @@ export function ChatShell() {
         isLoading={isLoading}
         attachment={attachment}
         onAttachmentChange={setAttachment}
+        onNotice={setNotice}
       />
     </div>
   );

@@ -141,6 +141,7 @@ const PricingSwitch = ({
 
 export default function Pricing() {
   const [isYearly, setIsYearly] = useState(false);
+  const [pricingNotice, setPricingNotice] = useState<string | null>(null);
   const pricingRef = useRef<HTMLDivElement>(null);
 
   const revealVariants = {
@@ -160,6 +161,11 @@ export default function Pricing() {
 
   const togglePricingPeriod = (value: string) =>
     setIsYearly(Number.parseInt(value) === 1);
+
+  const showPricingNotice = () => {
+    setPricingNotice("الاشتراكات ستتوفر قريبًا قبل الإطلاق الرسمي.");
+    window.setTimeout(() => setPricingNotice(null), 3600);
+  };
 
   return (
     <div
@@ -262,7 +268,7 @@ export default function Pricing() {
               <CardContent className="flex flex-1 flex-col pt-0">
                 <button
                   type="button"
-                  onClick={() => alert("سوف تتوفر هذه الميزة قريباً!")}
+                  onClick={showPricingNotice}
                   className={`mb-3 w-full rounded-xl px-4 py-3 text-base font-bold transition-all ${
                     plan.popular
                       ? "border border-orange-400 bg-gradient-to-t from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/30 hover:-translate-y-0.5"
@@ -276,7 +282,7 @@ export default function Pricing() {
                 {plan.secondaryButtonText && (
                   <button
                     type="button"
-                    onClick={() => alert("سوف تتوفر هذه الميزة قريباً!")}
+                    onClick={showPricingNotice}
                     className="mb-6 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-base font-bold text-gray-800 shadow-sm transition-all hover:-translate-y-0.5 hover:bg-gray-50"
                   >
                     {plan.secondaryButtonText}
@@ -312,6 +318,15 @@ export default function Pricing() {
       <p className="mx-auto mt-5 max-w-2xl text-center text-sm font-semibold leading-7 text-[var(--voltjo-muted)]">
         الأسعار والمزايا مؤقتة وقابلة للتعديل قبل الإطلاق الرسمي.
       </p>
+      {pricingNotice ? (
+        <p
+          role="status"
+          aria-live="polite"
+          className="mx-auto mt-3 max-w-2xl rounded-full border border-orange-200 bg-orange-50 px-4 py-2 text-center text-sm font-bold leading-7 text-gray-800"
+        >
+          {pricingNotice}
+        </p>
+      ) : null}
     </div>
   );
 }

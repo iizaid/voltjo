@@ -2,6 +2,7 @@
 
 import { Container } from "@/components/ui/Container";
 import { Brain, HelpCircle, Car, MapPin, BarChart3, BellRing, CheckCircle2, LucideIcon } from "lucide-react";
+import TrueFocus from "@/components/TrueFocus";
 
 const leftCards = [
   { id: "01", title: "يفهم نوع السؤال", desc: "سيارة، شحن، مقارنة، أو مشكلة شائعة.", icon: HelpCircle },
@@ -74,9 +75,6 @@ const BranchCard = ({ num, title, desc, icon: Icon, side }: BranchCardProps) => 
     </div>
   );
 };
-
-// @ts-expect-error: TrueFocus is a JSX component without types
-import TrueFocus from "@/components/TrueFocus";
 
 export function AiAssistantSection() {
   return (

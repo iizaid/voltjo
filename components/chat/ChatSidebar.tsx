@@ -63,9 +63,16 @@ export function ChatSidebar({
 
   useEffect(() => {
     setIsMounted(true);
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      setSidebarWidth(parseInt(saved, 10));
+    try {
+      const saved = window.localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const parsedWidth = Number.parseInt(saved, 10);
+        if (Number.isFinite(parsedWidth)) {
+          setSidebarWidth(Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, parsedWidth)));
+        }
+      }
+    } catch {
+      // Sidebar width persistence is best-effort only.
     }
   }, []);
   const isResizing = useRef(false);
@@ -101,7 +108,11 @@ export function ChatSidebar({
 
   useEffect(() => {
     if (isMounted) {
-      localStorage.setItem(STORAGE_KEY, String(sidebarWidth));
+      try {
+        window.localStorage.setItem(STORAGE_KEY, String(sidebarWidth));
+      } catch {
+        // Sidebar width persistence is best-effort only.
+      }
     }
   }, [sidebarWidth, isMounted]);
 

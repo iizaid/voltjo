@@ -22,14 +22,23 @@ export function saveOnboardingDraft(data: CustomerProfileDraft) {
   const storage = getLocalStorage();
   if (!storage) return;
 
-  storage.setItem(ONBOARDING_STORAGE_KEY, JSON.stringify(data));
+  try {
+    storage.setItem(ONBOARDING_STORAGE_KEY, JSON.stringify(data));
+  } catch {
+    // Onboarding persistence is best-effort until backend storage is added.
+  }
 }
 
 export function loadOnboardingDraft(): CustomerProfileDraft | null {
   const storage = getLocalStorage();
   if (!storage) return null;
 
-  const rawDraft = storage.getItem(ONBOARDING_STORAGE_KEY);
+  let rawDraft: string | null;
+  try {
+    rawDraft = storage.getItem(ONBOARDING_STORAGE_KEY);
+  } catch {
+    return null;
+  }
   if (!rawDraft) return null;
 
   try {
@@ -45,18 +54,36 @@ export function saveOnboardingProgress(data: OnboardingProgress) {
   const storage = getLocalStorage();
   if (!storage) return;
 
-  storage.setItem(ONBOARDING_PROGRESS_KEY, JSON.stringify(data));
+  try {
+    storage.setItem(ONBOARDING_PROGRESS_KEY, JSON.stringify(data));
+  } catch {
+    // Onboarding persistence is best-effort until backend storage is added.
+  }
 }
 
 export function loadOnboardingProgress(): OnboardingProgress | null {
   const storage = getLocalStorage();
   if (!storage) return null;
 
-  const raw = storage.getItem(ONBOARDING_PROGRESS_KEY);
+  let raw: string | null;
+  try {
+    raw = storage.getItem(ONBOARDING_PROGRESS_KEY);
+  } catch {
+    return null;
+  }
   if (!raw) return null;
 
   try {
-    return JSON.parse(raw) as OnboardingProgress;
+    const parsed = JSON.parse(raw);
+    if (
+      !parsed ||
+      typeof parsed !== "object" ||
+      !["intro", "questions", "auth"].includes(parsed.flowState) ||
+      typeof parsed.currentQuestionIndex !== "number"
+    ) {
+      return null;
+    }
+    return parsed as OnboardingProgress;
   } catch {
     return null;
   }
@@ -66,6 +93,10 @@ export function clearOnboardingDraft() {
   const storage = getLocalStorage();
   if (!storage) return;
 
-  storage.removeItem(ONBOARDING_STORAGE_KEY);
-  storage.removeItem(ONBOARDING_PROGRESS_KEY);
+  try {
+    storage.removeItem(ONBOARDING_STORAGE_KEY);
+    storage.removeItem(ONBOARDING_PROGRESS_KEY);
+  } catch {
+    // Onboarding persistence is best-effort until backend storage is added.
+  }
 }

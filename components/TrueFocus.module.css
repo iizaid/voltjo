@@ -1,4 +1,4 @@
-.focus-container {
+.focusContainer {
   position: relative;
   display: flex;
   gap: 0.3em;
@@ -9,7 +9,7 @@
   user-select: none;
 }
 
-.focus-word {
+.focusWord {
   position: relative;
   cursor: pointer;
   transition:
@@ -19,11 +19,19 @@
   user-select: none;
 }
 
-.focus-word.active {
+.focusWord.active {
   filter: blur(0);
 }
 
-.focus-frame {
+.manual {
+  cursor: pointer;
+}
+
+.active {
+  filter: blur(0);
+}
+
+.focusFrame {
   position: absolute;
   top: 0;
   left: 0;
@@ -42,30 +50,30 @@
   transition: none;
 }
 
-.top-left {
+.topLeft {
   top: -10px;
   left: -10px;
   border-right: none;
   border-bottom: none;
 }
 
-.top-right {
+.topRight {
   top: -10px;
   right: -10px;
   border-left: none;
   border-bottom: none;
 }
 
-.bottom-left {
+.bottomLeft {
   bottom: -10px;
   left: -10px;
   border-right: none;
   border-top: none;
 }
 
-.bottom-right {
-  bottom: -10px;
+.bottomRight {
   right: -10px;
+  bottom: -10px;
   border-left: none;
   border-top: none;
 }

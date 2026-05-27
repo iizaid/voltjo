@@ -3,6 +3,14 @@
 import { ArrowUp, Image, Paperclip, FileText, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { ChatAttachment } from "@/lib/chat/types";
+import {
+  ALLOWED_CHAT_ATTACHMENT_TYPES,
+  ATTACHMENT_DEMO_NOTICE,
+  INVALID_ATTACHMENT_TYPE_NOTICE,
+  LARGE_ATTACHMENT_NOTICE,
+  MAX_CHAT_ATTACHMENT_SIZE_BYTES,
+  MAX_CHAT_MESSAGE_LENGTH,
+} from "@/lib/chat/constants";
 
 export function ChatComposer({
   value,
@@ -11,6 +19,7 @@ export function ChatComposer({
   isLoading,
   attachment,
   onAttachmentChange,
+  onNotice,
 }: {
   value: string;
   onChange: (value: string) => void;
@@ -18,6 +27,7 @@ export function ChatComposer({
   isLoading?: boolean;
   attachment?: ChatAttachment | null;
   onAttachmentChange?: (att: ChatAttachment | null) => void;
+  onNotice?: (message: string) => void;
 }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
@@ -28,13 +38,32 @@ export function ChatComposer({
     onSubmit(value);
   };
 
-  const handleFileSelect = (file: File) => {
+  const handleFileSelect = (file: File | undefined | null) => {
+    if (!file) return;
+
+    if (
+      !ALLOWED_CHAT_ATTACHMENT_TYPES.includes(
+        file.type as (typeof ALLOWED_CHAT_ATTACHMENT_TYPES)[number],
+      )
+    ) {
+      onNotice?.(INVALID_ATTACHMENT_TYPE_NOTICE);
+      setDropdownOpen(false);
+      return;
+    }
+
+    if (file.size > MAX_CHAT_ATTACHMENT_SIZE_BYTES) {
+      onNotice?.(LARGE_ATTACHMENT_NOTICE);
+      setDropdownOpen(false);
+      return;
+    }
+
     onAttachmentChange?.({
       id: `att-${Date.now()}`,
       name: file.name,
       size: file.size,
       type: file.type,
     });
+    onNotice?.(ATTACHMENT_DEMO_NOTICE);
     setDropdownOpen(false);
   };
 
@@ -76,6 +105,7 @@ export function ChatComposer({
         <textarea
           aria-label="رسالة إلى VoltJo Assistant"
           value={value}
+          maxLength={MAX_CHAT_MESSAGE_LENGTH + 1}
           onChange={(event) => onChange(event.target.value)}
           onKeyDown={(event) => {
             if (event.key === "Enter" && !event.shiftKey) {
@@ -91,25 +121,22 @@ export function ChatComposer({
           {/* Hidden file inputs */}
           <input
             type="file"
-            accept="image/*"
+            accept="image/png,image/jpeg,image/webp"
             ref={imageInputRef}
             className="hidden"
             onChange={(e) => {
-              if (e.target.files && e.target.files[0]) {
-                handleFileSelect(e.target.files[0]);
-                e.target.value = "";
-              }
+              handleFileSelect(e.target.files?.[0]);
+              e.target.value = "";
             }}
           />
           <input
             type="file"
+            accept="application/pdf"
             ref={fileInputRef}
             className="hidden"
             onChange={(e) => {
-              if (e.target.files && e.target.files[0]) {
-                handleFileSelect(e.target.files[0]);
-                e.target.value = "";
-              }
+              handleFileSelect(e.target.files?.[0]);
+              e.target.value = "";
             }}
           />
 
