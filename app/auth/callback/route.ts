@@ -39,6 +39,19 @@ export async function GET(request: NextRequest) {
     if (error) {
       return NextResponse.redirect(new URL(AUTH_ERROR_REDIRECT_PATH, request.url));
     }
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("onboarding_completed")
+        .eq("id", user.id)
+        .maybeSingle();
+
+      if (!profile?.onboarding_completed) {
+        return NextResponse.redirect(new URL("/start?auth=oauth-success", request.url));
+      }
+    }
   }
 
   return NextResponse.redirect(new URL(next, request.url));

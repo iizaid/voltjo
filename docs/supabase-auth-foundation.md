@@ -137,6 +137,8 @@ The current in-memory rate limiter is a Phase 1 safety guard only. Replace it wi
 - Decide intentionally whether email confirmation is enabled.
 - Set the production Site URL in Supabase Auth settings.
 - Add all production auth redirect URLs, including `/auth/callback`.
+- Configure Google and GitHub OAuth providers in the Supabase Auth dashboard.
+- Do not commit OAuth client secrets to the VoltJo repository.
 - Use a production SMTP provider for auth email before launch.
 - Keep the Supabase service role key out of frontend code and out of `NEXT_PUBLIC_*`.
 - Add production-grade distributed rate limiting before launch.

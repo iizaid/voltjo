@@ -73,7 +73,8 @@ Not implemented yet:
 ## Production Security Checklist
 
 - Run `supabase/schema.sql` in Supabase.
-- Configure Supabase Site URL and Redirect URLs, including `/auth/callback`.
+- Configure Supabase Site URL and Redirect URLs, including `/auth/callback` for email and OAuth.
+- Enable Google and GitHub providers in Supabase Auth dashboard with their respective credentials.
 - Decide whether email confirmation is enabled.
 - Use a production SMTP provider for auth email.
 - Verify RLS with two separate users.

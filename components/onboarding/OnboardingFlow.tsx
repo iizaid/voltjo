@@ -1,16 +1,19 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { AnimatePresence } from "motion/react";
 import { OnboardingAuthPanel } from "@/components/onboarding/OnboardingAuthPanel";
 import { OnboardingIntro } from "@/components/onboarding/OnboardingIntro";
 import { OnboardingQuestion } from "@/components/onboarding/OnboardingQuestion";
 import { onboardingQuestions } from "@/lib/onboarding/questions";
+import { saveOnboardingProfileAction } from "@/lib/auth/actions";
 import {
   loadOnboardingDraft,
   saveOnboardingDraft,
   loadOnboardingProgress,
   saveOnboardingProgress,
+  clearOnboardingDraft,
 } from "@/lib/onboarding/storage";
 import type {
   CustomerProfileDraft,
@@ -44,11 +47,13 @@ function hasDraftAnswers(answers: CustomerProfileDraft) {
   return Object.keys(answers).length > 0;
 }
 
-export function OnboardingFlow() {
+export function OnboardingFlow({ isAuthenticated }: { isAuthenticated?: boolean }) {
+  const router = useRouter();
   const [flowState, setFlowState] = useState<FlowState>("intro");
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<CustomerProfileDraft>({});
   const [hasHydrated, setHasHydrated] = useState(false);
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
   const nextTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const visibleQuestions = useMemo(() => getVisibleQuestions(answers), [answers]);
@@ -68,10 +73,23 @@ export function OnboardingFlow() {
     }
   };
 
-  const goToNextStep = () => {
+  const goToNextStep = async () => {
     clearNextTimeout();
     if (currentQuestionIndex >= visibleQuestions.length - 1) {
-      setFlowState("auth");
+      if (isAuthenticated) {
+        setIsSavingProfile(true);
+        const result = await saveOnboardingProfileAction(answers);
+        if (result.ok) {
+          clearOnboardingDraft();
+          router.push("/assistant");
+          router.refresh();
+        } else {
+          setIsSavingProfile(false);
+          setFlowState("auth");
+        }
+      } else {
+        setFlowState("auth");
+      }
       return;
     }
 
@@ -175,6 +193,27 @@ export function OnboardingFlow() {
       setCurrentQuestionIndex(Math.max(0, visibleQuestions.length - 1));
     }
   }, [currentQuestionIndex, visibleQuestions.length]);
+
+  useEffect(() => {
+    if (
+      hasHydrated &&
+      isAuthenticated &&
+      flowState === "auth" &&
+      hasDraftAnswers(answers) &&
+      !isSavingProfile
+    ) {
+      setIsSavingProfile(true);
+      saveOnboardingProfileAction(answers).then((result) => {
+        if (result.ok) {
+          clearOnboardingDraft();
+          router.push("/assistant");
+          router.refresh();
+        } else {
+          setIsSavingProfile(false);
+        }
+      });
+    }
+  }, [hasHydrated, isAuthenticated, flowState, answers, isSavingProfile, router]);
 
   return (
     <AnimatePresence mode="wait">
