@@ -57,7 +57,7 @@ export function ChatShell({
 
   const searchInputRef = useRef<HTMLInputElement>(null);
   const hasSubmittedInitialPromptRef = useRef(false);
-  const submitPromptRef = useRef<((prompt: string, att?: ChatAttachment) => Promise<void>) | null>(null);
+  const submitPromptRef = useRef<((prompt: string, att?: ChatAttachment, options?: { forceNew?: boolean }) => Promise<void>) | null>(null);
 
   // Load from local storage on mount
   useEffect(() => {
@@ -77,16 +77,19 @@ export function ChatShell({
 
   // Persist to local storage on change
   useEffect(() => {
+    if (!hasHydratedConversations) return;
     saveConversations(conversations);
-  }, [conversations]);
+  }, [conversations, hasHydratedConversations]);
 
   useEffect(() => {
+    if (!hasHydratedConversations) return;
     saveActiveConversationId(activeId);
-  }, [activeId]);
+  }, [activeId, hasHydratedConversations]);
 
   useEffect(() => {
+    if (!hasHydratedConversations) return;
     saveSidebarCollapsed(sidebarCollapsed);
-  }, [sidebarCollapsed]);
+  }, [sidebarCollapsed, hasHydratedConversations]);
 
   const activeConversation = conversations.find((c) => c.id === activeId);
   const messages = activeConversation?.messages ?? [];
@@ -133,7 +136,11 @@ export function ChatShell({
     }
   };
 
-  const submitPrompt = async (prompt: string, att?: ChatAttachment) => {
+  const submitPrompt = async (
+    prompt: string,
+    att?: ChatAttachment,
+    options?: { forceNew?: boolean }
+  ) => {
     const trimmedPrompt = prompt.trim();
     if ((!trimmedPrompt && !att) || isLoading) return;
 
@@ -148,7 +155,7 @@ export function ChatShell({
       setNotice(null);
     }
 
-    let targetId = activeId;
+    let targetId = options?.forceNew ? null : activeId;
     let newConversations = [...conversations];
 
     const userMessage = createUserMessage(trimmedPrompt, att);
@@ -228,7 +235,8 @@ export function ChatShell({
     if (hasSubmittedInitialPromptRef.current) return;
 
     hasSubmittedInitialPromptRef.current = true;
-    void submitPromptRef.current?.(initialPrompt);
+    void submitPromptRef.current?.(initialPrompt, undefined, { forceNew: true });
+    window.history.replaceState(null, "", "/assistant");
   }, [hasHydratedConversations, initialPrompt]);
 
   return (

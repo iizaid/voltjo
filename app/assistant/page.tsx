@@ -12,9 +12,8 @@ export default async function AssistantPage({ searchParams }: Props) {
     ? resolvedParams.prompt[0]
     : resolvedParams.prompt;
 
-  const initialPrompt = rawPrompt
-    ? rawPrompt.trim().slice(0, MAX_CHAT_MESSAGE_LENGTH)
-    : null;
+  const trimmedPrompt = rawPrompt?.trim().slice(0, MAX_CHAT_MESSAGE_LENGTH) ?? "";
+  const initialPrompt = trimmedPrompt.length > 0 ? trimmedPrompt : null;
 
   const { user, profile } = await getCurrentUserAndProfile();
   const label = profile?.full_name || user?.email || undefined;

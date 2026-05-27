@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowUp } from "lucide-react";
+import { MAX_CHAT_MESSAGE_LENGTH } from "@/lib/chat/constants";
 
 const quickActions = [
   {
@@ -52,6 +53,7 @@ export function HeroPromptBox() {
           className="min-h-[72px] w-full resize-none bg-transparent px-2 py-2 text-right text-[15px] font-medium leading-7 text-[var(--voltjo-black)] outline-none placeholder:text-[var(--voltjo-muted)]"
           placeholder="اسأل عن سيارة، قارن بين موديلين، أو احسب تكلفة الشحن..."
           rows={2}
+          maxLength={MAX_CHAT_MESSAGE_LENGTH}
           value={value}
           onChange={(e) => setValue(e.target.value)}
           onKeyDown={handleKeyDown}
@@ -87,7 +89,7 @@ export function HeroPromptBox() {
 
       {/* Helper text */}
       <p className="mt-4 text-center text-[12px] font-medium leading-6 text-[var(--voltjo-muted)]/70">
-        ابدأ سؤالك الآن — وسيتم نقلك إلى حسابك أو إنشاء حساب لمتابعة داخل المساعد الذكي.
+        اكتب سؤالك الآن — وسيتم فتح المساعد الذكي مباشرة بنفس السؤال.
       </p>
     </div>
   );
