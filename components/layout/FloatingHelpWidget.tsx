@@ -29,7 +29,7 @@ const actions = [
     id: "contact",
     title: "تواصل معنا",
     description: "للملاحظات أو الإبلاغ عن خطأ في البيانات.",
-    href: "mailto:hello@voltjo.com",
+    href: "mailto:zaid.tarawneh.505@gmail.com",
     Icon: Mail,
     external: true,
   },

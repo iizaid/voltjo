@@ -58,11 +58,16 @@ export function ChatSidebar({
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
   const [confirmingDeleteId, setConfirmingDeleteId] = useState<string | null>(null);
   const [confirmingClearAll, setConfirmingClearAll] = useState(false);
-  const [sidebarWidth, setSidebarWidth] = useState<number>(() => {
-    if (typeof window === "undefined") return DEFAULT_WIDTH;
+  const [sidebarWidth, setSidebarWidth] = useState<number>(DEFAULT_WIDTH);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
     const saved = localStorage.getItem(STORAGE_KEY);
-    return saved ? parseInt(saved, 10) : DEFAULT_WIDTH;
-  });
+    if (saved) {
+      setSidebarWidth(parseInt(saved, 10));
+    }
+  }, []);
   const isResizing = useRef(false);
   const startX = useRef(0);
   const startWidth = useRef(0);
@@ -95,8 +100,10 @@ export function ChatSidebar({
   }, [sidebarWidth, onMouseMove, onMouseUp]);
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, String(sidebarWidth));
-  }, [sidebarWidth]);
+    if (isMounted) {
+      localStorage.setItem(STORAGE_KEY, String(sidebarWidth));
+    }
+  }, [sidebarWidth, isMounted]);
 
   const visibleConversations = getVisibleConversations({
     conversations,
@@ -124,14 +131,14 @@ export function ChatSidebar({
       )}
       {/* ── Logo row ── */}
       <div className="flex items-center justify-between gap-3">
-        <Link href="/" aria-label="العودة للصفحة الرئيسية">
+        <div className="cursor-pointer" aria-label="العودة للصفحة الرئيسية">
           <div className="lg:hidden">
             <VoltJoLogo />
           </div>
           <div className="hidden lg:block">
             {collapsed ? <VoltJoLogo compact /> : <VoltJoLogo />}
           </div>
-        </Link>
+        </div>
         {/* Collapse toggle – desktop */}
         <button
           type="button"

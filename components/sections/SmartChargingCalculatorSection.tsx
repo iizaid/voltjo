@@ -6,6 +6,7 @@ import {
   Gauge,
   type LucideIcon,
 } from "lucide-react";
+import RotatingText from "@/components/RotatingText";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 
@@ -116,8 +117,17 @@ export function SmartChargingCalculatorSection() {
       <Container>
         <div className="mx-auto max-w-[1240px]">
           <div className="mx-auto max-w-3xl text-center">
-            <h2 className="mt-5 text-balance text-4xl font-black leading-[1.25] text-[var(--voltjo-black)] sm:text-5xl">
-              حوّل استخدامك اليومي إلى رقم واضح
+            <h2 className="mt-5 flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-balance text-4xl font-black leading-[1.25] text-[var(--voltjo-black)] sm:text-5xl">
+              <span>حوّل استخدامك اليومي إلى</span>
+              <RotatingText
+                texts={["رقم واضح", "تكلفة مبسطة", "قرار أذكى"]}
+                splitBy="words"
+                rotationInterval={2400}
+                staggerDuration={0.025}
+                mainClassName="inline-flex min-w-[7.6em] justify-center rounded-[16px] bg-[var(--voltjo-orange)] px-4 py-1.5 text-white shadow-[0_16px_36px_rgba(255,106,0,0.22)]"
+                splitLevelClassName="overflow-hidden pb-3 -mb-2"
+                elementLevelClassName="leading-normal"
+              />
             </h2>
             <p className="mx-auto mt-4 max-w-2xl text-base font-semibold leading-8 text-[var(--voltjo-muted)] sm:text-lg">
               أدخل السيارة، المسافة، وطريقة الشحن — وشاهد تقديرًا مبسطًا

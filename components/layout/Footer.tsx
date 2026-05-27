@@ -43,7 +43,7 @@ export function Footer() {
             ))}
             <li>
               <a
-                href="mailto:hello@voltjo.com"
+                href="mailto:zaid.tarawneh.505@gmail.com"
                 className="text-[15px] font-semibold text-white/80 transition-colors hover:text-[var(--voltjo-orange)]"
               >
                 تواصل معنا
@@ -55,12 +55,12 @@ export function Footer() {
         {/* Contact Button */}
         <div>
           <a
-            href="mailto:hello@voltjo.com"
+            href="mailto:zaid.tarawneh.505@gmail.com"
             className="group flex items-center gap-2.5 rounded-full border border-[var(--voltjo-orange)]/40 bg-[var(--voltjo-orange)]/10 px-7 py-3 transition-all hover:bg-[var(--voltjo-orange)]/20"
           >
             <Mail className="size-[18px] text-[var(--voltjo-orange)]" />
             <span className="text-[15px] font-bold tracking-wide text-[var(--voltjo-orange)]" dir="ltr">
-              hello@voltjo.com
+              zaid.tarawneh.505@gmail.com
             </span>
           </a>
         </div>
