@@ -76,7 +76,7 @@ AI_PROVIDER=openai
 AI_MODEL=gpt-4o-mini
 
 # Secure private key for OpenAI access (kept strictly server-side)
-OPENAI_API_KEY=sk-proj-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+OPENAI_API_KEY=<server-only-provider-key>
 
 # Optional: Remote PostgreSQL/MongoDB URI for thread database persistence
 # DATABASE_URL=postgresql://db_user:password@localhost:5432/voltjo

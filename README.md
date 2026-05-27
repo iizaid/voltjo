@@ -51,6 +51,9 @@ Implemented:
 - profile-aware onboarding persistence
 - protected dashboard
 - RLS schema for `public.profiles`
+- protected account/security page
+- auth callback redirect hardening
+- basic in-memory auth rate limiting
 
 Not implemented yet:
 
@@ -58,4 +61,23 @@ Not implemented yet:
 - chat database persistence
 - vehicle database
 - payments
-- rate limiting
+- distributed production rate limiting
+- CAPTCHA/bot protection
+- monitoring/audit logs
+- final Content-Security-Policy
+
+## Production Security Checklist
+
+- Run `supabase/schema.sql` in Supabase.
+- Configure Supabase Site URL and Redirect URLs, including `/auth/callback`.
+- Decide whether email confirmation is enabled.
+- Use a production SMTP provider for auth email.
+- Verify RLS with two separate users.
+- Keep service role keys out of frontend code and `NEXT_PUBLIC_*`.
+- Replace the in-memory rate limiter before public launch.
+- Add monitoring/logging and bot protection before public launch.
+- Review Next.js `middleware.ts` to `proxy.ts` migration before deployment.
+- Add and test CSP once production domains are final.
+- Deploy over HTTPS only.
+
+More details are in `docs/supabase-auth-foundation.md`.

@@ -38,7 +38,6 @@ export function ChatSidebar({
   searchQuery,
   onSearchChange,
   searchInputRef,
-  onSettingsAction,
 }: {
   collapsed: boolean;
   mobileOpen: boolean;
@@ -56,7 +55,6 @@ export function ChatSidebar({
   searchQuery: string;
   onSearchChange: (q: string) => void;
   searchInputRef: React.RefObject<HTMLInputElement | null>;
-  onSettingsAction: () => void;
 }) {
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
   const [confirmingDeleteId, setConfirmingDeleteId] = useState<string | null>(null);
@@ -297,21 +295,20 @@ export function ChatSidebar({
         {accountMenuOpen && !collapsed && (
           <div className="absolute bottom-16 right-0 z-50 w-full rounded-xl border border-[rgba(31,31,29,0.1)] bg-[#FEFEFC] p-2 shadow-lg">
             <Link
+              href={account ? "/account" : "/start"}
+              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-[#1F1F1D] hover:bg-[rgba(31,31,29,0.055)]"
+              onClick={() => setAccountMenuOpen(false)}
+            >
+              <Settings size={15} />
+              {account ? "إدارة الحساب" : "ابدأ واحفظ ملفك"}
+            </Link>
+            <Link
               href="/"
               className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-[#1F1F1D] hover:bg-[rgba(31,31,29,0.055)]"
               onClick={() => setAccountMenuOpen(false)}
             >
               العودة للموقع
             </Link>
-            <button
-              onClick={() => {
-                setAccountMenuOpen(false);
-                onSettingsAction();
-              }}
-              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-[#1F1F1D] hover:bg-[rgba(31,31,29,0.055)]"
-            >
-              <Settings size={15} /> الإعدادات
-            </button>
             <button
               onClick={() => {
                 setAccountMenuOpen(false);

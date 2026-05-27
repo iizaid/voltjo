@@ -210,11 +210,6 @@ export function ChatShell({ account }: { account?: ChatAccount | null }) {
     }
   };
 
-  const handleSettingsAction = () => {
-    setNotice("إعدادات الحساب ستكون متاحة لاحقًا.");
-    setTimeout(() => setNotice(null), 3000);
-  };
-
   return (
     <div className="flex h-dvh w-full overflow-hidden bg-[#F8F7F4] text-[#1F1F1D]" dir="rtl">
       {mobileSidebarOpen ? (
@@ -248,7 +243,6 @@ export function ChatShell({ account }: { account?: ChatAccount | null }) {
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         searchInputRef={searchInputRef}
-        onSettingsAction={handleSettingsAction}
       />
       <ChatThread
         messages={messages}

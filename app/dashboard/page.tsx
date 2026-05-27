@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { signOutAction } from "@/lib/auth/actions";
+import { getCurrentUserAndProfile } from "@/lib/auth/session";
 import { onboardingQuestions } from "@/lib/onboarding/questions";
-import { createClient } from "@/lib/supabase/server";
 
 function getOptionLabel(questionId: string, value: string | null) {
   if (!value) return "غير محدد";
@@ -19,25 +19,11 @@ function getPriorityLabels(values: string[]) {
 }
 
 export default async function DashboardPage() {
-  const supabase = await createClient();
-
-  if (!supabase) {
-    redirect("/start");
-  }
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { user, profile } = await getCurrentUserAndProfile();
 
   if (!user) {
     redirect("/start");
   }
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", user.id)
-    .maybeSingle();
 
   const priorityLabels = profile ? getPriorityLabels(profile.priorities) : [];
 

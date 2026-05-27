@@ -32,6 +32,37 @@ comment on table public.profiles is
 comment on column public.profiles.id is
   'Always equals auth.users.id. Never accept this value from client payloads.';
 
+comment on column public.profiles.priorities is
+  'Backend validates values against lib/onboarding/questions.ts. Database constraints here are safety rails, not the primary source of option truth.';
+
+do $$
+begin
+  if not exists (
+    select 1 from pg_constraint where conname = 'profiles_full_name_length'
+  ) then
+    alter table public.profiles
+      add constraint profiles_full_name_length
+      check (full_name is null or char_length(full_name) <= 80);
+  end if;
+
+  if not exists (
+    select 1 from pg_constraint where conname = 'profiles_profile_version_positive'
+  ) then
+    alter table public.profiles
+      add constraint profiles_profile_version_positive
+      check (profile_version >= 1);
+  end if;
+
+  if not exists (
+    select 1 from pg_constraint where conname = 'profiles_priorities_reasonable_size'
+  ) then
+    alter table public.profiles
+      add constraint profiles_priorities_reasonable_size
+      check (cardinality(priorities) <= 10);
+  end if;
+end
+$$;
+
 alter table public.profiles enable row level security;
 
 drop policy if exists "Users can select their own profile" on public.profiles;

@@ -48,3 +48,36 @@ export async function getCurrentProfile(): Promise<CurrentProfile | null> {
   if (error) return null;
   return data;
 }
+
+export async function getCurrentUserAndProfile() {
+  const supabase = await createClient();
+  if (!supabase) {
+    return {
+      user: null,
+      profile: null,
+    };
+  }
+
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError || !user) {
+    return {
+      user: null,
+      profile: null,
+    };
+  }
+
+  const { data: profile, error: profileError } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  return {
+    user,
+    profile: profileError ? null : profile,
+  };
+}

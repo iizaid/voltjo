@@ -48,6 +48,8 @@ export function OnboardingAuthPanel({
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (isSubmitting) return;
+
     setIsSubmitting(true);
     setAuthMessage(null);
     setAuthError(null);
@@ -59,7 +61,11 @@ export function OnboardingAuthPanel({
         : await signInAction(formData);
 
     if (!result.ok) {
-      setAuthError(result.message);
+      setAuthError(
+        result.needsOnboarding
+          ? "أكمل أسئلة البداية حتى نجهّز ملفك الذكي قبل الدخول."
+          : result.message,
+      );
       setIsSubmitting(false);
       return;
     }
@@ -72,6 +78,7 @@ export function OnboardingAuthPanel({
 
     clearOnboardingDraft();
     setAuthMessage(result.message);
+    setIsSubmitting(false);
     router.push("/assistant");
     router.refresh();
   };

@@ -2,9 +2,13 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { onboardingQuestions } from "@/lib/onboarding/questions";
-import type { CustomerProfileDraft, OnboardingQuestionId } from "@/lib/onboarding/types";
-import type { Database } from "@/lib/supabase/database.types";
+import type { CustomerProfileDraft } from "@/lib/onboarding/types";
+import {
+  profileInsertFromDraft,
+  validateFullName,
+  validateProfileDraft,
+} from "@/lib/auth/profile-validation";
+import { checkAuthRateLimit } from "@/lib/security/rate-limit";
 
 type AuthActionState = {
   ok: boolean;
@@ -13,129 +17,90 @@ type AuthActionState = {
   needsOnboarding?: boolean;
 };
 
+type ParsedDraftResult =
+  | {
+      ok: true;
+      hasDraft: true;
+      draft: CustomerProfileDraft;
+    }
+  | {
+      ok: true;
+      hasDraft: false;
+    }
+  | {
+      ok: false;
+      message: string;
+    };
+
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-const allowedValuesByQuestion = onboardingQuestions.reduce<
-  Record<OnboardingQuestionId, Set<string>>
->((acc, question) => {
-  acc[question.id] = new Set(question.options.map((option) => option.value));
-  return acc;
-}, {} as Record<OnboardingQuestionId, Set<string>>);
-
-function cleanText(value: FormDataEntryValue | null, maxLength: number) {
-  if (typeof value !== "string") return "";
-  return value.trim().slice(0, maxLength);
-}
+const MAX_EMAIL_LENGTH = 254;
+const MAX_PASSWORD_LENGTH = 128;
+const MAX_ONBOARDING_PAYLOAD_LENGTH = 6000;
 
 function safeAuthErrorMessage() {
   return "تعذر إكمال العملية. تأكد من البيانات وحاول مرة أخرى.";
 }
 
-function validateProfileDraft(input: unknown): {
-  ok: true;
-  draft: CustomerProfileDraft;
-} | {
-  ok: false;
-  message: string;
-} {
-  if (!input || typeof input !== "object") {
+function getFormString(formData: FormData, key: string) {
+  const value = formData.get(key);
+  return typeof value === "string" ? value : "";
+}
+
+function validateEmail(value: FormDataEntryValue | null) {
+  if (typeof value !== "string") {
+    return { ok: false as const, message: "أدخل بريدًا إلكترونيًا صحيحًا." };
+  }
+
+  const email = value.trim().toLowerCase();
+
+  if (
+    email.length === 0 ||
+    email.length > MAX_EMAIL_LENGTH ||
+    !EMAIL_REGEX.test(email)
+  ) {
+    return { ok: false as const, message: "أدخل بريدًا إلكترونيًا صحيحًا." };
+  }
+
+  return { ok: true as const, email };
+}
+
+function validatePassword(value: FormDataEntryValue | null) {
+  if (typeof value !== "string") {
+    return { ok: false as const, message: "أدخل كلمة المرور." };
+  }
+
+  if (value.length < 8 || value.length > MAX_PASSWORD_LENGTH) {
+    return {
+      ok: false as const,
+      message: "كلمة المرور يجب أن تكون بين 8 و128 حرفًا.",
+    };
+  }
+
+  return { ok: true as const, password: value };
+}
+
+function parseProfileDraftFromForm(
+  formData: FormData,
+  { required }: { required: boolean },
+): ParsedDraftResult {
+  const rawAnswers = getFormString(formData, "onboardingAnswers");
+
+  if (!rawAnswers) {
+    if (!required) return { ok: true, hasDraft: false };
     return { ok: false, message: "أكمل أسئلة الملف الذكي قبل المتابعة." };
   }
 
-  const source = input as Record<string, unknown>;
-  const draft: CustomerProfileDraft = {};
-
-  for (const question of onboardingQuestions) {
-    const value = source[question.id];
-    const allowed = allowedValuesByQuestion[question.id];
-
-    if (question.type === "multi") {
-      if (!Array.isArray(value)) {
-        return { ok: false, message: "إجابات الملف الذكي غير مكتملة أو غير صحيحة." };
-      }
-      const safeValues = value
-        .filter((item): item is string => typeof item === "string")
-        .filter((item) => allowed.has(item));
-
-      if (safeValues.length !== value.length || safeValues.length > 8) {
-        return { ok: false, message: "إحدى قيم الملف الذكي غير مسموحة." };
-      }
-
-      draft[question.id] = safeValues as never;
-      continue;
-    }
-
-    if (typeof value !== "string" || !allowed.has(value)) {
-      if (question.id === "city" && source.country !== "jordan") {
-        continue;
-      }
-      if (
-        question.id === "hasDrivenEvOrHybrid" &&
-        (source.ownershipStatus === "owns_ev" ||
-          source.ownershipStatus === "owns_hybrid")
-      ) {
-        draft.hasDrivenEvOrHybrid = "yes";
-        continue;
-      }
-
-      return { ok: false, message: "إحدى إجابات الملف الذكي غير مسموحة." };
-    }
-
-    draft[question.id] = value as never;
-  }
-
-  if (draft.country !== "jordan") {
-    delete draft.city;
-  }
-
-  if (
-    draft.ownershipStatus === "owns_ev" ||
-    draft.ownershipStatus === "owns_hybrid"
-  ) {
-    draft.hasDrivenEvOrHybrid = "yes";
-  }
-
-  return { ok: true, draft };
-}
-
-function parseProfileDraftFromForm(formData: FormData) {
-  const rawAnswers = cleanText(formData.get("onboardingAnswers"), 5000);
-  if (!rawAnswers) {
-    return { ok: false as const, message: "أكمل أسئلة الملف الذكي قبل المتابعة." };
+  if (rawAnswers.length > MAX_ONBOARDING_PAYLOAD_LENGTH) {
+    return { ok: false, message: "بيانات الملف الذكي أكبر من المسموح." };
   }
 
   try {
-    return validateProfileDraft(JSON.parse(rawAnswers));
+    const result = validateProfileDraft(JSON.parse(rawAnswers));
+    if (!result.ok) return result;
+    return { ok: true, hasDraft: true, draft: result.draft };
   } catch {
-    return { ok: false as const, message: "تعذر قراءة إجابات الملف الذكي." };
+    return { ok: false, message: "تعذر قراءة إجابات الملف الذكي." };
   }
-}
-
-function profileInsertFromDraft({
-  userId,
-  fullName,
-  draft,
-}: {
-  userId: string;
-  fullName?: string;
-  draft: CustomerProfileDraft;
-}): Database["public"]["Tables"]["profiles"]["Insert"] {
-  return {
-    id: userId,
-    ...(fullName !== undefined ? { full_name: fullName || null } : {}),
-    age_range: draft.ageRange ?? null,
-    country: draft.country ?? null,
-    city: draft.city ?? null,
-    ownership_status: draft.ownershipStatus ?? null,
-    has_driven_ev_or_hybrid: draft.hasDrivenEvOrHybrid ?? null,
-    main_goal: draft.mainGoal ?? null,
-    driving_pattern: draft.drivingPattern ?? null,
-    home_charging_access: draft.homeChargingAccess ?? null,
-    priorities: Array.isArray(draft.priorities) ? draft.priorities : [],
-    onboarding_completed: true,
-    onboarding_completed_at: new Date().toISOString(),
-    profile_version: 1,
-  };
 }
 
 async function upsertCurrentUserProfile({
@@ -177,25 +142,22 @@ async function upsertCurrentUserProfile({
 }
 
 export async function signUpAction(formData: FormData): Promise<AuthActionState> {
-  const name = cleanText(formData.get("name"), 80);
-  const email = cleanText(formData.get("email"), 254).toLowerCase();
-  const password = cleanText(formData.get("password"), 128);
-  const draftResult = parseProfileDraftFromForm(formData);
+  const nameResult = validateFullName(getFormString(formData, "name"));
+  const emailResult = validateEmail(formData.get("email"));
+  const passwordResult = validatePassword(formData.get("password"));
+  const draftResult = parseProfileDraftFromForm(formData, { required: true });
 
-  if (name.length < 2 || name.length > 80) {
-    return { ok: false, message: "اكتب اسمًا صحيحًا بين 2 و80 حرفًا." };
+  if (!nameResult.ok) return nameResult;
+  if (!emailResult.ok) return emailResult;
+  if (!passwordResult.ok) return passwordResult;
+  if (!draftResult.ok) return draftResult;
+  if (!draftResult.hasDraft) {
+    return { ok: false, message: "أكمل أسئلة الملف الذكي قبل المتابعة." };
   }
 
-  if (!EMAIL_REGEX.test(email)) {
-    return { ok: false, message: "أدخل بريدًا إلكترونيًا صحيحًا." };
-  }
-
-  if (password.length < 8) {
-    return { ok: false, message: "كلمة المرور يجب أن تكون 8 أحرف على الأقل." };
-  }
-
-  if (!draftResult.ok) {
-    return draftResult;
+  const rateLimit = checkAuthRateLimit("signup", emailResult.email);
+  if (!rateLimit.ok) {
+    return { ok: false, message: rateLimit.message };
   }
 
   const supabase = await createClient();
@@ -204,11 +166,11 @@ export async function signUpAction(formData: FormData): Promise<AuthActionState>
   }
 
   const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
+    email: emailResult.email,
+    password: passwordResult.password,
     options: {
       data: {
-        full_name: name,
+        full_name: nameResult.name,
       },
     },
   });
@@ -227,7 +189,7 @@ export async function signUpAction(formData: FormData): Promise<AuthActionState>
   }
 
   const profileResult = await upsertCurrentUserProfile({
-    fullName: name,
+    fullName: nameResult.name,
     draft: draftResult.draft,
   });
 
@@ -239,16 +201,17 @@ export async function signUpAction(formData: FormData): Promise<AuthActionState>
 }
 
 export async function signInAction(formData: FormData): Promise<AuthActionState> {
-  const email = cleanText(formData.get("email"), 254).toLowerCase();
-  const password = cleanText(formData.get("password"), 128);
-  const draftResult = parseProfileDraftFromForm(formData);
+  const emailResult = validateEmail(formData.get("email"));
+  const passwordResult = validatePassword(formData.get("password"));
+  const draftResult = parseProfileDraftFromForm(formData, { required: false });
 
-  if (!EMAIL_REGEX.test(email)) {
-    return { ok: false, message: "أدخل بريدًا إلكترونيًا صحيحًا." };
-  }
+  if (!emailResult.ok) return emailResult;
+  if (!passwordResult.ok) return passwordResult;
+  if (!draftResult.ok) return draftResult;
 
-  if (!password) {
-    return { ok: false, message: "أدخل كلمة المرور." };
+  const rateLimit = checkAuthRateLimit("login", emailResult.email);
+  if (!rateLimit.ok) {
+    return { ok: false, message: rateLimit.message };
   }
 
   const supabase = await createClient();
@@ -257,15 +220,15 @@ export async function signInAction(formData: FormData): Promise<AuthActionState>
   }
 
   const { error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
+    email: emailResult.email,
+    password: passwordResult.password,
   });
 
   if (error) {
     return { ok: false, message: "بيانات الدخول غير صحيحة أو الحساب غير مؤكد." };
   }
 
-  if (draftResult.ok) {
+  if (draftResult.hasDraft) {
     const profileResult = await upsertCurrentUserProfile({
       draft: draftResult.draft,
     });
