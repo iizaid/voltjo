@@ -83,6 +83,7 @@ Not implemented yet:
 - Review Next.js `middleware.ts` to `proxy.ts` migration before deployment.
 - Add and test CSP once production domains are final.
 - Deploy over HTTPS only.
+- Before production, search runtime UI for provider names such as Supabase, OpenAI, Stripe, database, backend.
 
 More details are in `docs/supabase-auth-foundation.md`.
 

@@ -115,7 +115,7 @@ async function upsertCurrentUserProfile({
 }) {
   const supabase = await createClient();
   if (!supabase) {
-    return { ok: false, message: "إعدادات Supabase غير مكتملة." };
+    return { ok: false, message: "الخدمة غير جاهزة حاليًا. حاول لاحقًا." };
   }
 
   const {
@@ -165,7 +165,7 @@ export async function signUpAction(formData: FormData): Promise<AuthActionState>
 
   const supabase = await createClient();
   if (!supabase) {
-    return { ok: false, message: "إعدادات Supabase غير مكتملة." };
+    return { ok: false, message: "الخدمة غير جاهزة حاليًا. حاول لاحقًا." };
   }
 
   const { data, error } = await supabase.auth.signUp({
@@ -219,7 +219,7 @@ export async function signInAction(formData: FormData): Promise<AuthActionState>
 
   const supabase = await createClient();
   if (!supabase) {
-    return { ok: false, message: "إعدادات Supabase غير مكتملة." };
+    return { ok: false, message: "الخدمة غير جاهزة حاليًا. حاول لاحقًا." };
   }
 
   const { error } = await supabase.auth.signInWithPassword({

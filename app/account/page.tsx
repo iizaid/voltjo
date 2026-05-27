@@ -286,7 +286,7 @@ export default async function AccountPage() {
                 <MiniStat label="تاريخ الحساب" value={accountCreatedAt} />
               </div>
               <p className="mt-4 text-sm font-semibold leading-7 text-[var(--voltjo-muted)]">
-                كلمة المرور تُدار عبر Supabase Auth ولا يتم تخزينها داخل VoltJo.
+                كلمة المرور تُدار عبر نظام تسجيل آمن ولا يتم تخزينها داخل VoltJo.
               </p>
             </section>
           </div>

@@ -173,8 +173,7 @@ export function OnboardingAuthPanel({
               value={serializedAnswers}
             />
             <p className="rounded-[16px] border border-[rgba(255,106,0,0.18)] bg-[rgba(255,106,0,0.055)] px-4 py-3 text-sm font-semibold leading-7 text-[var(--voltjo-muted)]">
-              سيتم إنشاء حساب Supabase حقيقي وحفظ تفضيلاتك في ملفك الخاص.
-              لا يتم حفظ كلمة المرور داخل VoltJo.
+              سيتم إنشاء حساب VoltJo وحفظ تفضيلاتك في ملفك الذكي. لا يتم حفظ كلمة المرور داخل VoltJo.
             </p>
             {authError ? (
               <p
