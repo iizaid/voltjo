@@ -9,7 +9,6 @@ const pages = {
   calculators: "الحاسبات",
   resources: "المصادر",
   pricing: "الأسعار",
-  dashboard: "لوحة التحكم",
 } as const;
 
 type PageSlug = keyof typeof pages;

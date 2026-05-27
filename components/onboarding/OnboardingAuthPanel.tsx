@@ -5,11 +5,9 @@ import { useRouter } from "next/navigation";
 import { motion } from "motion/react";
 import Folder from "@/components/Folder";
 import { VoltJoLogo } from "@/components/brand/VoltJoLogo";
+import { signInAction, signUpAction } from "@/lib/auth/actions";
 import { onboardingQuestions } from "@/lib/onboarding/questions";
-import {
-  clearOnboardingDraft,
-  saveOnboardingDraft,
-} from "@/lib/onboarding/storage";
+import { clearOnboardingDraft } from "@/lib/onboarding/storage";
 import type { CustomerProfileDraft } from "@/lib/onboarding/types";
 
 type AuthMode = "signup" | "login";
@@ -43,19 +41,39 @@ export function OnboardingAuthPanel({
   const router = useRouter();
   const [mode, setMode] = useState<AuthMode>("signup");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [authMessage, setAuthMessage] = useState<string | null>(null);
+  const [authError, setAuthError] = useState<string | null>(null);
   const highlights = useMemo(() => getProfileHighlights(answers), [answers]);
+  const serializedAnswers = useMemo(() => JSON.stringify(answers), [answers]);
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setIsSubmitting(true);
+    setAuthMessage(null);
+    setAuthError(null);
 
-    // TODO: Replace this fake success with backend auth and profile persistence.
-    // Do not persist email/password in the local demo flow.
-    saveOnboardingDraft(answers);
+    const formData = new FormData(event.currentTarget);
+    const result =
+      mode === "signup"
+        ? await signUpAction(formData)
+        : await signInAction(formData);
 
-    window.setTimeout(() => {
-      router.push("/assistant");
-    }, 520);
+    if (!result.ok) {
+      setAuthError(result.message);
+      setIsSubmitting(false);
+      return;
+    }
+
+    if (result.emailConfirmationRequired) {
+      setAuthMessage(result.message);
+      setIsSubmitting(false);
+      return;
+    }
+
+    clearOnboardingDraft();
+    setAuthMessage(result.message);
+    router.push("/assistant");
+    router.refresh();
   };
 
   const handleCancel = () => {
@@ -142,10 +160,32 @@ export function OnboardingAuthPanel({
           </div>
 
           <form className="mt-7 grid gap-4" onSubmit={handleSubmit}>
+            <input
+              type="hidden"
+              name="onboardingAnswers"
+              value={serializedAnswers}
+            />
             <p className="rounded-[16px] border border-[rgba(255,106,0,0.18)] bg-[rgba(255,106,0,0.055)] px-4 py-3 text-sm font-semibold leading-7 text-[var(--voltjo-muted)]">
-              هذه نسخة تجريبية محلية. لن يتم إنشاء حساب حقيقي الآن، وسيتم استخدام
-              إجاباتك فقط لتخصيص التجربة داخل المتصفح.
+              سيتم إنشاء حساب Supabase حقيقي وحفظ تفضيلاتك في ملفك الخاص.
+              لا يتم حفظ كلمة المرور داخل VoltJo.
             </p>
+            {authError ? (
+              <p
+                role="alert"
+                className="rounded-[14px] border border-red-200 bg-red-50 px-4 py-3 text-sm font-bold leading-7 text-red-700"
+              >
+                {authError}
+              </p>
+            ) : null}
+            {authMessage ? (
+              <p
+                role="status"
+                aria-live="polite"
+                className="rounded-[14px] border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-bold leading-7 text-emerald-800"
+              >
+                {authMessage}
+              </p>
+            ) : null}
             {mode === "signup" ? (
               <label className="grid gap-2 text-sm font-bold text-[var(--voltjo-black)]">
                 الاسم

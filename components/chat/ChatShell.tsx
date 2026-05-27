@@ -31,7 +31,13 @@ import {
   MAX_CHAT_MESSAGE_LENGTH,
 } from "@/lib/chat/constants";
 
-export function ChatShell() {
+export type ChatAccount = {
+  label: string;
+  sublabel: string;
+  initial: string;
+};
+
+export function ChatShell({ account }: { account?: ChatAccount | null }) {
   const [conversations, setConversations] = useState<ChatConversation[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [composerValue, setComposerValue] = useState("");
@@ -238,6 +244,7 @@ export function ChatShell() {
         onRenameConversation={handleRenameConversation}
         onClearConversations={handleClearConversations}
         onExportConversations={handleExportConversations}
+        account={account}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         searchInputRef={searchInputRef}

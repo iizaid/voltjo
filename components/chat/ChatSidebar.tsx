@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { VoltJoLogo } from "@/components/brand/VoltJoLogo";
+import type { ChatAccount } from "@/components/chat/ChatShell";
 import type { ChatConversation } from "@/lib/chat/types";
 import { getVisibleConversations } from "@/lib/chat/conversation-utils";
 import { useState, useRef, useCallback, useEffect } from "react";
@@ -33,6 +34,7 @@ export function ChatSidebar({
   onRenameConversation,
   onClearConversations,
   onExportConversations,
+  account,
   searchQuery,
   onSearchChange,
   searchInputRef,
@@ -50,6 +52,7 @@ export function ChatSidebar({
   onRenameConversation: (id: string) => void;
   onClearConversations: () => void;
   onExportConversations: () => void;
+  account?: ChatAccount | null;
   searchQuery: string;
   onSearchChange: (q: string) => void;
   searchInputRef: React.RefObject<HTMLInputElement | null>;
@@ -356,11 +359,15 @@ export function ChatSidebar({
         <div className="flex items-center justify-between rounded-xl px-2 py-2">
           <div className="flex items-center gap-3">
             <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#1F1F1D] text-sm font-black text-white">
-              V
+              {account?.initial ?? "V"}
             </span>
             <span className={collapsed ? "lg:hidden" : ""}>
-              <span className="block text-sm font-bold text-[#1F1F1D]">حساب VoltJo</span>
-              <span className="block text-xs font-semibold text-[#6F6A60]">نسخة تجريبية</span>
+              <span className="block text-sm font-bold text-[#1F1F1D]">
+                {account?.label ?? "حساب VoltJo"}
+              </span>
+              <span className="block text-xs font-semibold text-[#6F6A60]">
+                {account?.sublabel ?? "نسخة تجريبية"}
+              </span>
             </span>
           </div>
           <button
