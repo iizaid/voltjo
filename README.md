@@ -49,7 +49,8 @@ Implemented:
 
 - Supabase email/password auth foundation
 - profile-aware onboarding persistence
-- protected dashboard
+- protected Smart Profile page at `/account`
+- lightweight control center at `/dashboard`
 - RLS schema for `public.profiles`
 - protected account/security page
 - auth callback redirect hardening
@@ -60,6 +61,9 @@ Not implemented yet:
 - AI provider integration
 - chat database persistence
 - vehicle database
+- saved cars
+- comparison persistence
+- reports
 - payments
 - distributed production rate limiting
 - CAPTCHA/bot protection
@@ -81,3 +85,9 @@ Not implemented yet:
 - Deploy over HTTPS only.
 
 More details are in `docs/supabase-auth-foundation.md`.
+
+## Account vs Dashboard
+
+- `/account` is the main Smart Profile page: identity, onboarding preferences, completion status, and account/security information.
+- `/dashboard` is intentionally lightweight until product databases exist. Future modules can include saved cars, comparisons, reports, and chat history.
+- Login rate-limit buckets reset after successful login, but the in-memory limiter is still temporary and must be replaced before public launch.

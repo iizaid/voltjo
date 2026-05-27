@@ -8,7 +8,10 @@ import {
   validateFullName,
   validateProfileDraft,
 } from "@/lib/auth/profile-validation";
-import { checkAuthRateLimit } from "@/lib/security/rate-limit";
+import {
+  checkAuthRateLimit,
+  clearAuthRateLimit,
+} from "@/lib/security/rate-limit";
 
 type AuthActionState = {
   ok: boolean;
@@ -227,6 +230,8 @@ export async function signInAction(formData: FormData): Promise<AuthActionState>
   if (error) {
     return { ok: false, message: "بيانات الدخول غير صحيحة أو الحساب غير مؤكد." };
   }
+
+  clearAuthRateLimit("login", emailResult.email);
 
   if (draftResult.hasDraft) {
     const profileResult = await upsertCurrentUserProfile({

@@ -300,7 +300,7 @@ export function ChatSidebar({
               onClick={() => setAccountMenuOpen(false)}
             >
               <Settings size={15} />
-              {account ? "إدارة الحساب" : "ابدأ واحفظ ملفك"}
+              {account ? "الملف الشخصي" : "إنشاء ملف ذكي"}
             </Link>
             <Link
               href="/"

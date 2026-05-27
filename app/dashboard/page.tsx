@@ -1,22 +1,19 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import {
+  ArrowLeft,
+  Car,
+  MessageSquareText,
+  UserRound,
+  type LucideIcon,
+} from "lucide-react";
 import { signOutAction } from "@/lib/auth/actions";
 import { getCurrentUserAndProfile } from "@/lib/auth/session";
-import { onboardingQuestions } from "@/lib/onboarding/questions";
-
-function getOptionLabel(questionId: string, value: string | null) {
-  if (!value) return "غير محدد";
-  const question = onboardingQuestions.find((item) => item.id === questionId);
-  return question?.options.find((option) => option.value === value)?.label ?? value;
-}
-
-function getPriorityLabels(values: string[]) {
-  const question = onboardingQuestions.find((item) => item.id === "priorities");
-  return values.map(
-    (value) =>
-      question?.options.find((option) => option.value === value)?.label ?? value,
-  );
-}
+import {
+  calculateProfileCompletion,
+  getOptionLabel,
+  UNKNOWN_LABEL,
+} from "@/lib/auth/profile-display";
 
 export default async function DashboardPage() {
   const { user, profile } = await getCurrentUserAndProfile();
@@ -25,19 +22,28 @@ export default async function DashboardPage() {
     redirect("/start");
   }
 
-  const priorityLabels = profile ? getPriorityLabels(profile.priorities) : [];
+  const completion = calculateProfileCompletion(profile);
+  const profileComplete = Boolean(profile?.onboarding_completed);
+  const displayName = profile?.full_name || user.email || "مستخدم VoltJo";
 
   return (
-    <main className="min-h-dvh bg-[#FAFAFA] px-4 py-10 text-[var(--voltjo-black)] sm:px-6">
-      <section className="mx-auto max-w-4xl rounded-[28px] border border-[rgba(13,13,13,0.08)] bg-white p-6 shadow-[0_24px_70px_rgba(13,13,13,0.06)] sm:p-8">
+    <main
+      className="min-h-dvh bg-[#FAFAFA] px-4 py-8 text-[var(--voltjo-black)] sm:px-6 lg:py-12"
+      dir="rtl"
+    >
+      <section className="mx-auto max-w-5xl rounded-[30px] border border-[rgba(13,13,13,0.08)] bg-white p-6 shadow-[0_24px_80px_rgba(13,13,13,0.06)] sm:p-8 lg:p-10">
         <div className="flex flex-col gap-4 border-b border-[rgba(13,13,13,0.08)] pb-6 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-sm font-bold text-[var(--voltjo-orange)]">
-              لوحة VoltJo
+              لوحة التحكم
             </p>
             <h1 className="mt-2 text-3xl font-black leading-tight sm:text-4xl">
-              ملفك الذكي
+              أهلًا، {displayName}
             </h1>
+            <p className="mt-3 max-w-2xl text-sm font-semibold leading-7 text-[var(--voltjo-muted)]">
+              هذه لوحة خفيفة لمرحلة الملف الذكي. ستصبح مركزًا للحفظ والمقارنات
+              والتقارير عندما يتم ربط قاعدة بيانات السيارات والمحادثات لاحقًا.
+            </p>
           </div>
           <form action={signOutAction}>
             <button
@@ -49,76 +55,104 @@ export default async function DashboardPage() {
           </form>
         </div>
 
-        {!profile || !profile.onboarding_completed ? (
-          <div className="mt-8 rounded-[22px] border border-orange-200 bg-orange-50 p-5">
-            <h2 className="text-xl font-black">أكمل ملفك الذكي</h2>
-            <p className="mt-2 text-sm font-semibold leading-7 text-[var(--voltjo-muted)]">
-              لم نجد ملفًا مكتملًا لهذا الحساب. أجب على أسئلة البداية حتى نخصص
-              المساعد، المقارنات، وتقديرات التكلفة حسب احتياجك.
+        {!profile || !profileComplete ? (
+          <div className="mt-8 rounded-[24px] border border-orange-200 bg-orange-50 p-6">
+            <h2 className="text-2xl font-black">أكمل ملفك الذكي أولًا</h2>
+            <p className="mt-3 max-w-2xl text-sm font-semibold leading-8 text-[var(--voltjo-muted)]">
+              الملف الذكي هو الأساس الحالي لتخصيص تجربة VoltJo. أكمله حتى
+              يتمكن المساعد والمقارنات وتقديرات التكلفة من فهم احتياجك بشكل
+              أفضل.
             </p>
             <Link
               href="/start"
-              className="mt-5 inline-flex h-11 items-center rounded-full bg-[var(--voltjo-black)] px-5 text-sm font-bold text-white"
+              className="mt-5 inline-flex h-12 items-center gap-2 rounded-full bg-[var(--voltjo-black)] px-5 text-sm font-bold text-white"
             >
-              إكمال الأسئلة
+              إكمال الملف الذكي
+              <ArrowLeft size={16} />
             </Link>
           </div>
         ) : (
-          <div className="mt-8 grid gap-4 sm:grid-cols-2">
-            <InfoItem label="البريد الإلكتروني" value={user.email ?? "غير محدد"} />
-            <InfoItem label="الاسم" value={profile.full_name ?? "غير محدد"} />
-            <InfoItem
-              label="المدينة"
-              value={getOptionLabel("city", profile.city)}
-            />
-            <InfoItem
-              label="الهدف الرئيسي"
-              value={getOptionLabel("mainGoal", profile.main_goal)}
-            />
-            <InfoItem
-              label="نمط القيادة"
-              value={getOptionLabel("drivingPattern", profile.driving_pattern)}
-            />
-            <InfoItem
-              label="الشحن المنزلي"
-              value={getOptionLabel(
-                "homeChargingAccess",
-                profile.home_charging_access,
-              )}
-            />
-            <div className="rounded-[20px] border border-[rgba(13,13,13,0.08)] bg-[#FAFAFA] p-5 sm:col-span-2">
-              <p className="text-sm font-bold text-[var(--voltjo-muted)]">
-                الأولويات
+          <>
+            <div className="mt-8 grid gap-4 sm:grid-cols-3">
+              <SummaryCard
+                label="جاهزية الملف"
+                value={`${completion.percentage}%`}
+                description={completion.statusText}
+                icon={UserRound}
+              />
+              <SummaryCard
+                label="الهدف الحالي"
+                value={getOptionLabel("mainGoal", profile.main_goal)}
+                description="يستخدم لتوجيه المساعد والمقارنات."
+                icon={Car}
+              />
+              <SummaryCard
+                label="المساعد"
+                value="جاهز للتجربة"
+                description="الدردشة الحالية لا تزال محلية وتجريبية."
+                icon={MessageSquareText}
+              />
+            </div>
+
+            <div className="mt-8 rounded-[24px] border border-[rgba(13,13,13,0.08)] bg-[#FAFAFA] p-6">
+              <h2 className="text-2xl font-black">الخطوة التالية</h2>
+              <p className="mt-3 max-w-2xl text-sm font-semibold leading-8 text-[var(--voltjo-muted)]">
+                استخدم المساعد الآن، أو راجع ملفك الذكي. وحدات السيارات
+                المحفوظة، المقارنات، التقارير، وسجل المحادثات ستُضاف بعد تجهيز
+                قواعد البيانات الخاصة بها.
               </p>
-              <div className="mt-3 flex flex-wrap gap-2">
-                {(priorityLabels.length ? priorityLabels : ["غير محدد"]).map(
-                  (priority) => (
-                    <span
-                      key={priority}
-                      className="rounded-full border border-[rgba(13,13,13,0.08)] bg-white px-3 py-1 text-sm font-bold"
-                    >
-                      {priority}
-                    </span>
-                  ),
-                )}
+              <div className="mt-5 flex flex-wrap gap-3">
+                <Link
+                  href="/assistant"
+                  className="inline-flex h-12 items-center gap-2 rounded-full bg-[var(--voltjo-black)] px-5 text-sm font-bold text-white"
+                >
+                  فتح المساعد
+                  <ArrowLeft size={16} />
+                </Link>
+                <Link
+                  href="/account"
+                  className="inline-flex h-12 items-center rounded-full border border-[rgba(13,13,13,0.12)] bg-white px-5 text-sm font-bold"
+                >
+                  إدارة الملف الشخصي
+                </Link>
+                <Link
+                  href="/start"
+                  className="inline-flex h-12 items-center rounded-full border border-[rgba(13,13,13,0.12)] bg-white px-5 text-sm font-bold"
+                >
+                  تحديث الإجابات
+                </Link>
               </div>
             </div>
-            <InfoItem
-              label="حالة الملف"
-              value={profile.onboarding_completed ? "مكتمل" : "غير مكتمل"}
-            />
-          </div>
+          </>
         )}
       </section>
     </main>
   );
 }
 
-function InfoItem({ label, value }: { label: string; value: string }) {
+function SummaryCard({
+  label,
+  value,
+  description,
+  icon: Icon,
+}: {
+  label: string;
+  value: string;
+  description: string;
+  icon: LucideIcon;
+}) {
   return (
-    <div className="rounded-[20px] border border-[rgba(13,13,13,0.08)] bg-[#FAFAFA] p-5">
-      <p className="text-sm font-bold text-[var(--voltjo-muted)]">{label}</p>
-      <p className="mt-2 text-lg font-black leading-8">{value}</p>
+    <div className="rounded-[22px] border border-[rgba(13,13,13,0.08)] bg-[#FAFAFA] p-5">
+      <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white text-[var(--voltjo-orange)]">
+        <Icon size={21} />
+      </span>
+      <p className="mt-4 text-sm font-bold text-[var(--voltjo-muted)]">
+        {label}
+      </p>
+      <p className="mt-2 text-xl font-black leading-8">{value || UNKNOWN_LABEL}</p>
+      <p className="mt-2 text-sm font-semibold leading-7 text-[var(--voltjo-muted)]">
+        {description}
+      </p>
     </div>
   );
 }

@@ -8,10 +8,10 @@ This document describes Phase 1 of the VoltJo backend foundation: Supabase Auth 
 - Email/password auth actions for signup, login, and logout.
 - A `public.profiles` table schema for one smart profile per Supabase user.
 - Centralized server-side validation for onboarding answers from `lib/onboarding/questions.ts`.
-- Basic in-memory auth rate limiting for signup/login attempts.
+- Basic in-memory auth rate limiting for signup/login attempts. Login buckets are cleared after successful login.
 - Safe auth callback redirects that only allow internal relative paths.
-- Protected `/dashboard` route that reads the authenticated user and their profile.
-- Protected `/account` route for account/security status.
+- Protected `/account` route as the main Smart Profile page.
+- Protected `/dashboard` route as a lightweight control center for this phase.
 - Middleware that refreshes Supabase auth cookies and protects `/dashboard` and `/account`.
 - `/assistant` remains public in this phase, but it can display the authenticated account/profile label when available.
 
@@ -75,6 +75,12 @@ Protected routes:
 
 Unauthenticated users are redirected to `/start`.
 
+## Account vs Dashboard
+
+- `/account` is the main Smart Profile page. It contains user identity, smart profile answers, profile completion, personalization explanation, and account/security information.
+- `/dashboard` is intentionally lightweight in this phase. It points users to the Smart Profile and assistant while reserving space for future saved cars, comparisons, reports, and chat history.
+- The Smart Profile is the current core production object. Larger dashboard modules should wait until chat persistence, vehicle data, saved cars, comparisons, and reports exist.
+
 ## Auth And Profile Flow
 
 Signup from `/start`:
@@ -99,6 +105,7 @@ Login from `/start`:
 - Onboarding values are validated against `lib/onboarding/questions.ts`.
 - Duplicate priorities, invalid city/country combinations, oversized payloads, and invalid option slugs are rejected server-side.
 - If the user already owns an EV or hybrid, `has_driven_ev_or_hybrid` is normalized to `yes` server-side.
+- Login rate-limit buckets reset after successful login so successful users are not left blocked by previous valid attempts.
 - User-facing errors avoid raw Supabase error details.
 - Profile fields are rendered as React text nodes, not raw HTML.
 - Basic security headers are configured in `next.config.ts`.
@@ -111,6 +118,9 @@ Login from `/start`:
 - OpenAI or paid AI APIs
 - chat database persistence
 - vehicle database
+- saved cars
+- comparison persistence
+- reports
 - Stripe or payments
 - distributed production rate limiting
 - password reset UI
@@ -146,6 +156,7 @@ The current in-memory rate limiter is a Phase 1 safety guard only. Replace it wi
 - If email confirmation is enabled, verify the confirmation message appears and the draft remains local.
 - Log in after confirming email and verify profile save.
 - Open `/dashboard` while signed in and verify profile data is displayed.
+- Open `/account` while signed in and verify the Smart Profile summary and security note are displayed.
 - Open `/dashboard` while signed out and verify redirect to `/start`.
 - Open `/assistant` signed out and verify demo mode still works.
 - Open `/assistant` signed in and verify account label appears.

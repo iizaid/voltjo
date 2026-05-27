@@ -56,6 +56,10 @@ export function checkAuthRateLimit(action: RateLimitAction, email: string) {
   return { ok: true as const };
 }
 
+export function clearAuthRateLimit(action: RateLimitAction, email: string) {
+  buckets.delete(getRateLimitKey(action, email));
+}
+
 // This is intentionally in-memory for Phase 1 hardening only. Multi-instance
 // production deployments must replace it with Redis/Upstash, Supabase Edge
 // rate limiting, or platform/WAF-level protection.
