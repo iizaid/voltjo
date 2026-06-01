@@ -49,6 +49,7 @@ export function ChatComposer({
   thinkingMode: boolean;
   onThinkingModeChange: (enabled: boolean) => void;
 }) {
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -89,6 +90,16 @@ export function ChatComposer({
     onNotice?.(ATTACHMENT_DEMO_NOTICE);
     setDropdownOpen(false);
   };
+
+  useEffect(() => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    textarea.style.height = "auto";
+    const nextHeight = Math.min(textarea.scrollHeight, 220);
+    textarea.style.height = `${nextHeight}px`;
+    textarea.style.overflowY = textarea.scrollHeight > 220 ? "auto" : "hidden";
+  }, [value]);
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -144,9 +155,10 @@ export function ChatComposer({
           </AnimatePresence>
 
           <textarea
+            ref={textareaRef}
             aria-label="رسالة إلى VoltJo Assistant"
             value={value}
-            maxLength={MAX_CHAT_MESSAGE_LENGTH + 1}
+            maxLength={MAX_CHAT_MESSAGE_LENGTH}
             onChange={(event) => onChange(event.target.value)}
             onKeyDown={(event) => {
               if (event.key === "Enter" && !event.shiftKey) {
@@ -232,7 +244,7 @@ export function ChatComposer({
               <button
                 type="button"
                 aria-pressed={thinkingMode}
-                className={`hidden h-9 items-center gap-2 rounded-xl px-3 text-[13px] font-semibold transition sm:inline-flex ${
+                className={`inline-flex h-9 items-center gap-2 rounded-xl px-3 text-[13px] font-semibold transition ${
                   thinkingMode
                     ? "bg-[#1F1F1D] text-white shadow-[0_8px_18px_rgba(31,31,29,0.12)]"
                     : "text-[#6F6A60] hover:bg-[#F8F7F4] hover:text-[#1F1F1D]"

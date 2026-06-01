@@ -35,13 +35,19 @@ export function AssistantTypingText({
     );
   }
 
+  const typingSpeed =
+    text.length > 700 ? 12 :
+    text.length > 400 ? 18 :
+    text.length > 220 ? 26 :
+    36;
+
   return (
     <TextType
       as="span"
       text={text}
       loop={false}
       showCursor={false}
-      typingSpeed={14}
+      typingSpeed={typingSpeed}
       reducedMotionText={text}
       dir="rtl"
       className="block w-full whitespace-pre-wrap break-words text-right [unicode-bidi:plaintext]"

@@ -7,6 +7,11 @@ export interface ChatAttachment {
   type: string;
 }
 
+export interface ChatMessageMetadata {
+  modelId?: string;
+  thinkingMode?: boolean;
+}
+
 export interface ChatMessage {
   id: string;
   role: ChatRole;
@@ -15,6 +20,7 @@ export interface ChatMessage {
   createdAt: string;
   status?: "sending" | "streaming" | "done" | "error";
   attachment?: ChatAttachment;
+  metadata?: ChatMessageMetadata;
 }
 
 export type ChatCategory = "السيارات" | "الشحن" | "المقارنة" | "الحاسبات" | "الدعم والضمان" | "عام";

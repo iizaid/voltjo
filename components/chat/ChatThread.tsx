@@ -23,6 +23,7 @@ export function ChatThread({
   typingMessageId,
   thinkingMode,
   onThinkingModeChange,
+  onAssistantTypingComplete,
 }: {
   messages: ChatMessageType[];
   composerValue: string;
@@ -40,6 +41,7 @@ export function ChatThread({
   typingMessageId: string | null;
   thinkingMode: boolean;
   onThinkingModeChange: (enabled: boolean) => void;
+  onAssistantTypingComplete: (id: string) => void;
 }) {
   const hasMessages = messages.length > 0;
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -76,6 +78,7 @@ export function ChatThread({
                       key={message.id}
                       message={message}
                       animateAssistant={message.id === typingMessageId}
+                      onTypingComplete={onAssistantTypingComplete}
                     />
                   ))}
                   <div ref={bottomRef} className="h-4" />

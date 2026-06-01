@@ -31,7 +31,7 @@ export function ChatTopBar({
               {selectedModel.name}
             </p>
             <p className="hidden text-[11px] font-semibold text-[#6F6A60] sm:block">
-              VoltJo Assistant
+              مستشار السيارات الكهربائية والهايبرد في الأردن
             </p>
           </div>
         </div>

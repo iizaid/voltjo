@@ -1,4 +1,10 @@
-import type { ChatAttachment, ChatCategory, ChatConversation, ChatMessage } from "./types";
+import type {
+  ChatAttachment,
+  ChatCategory,
+  ChatConversation,
+  ChatMessage,
+  ChatMessageMetadata,
+} from "./types";
 
 /**
  * Infers the chat category based on the query text.
@@ -93,7 +99,7 @@ export function createUserMessage(content: string, attachment?: ChatAttachment):
 /**
  * Generates an assistant placeholder message with "sending" status.
  */
-export function createAssistantPlaceholder(): ChatMessage {
+export function createAssistantPlaceholder(metadata?: ChatMessageMetadata): ChatMessage {
   const randomSuffix = Math.random().toString(36).substring(2, 11);
   const id = `placeholder-${Date.now()}-${randomSuffix}`;
 
@@ -103,6 +109,7 @@ export function createAssistantPlaceholder(): ChatMessage {
     content: "",
     status: "sending",
     createdAt: new Date().toISOString(),
+    metadata,
   };
 }
 
@@ -118,6 +125,7 @@ export function completeAssistantMessage(
     content: responseMessage.content,
     bullets: responseMessage.bullets,
     status: "done",
+    metadata: responseMessage.metadata ?? placeholderMessage.metadata,
   };
 }
 

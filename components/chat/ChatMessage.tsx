@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Paperclip } from "lucide-react";
 import { motion } from "motion/react";
 import { AssistantTypingText } from "@/components/chat/AssistantTypingText";
@@ -10,13 +10,26 @@ import type { ChatMessage as ChatMessageType } from "@/lib/chat/types";
 export function ChatMessage({
   message,
   animateAssistant = false,
+  onTypingComplete,
 }: {
   message: ChatMessageType;
   animateAssistant?: boolean;
+  onTypingComplete?: (id: string) => void;
 }) {
   const isUser = message.role === "user";
   const [typingComplete, setTypingComplete] = useState(!animateAssistant);
   const visibleBullets = typingComplete ? (message.bullets ?? []) : [];
+
+  useEffect(() => {
+    if (!isUser && animateAssistant) {
+      setTypingComplete(false);
+      return;
+    }
+
+    if (!isUser && message.status === "done") {
+      setTypingComplete(true);
+    }
+  }, [animateAssistant, isUser, message.status, message.id]);
 
   if (!isUser && message.status === "sending") {
     return (
@@ -33,7 +46,7 @@ export function ChatMessage({
               <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-[#C9C4BA] [animation-delay:300ms]" />
             </div>
             <p className="mt-1 text-[11px] font-medium text-[#6F6A60]">
-              جاري التفكير...
+              {message.metadata?.thinkingMode ? "أحلل السؤال بعمق..." : "جاري التفكير..."}
             </p>
           </div>
         </div>
@@ -109,7 +122,10 @@ export function ChatMessage({
             <AssistantTypingText
               text={message.content}
               animate={animateAssistant}
-              onComplete={() => setTypingComplete(true)}
+              onComplete={() => {
+                setTypingComplete(true);
+                onTypingComplete?.(message.id);
+              }}
             />
           </p>
           {visibleBullets.length > 0 ? (

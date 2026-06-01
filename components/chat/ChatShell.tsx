@@ -161,6 +161,10 @@ export function ChatShell({
     }
   };
 
+  const handleAssistantTypingComplete = (id: string) => {
+    setTypingMessageId((current) => (current === id ? null : current));
+  };
+
   const submitPrompt = async (
     prompt: string,
     att?: ChatAttachment,
@@ -186,7 +190,16 @@ export function ChatShell({
     let newConversations = [...conversations];
 
     const userMessage = createUserMessage(trimmedPrompt, att);
-    const placeholder = createAssistantPlaceholder();
+    const requestOptions = {
+      modelId: selectedModel.id,
+      thinkingMode,
+      attachment: att ?? null,
+    };
+
+    const placeholder = createAssistantPlaceholder({
+      modelId: requestOptions.modelId,
+      thinkingMode: requestOptions.thinkingMode,
+    });
     const title = generateConversationTitle(trimmedPrompt) || (att ? att.name : "محادثة جديدة");
 
     if (!targetId || !conversations.find((c) => c.id === targetId)) {
@@ -220,7 +233,7 @@ export function ChatShell({
     setMobileSidebarOpen(false);
 
     try {
-      const response = await simulateChatResponse(trimmedPrompt || att?.name || "مرفق");
+      const response = await simulateChatResponse(trimmedPrompt || att?.name || "مرفق", requestOptions);
       const completed = completeAssistantMessage(placeholder, response);
       setTypingMessageId(completed.id);
       setConversations((prev) =>
@@ -319,6 +332,7 @@ export function ChatShell({
         typingMessageId={typingMessageId}
         thinkingMode={thinkingMode}
         onThinkingModeChange={setThinkingMode}
+        onAssistantTypingComplete={handleAssistantTypingComplete}
       />
     </div>
   );
