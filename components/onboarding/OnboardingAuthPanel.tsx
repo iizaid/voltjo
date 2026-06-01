@@ -3,6 +3,7 @@
 import { FormEvent, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "motion/react";
+import { CheckCircle2 } from "lucide-react";
 import Folder from "@/components/Folder";
 import { VoltJoLogo } from "@/components/brand/VoltJoLogo";
 import { signInAction, signUpAction } from "@/lib/auth/actions";
@@ -46,6 +47,8 @@ export function OnboardingAuthPanel({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [authMessage, setAuthMessage] = useState<string | null>(null);
   const [authError, setAuthError] = useState<string | null>(notice || null);
+  const [emailConfirmationRequired, setEmailConfirmationRequired] =
+    useState(false);
   const highlights = useMemo(() => getProfileHighlights(answers), [answers]);
   const serializedAnswers = useMemo(() => JSON.stringify(answers), [answers]);
 
@@ -56,6 +59,7 @@ export function OnboardingAuthPanel({
     setIsSubmitting(true);
     setAuthMessage(null);
     setAuthError(null);
+    setEmailConfirmationRequired(false);
 
     const formData = new FormData(event.currentTarget);
     const result =
@@ -74,7 +78,9 @@ export function OnboardingAuthPanel({
     }
 
     if (result.emailConfirmationRequired) {
+      saveOnboardingDraft(answers);
       setAuthMessage(result.message);
+      setEmailConfirmationRequired(true);
       setIsSubmitting(false);
       return;
     }
@@ -96,6 +102,7 @@ export function OnboardingAuthPanel({
     setIsSubmitting(true);
     setAuthError(null);
     setAuthMessage(null);
+    setEmailConfirmationRequired(false);
 
     saveOnboardingDraft(answers);
 
@@ -238,13 +245,38 @@ export function OnboardingAuthPanel({
               </p>
             ) : null}
             {authMessage ? (
-              <p
-                role="status"
-                aria-live="polite"
-                className="rounded-[14px] border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-bold leading-7 text-emerald-800"
-              >
-                {authMessage}
-              </p>
+              emailConfirmationRequired ? (
+                <div
+                  role="status"
+                  aria-live="polite"
+                  className="rounded-[18px] border border-emerald-200 bg-[linear-gradient(180deg,rgba(236,253,245,0.96),rgba(240,253,250,0.92))] px-4 py-4 text-right shadow-sm"
+                >
+                  <div className="flex items-start gap-3">
+                    <span className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">
+                      <CheckCircle2 size={20} strokeWidth={2.2} />
+                    </span>
+                    <div className="space-y-2">
+                      <p className="text-sm font-extrabold leading-7 text-emerald-900">
+                        تم إنشاء حسابك بنجاح. أرسلنا رابط التأكيد إلى بريدك
+                        الإلكتروني. افتح الرابط لتفعيل حسابك، ثم عد إلى VoltJo
+                        لتسجيل الدخول.
+                      </p>
+                      <p className="text-sm font-semibold leading-7 text-emerald-800/90">
+                        قد يستغرق وصول الرسالة دقيقة، وتحقق من مجلد الرسائل غير
+                        المرغوب فيها أو العروض الترويجية.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <p
+                  role="status"
+                  aria-live="polite"
+                  className="rounded-[14px] border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-bold leading-7 text-emerald-800"
+                >
+                  {authMessage}
+                </p>
+              )
             ) : null}
             {mode === "signup" ? (
               <label className="grid gap-2 text-sm font-bold text-[var(--voltjo-black)]">

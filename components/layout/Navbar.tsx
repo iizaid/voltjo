@@ -7,7 +7,20 @@ import { VoltJoLogo } from "@/components/brand/VoltJoLogo";
 import { MegaMenu } from "@/components/layout/MegaMenu";
 import { megaMenus, navItems, type DropdownKey } from "@/data/navigation";
 
-export function Navbar() {
+export type NavbarAuthState = {
+  isAuthenticated: boolean;
+  displayName: string;
+  email: string | null;
+  initial: string;
+  profileCompleted: boolean;
+};
+
+function getAccountLabel(auth: NavbarAuthState | null | undefined) {
+  if (!auth?.isAuthenticated) return "ابدأ الآن";
+  return auth.displayName.trim().split(/\s+/)[0] || "حسابي";
+}
+
+export function Navbar({ auth }: { auth?: NavbarAuthState | null }) {
   const [openMenu, setOpenMenu] = useState<DropdownKey | null>(null);
   const navRef = useRef<HTMLDivElement>(null);
   const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -127,13 +140,35 @@ export function Navbar() {
           </div>
 
           <div className="hidden shrink-0 items-center gap-2 lg:flex" dir="rtl">
-            <Link
-              href="/start"
-              onClick={() => setOpenMenu(null)}
-              className="flex h-10 items-center justify-center rounded-[8px] bg-[var(--voltjo-orange)] px-5 text-sm font-bold text-[#FFFFFF] transition hover:bg-[#e85e00] hover:-translate-y-0.5 shadow-sm hover:shadow-md"
-            >
-              ابدأ الآن
-            </Link>
+            {auth?.isAuthenticated ? (
+              <>
+                <Link
+                  href="/assistant"
+                  onClick={() => setOpenMenu(null)}
+                  className="flex h-10 items-center justify-center rounded-[8px] border border-[var(--voltjo-border)] bg-white px-4 text-sm font-bold text-[var(--voltjo-black)] transition hover:bg-[rgba(13,13,13,0.04)]"
+                >
+                  المساعد
+                </Link>
+                <Link
+                  href="/account"
+                  onClick={() => setOpenMenu(null)}
+                  className="flex h-10 items-center gap-2 rounded-[8px] border border-[var(--voltjo-border)] bg-white px-3.5 text-sm font-bold text-[var(--voltjo-black)] transition hover:bg-[rgba(13,13,13,0.04)]"
+                >
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--voltjo-black)] text-[11px] font-black text-white">
+                    {auth.initial}
+                  </span>
+                  <span>{getAccountLabel(auth)}</span>
+                </Link>
+              </>
+            ) : (
+              <Link
+                href="/start"
+                onClick={() => setOpenMenu(null)}
+                className="flex h-10 items-center justify-center rounded-[8px] bg-[var(--voltjo-orange)] px-5 text-sm font-bold text-[#FFFFFF] transition hover:bg-[#e85e00] hover:-translate-y-0.5 shadow-sm hover:shadow-md"
+              >
+                ابدأ الآن
+              </Link>
+            )}
           </div>
 
           <details className="group lg:hidden" dir="rtl">
@@ -154,12 +189,32 @@ export function Navbar() {
                 ))}
               </div>
               <div className="mt-2 flex flex-col gap-2 border-t border-[var(--voltjo-border-soft)] pt-3">
-                <Link
-                  href="/start"
-                  className="flex w-full items-center justify-center rounded-[8px] bg-[var(--voltjo-orange)] px-4 py-2.5 text-sm font-bold text-[#FFFFFF] transition hover:bg-[#e85e00]"
-                >
-                  ابدأ الآن
-                </Link>
+                {auth?.isAuthenticated ? (
+                  <>
+                    <Link
+                      href="/assistant"
+                      className="flex w-full items-center justify-center rounded-[8px] border border-[var(--voltjo-border)] bg-white px-4 py-2.5 text-sm font-bold text-[var(--voltjo-black)] transition hover:bg-[rgba(13,13,13,0.04)]"
+                    >
+                      المساعد
+                    </Link>
+                    <Link
+                      href="/account"
+                      className="flex w-full items-center justify-center gap-2 rounded-[8px] border border-[var(--voltjo-border)] bg-white px-4 py-2.5 text-sm font-bold text-[var(--voltjo-black)] transition hover:bg-[rgba(13,13,13,0.04)]"
+                    >
+                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--voltjo-black)] text-[10px] font-black text-white">
+                        {auth.initial}
+                      </span>
+                      {auth.profileCompleted ? "حسابي" : "إكمال الملف الذكي"}
+                    </Link>
+                  </>
+                ) : (
+                  <Link
+                    href="/start"
+                    className="flex w-full items-center justify-center rounded-[8px] bg-[var(--voltjo-orange)] px-4 py-2.5 text-sm font-bold text-[#FFFFFF] transition hover:bg-[#e85e00]"
+                  >
+                    ابدأ الآن
+                  </Link>
+                )}
               </div>
             </div>
           </details>
