@@ -1,3 +1,5 @@
+import "server-only";
+
 export function getAiEnv() {
   return {
     aiProvider: process.env.AI_PROVIDER ?? "mock",

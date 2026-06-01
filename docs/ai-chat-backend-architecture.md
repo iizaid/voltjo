@@ -17,11 +17,12 @@ The frontend chat UI no longer generates assistant replies directly in the brows
 The API route:
 
 1. parses JSON safely
-2. validates the payload server-side
-3. resolves the current Supabase user when available
-4. applies in-memory rate limiting
-5. calls the current AI provider abstraction
-6. returns a structured JSON response
+2. applies a content-length guard before JSON parsing when the header is present
+3. validates the payload server-side
+4. resolves the current Supabase user when available
+5. applies in-memory rate limiting
+6. wraps provider calls with a timeout
+7. returns a structured JSON response
 
 ## Current provider
 
@@ -65,12 +66,23 @@ Current default:
 - No AI API keys are exposed to the client.
 - Client components must never import server env helpers.
 - Provider errors should be sanitized before returning to the UI.
+- `/api/chat` rejects oversized request bodies when `Content-Length` exceeds the configured limit.
 - `/api/chat` includes in-memory rate limiting in this phase.
+- `/api/chat` returns rate limit headers:
+  - `X-RateLimit-Limit`
+  - `X-RateLimit-Remaining`
+  - `X-RateLimit-Reset`
+  - `Retry-After` when blocked
+- Client requests use a timeout.
+- Provider execution uses a server-side timeout.
 - Production should replace in-memory rate limiting with shared storage or edge/network protection.
 
 ## Current limitations
 
 - Real AI providers are not implemented yet.
+- `AI_PROVIDER` can be configured, but non-mock providers still safely fall back to `mock`.
+- Real API keys will be added later server-side only.
 - Chat persistence is still localStorage only.
 - Attachments are still metadata/demo only.
 - `/api/chat` rate limiting is temporary and in-memory.
+- No streaming yet.

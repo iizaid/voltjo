@@ -1,3 +1,5 @@
+import "server-only";
+
 import type { AiChatRequest, AiChatResponse, AiProvider } from "@/lib/ai/types";
 
 function wait(ms: number) {

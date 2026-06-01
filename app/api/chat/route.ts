@@ -3,6 +3,9 @@ import { validateAiChatRequest } from "@/lib/ai/validation";
 import { getCurrentUser } from "@/lib/server/auth";
 import { apiError, apiSuccess } from "@/lib/server/api-response";
 import { checkRateLimit } from "@/lib/server/rate-limit";
+import { withTimeout } from "@/lib/server/timeout";
+
+const MAX_CHAT_API_BODY_BYTES = 12 * 1024;
 
 function getIpFromRequest(request: Request) {
   const forwardedFor = request.headers.get("x-forwarded-for");
@@ -17,7 +20,27 @@ function getIpFromRequest(request: Request) {
   return "unknown";
 }
 
+function buildRateLimitHeaders(limit: number, remaining: number, resetAt: number) {
+  return {
+    "X-RateLimit-Limit": String(limit),
+    "X-RateLimit-Remaining": String(remaining),
+    "X-RateLimit-Reset": String(Math.ceil(resetAt / 1000)),
+  };
+}
+
 export async function POST(request: Request) {
+  const contentLength = request.headers.get("content-length");
+  if (contentLength) {
+    const parsedLength = Number.parseInt(contentLength, 10);
+    if (Number.isFinite(parsedLength) && parsedLength > MAX_CHAT_API_BODY_BYTES) {
+      return apiError({
+        code: "PAYLOAD_TOO_LARGE",
+        message: "حجم الطلب كبير جدًا.",
+        status: 413,
+      });
+    }
+  }
+
   let body: unknown;
 
   try {
@@ -51,19 +74,30 @@ export async function POST(request: Request) {
   });
 
   if (!rateLimit.ok) {
+    const retryAfter = Math.max(1, Math.ceil((rateLimit.resetAt - Date.now()) / 1000));
     return apiError({
       code: "RATE_LIMITED",
       message: rateLimit.message,
       status: 429,
+      headers: {
+        ...buildRateLimitHeaders(rateLimit.limit, rateLimit.remaining, rateLimit.resetAt),
+        "Retry-After": String(retryAfter),
+      },
     });
   }
 
   try {
     const provider = getAiProvider();
-    const message = await provider.generateChatResponse(validation.data);
+    const message = await withTimeout({
+      promise: provider.generateChatResponse(validation.data),
+      timeoutMs: 30_000,
+      errorMessage: "AI provider timed out",
+    });
 
     return apiSuccess({
       message,
+    }, {
+      headers: buildRateLimitHeaders(rateLimit.limit, rateLimit.remaining, rateLimit.resetAt),
     });
   } catch {
     return apiError({

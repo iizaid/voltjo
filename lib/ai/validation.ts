@@ -88,17 +88,69 @@ export function validateAiChatRequest(input: unknown): ValidationResult {
 
     const { id, name, size, type } = rawAttachment;
 
-    if (
-      typeof id !== "string" ||
-      typeof name !== "string" ||
-      typeof size !== "number" ||
-      !Number.isFinite(size) ||
-      typeof type !== "string"
-    ) {
+    if (typeof id !== "string") {
       return {
         ok: false,
-        code: "INVALID_ATTACHMENT",
-        message: "بيانات المرفق غير مكتملة أو غير صالحة.",
+        code: "INVALID_ATTACHMENT_ID",
+        message: "معرّف المرفق غير صالح.",
+        status: 400,
+      };
+    }
+
+    if (typeof name !== "string") {
+      return {
+        ok: false,
+        code: "INVALID_ATTACHMENT_NAME",
+        message: "اسم المرفق غير صالح.",
+        status: 400,
+      };
+    }
+
+    if (typeof type !== "string") {
+      return {
+        ok: false,
+        code: "INVALID_ATTACHMENT_TYPE",
+        message: "نوع المرفق غير صالح.",
+        status: 400,
+      };
+    }
+
+    if (typeof size !== "number" || !Number.isFinite(size) || size < 0) {
+      return {
+        ok: false,
+        code: "INVALID_ATTACHMENT_SIZE",
+        message: "حجم المرفق غير صالح.",
+        status: 400,
+      };
+    }
+
+    const sanitizedId = id.trim();
+    const sanitizedName = name.trim();
+    const sanitizedType = type.trim();
+
+    if (!sanitizedId || sanitizedId.length > 120) {
+      return {
+        ok: false,
+        code: "INVALID_ATTACHMENT_ID",
+        message: "معرّف المرفق غير صالح.",
+        status: 400,
+      };
+    }
+
+    if (!sanitizedName || sanitizedName.length > 160) {
+      return {
+        ok: false,
+        code: "INVALID_ATTACHMENT_NAME",
+        message: "اسم المرفق غير صالح.",
+        status: 400,
+      };
+    }
+
+    if (!sanitizedType || sanitizedType.length > 100) {
+      return {
+        ok: false,
+        code: "INVALID_ATTACHMENT_TYPE",
+        message: "نوع المرفق غير صالح.",
         status: 400,
       };
     }
@@ -112,7 +164,7 @@ export function validateAiChatRequest(input: unknown): ValidationResult {
       };
     }
 
-    if (!isSupportedAttachmentType(type)) {
+    if (!isSupportedAttachmentType(sanitizedType)) {
       return {
         ok: false,
         code: "UNSUPPORTED_ATTACHMENT_TYPE",
@@ -122,10 +174,10 @@ export function validateAiChatRequest(input: unknown): ValidationResult {
     }
 
     attachment = {
-      id,
-      name: name.trim(),
+      id: sanitizedId,
+      name: sanitizedName,
       size,
-      type,
+      type: sanitizedType,
     };
   }
 

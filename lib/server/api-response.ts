@@ -6,10 +6,12 @@ export function apiError({
   code,
   message,
   status = 400,
+  headers,
 }: {
   code: string;
   message: string;
   status?: number;
+  headers?: HeadersInit;
 }) {
   return Response.json(
     {
@@ -19,6 +21,6 @@ export function apiError({
         message,
       },
     },
-    { status },
+    { status, headers },
   );
 }

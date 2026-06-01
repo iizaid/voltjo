@@ -1,6 +1,10 @@
+import "server-only";
+
+// Temporary in-memory rate limiter for single-instance use only.
+// Replace with shared storage or edge/network protection before public launch.
 type RateLimitResult =
-  | { ok: true }
-  | { ok: false; resetAt: number; message: string };
+  | { ok: true; limit: number; remaining: number; resetAt: number }
+  | { ok: false; limit: number; remaining: 0; resetAt: number; message: string };
 
 type RateLimitBucket = {
   count: number;
@@ -47,12 +51,19 @@ export function checkRateLimit({
       count: 1,
       resetAt: currentTime + windowMs,
     });
-    return { ok: true };
+    return {
+      ok: true,
+      limit,
+      remaining: Math.max(0, limit - 1),
+      resetAt: currentTime + windowMs,
+    };
   }
 
   if (existing.count >= limit) {
     return {
       ok: false,
+      limit,
+      remaining: 0,
       resetAt: existing.resetAt,
       message: "محاولات كثيرة. حاول بعد قليل.",
     };
@@ -60,5 +71,10 @@ export function checkRateLimit({
 
   existing.count += 1;
   buckets.set(bucketKey, existing);
-  return { ok: true };
+  return {
+    ok: true,
+    limit,
+    remaining: Math.max(0, limit - existing.count),
+    resetAt: existing.resetAt,
+  };
 }
