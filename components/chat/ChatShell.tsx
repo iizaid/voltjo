@@ -38,10 +38,24 @@ export type ChatAccount = {
 };
 
 export const CHAT_MODELS = [
-  { id: "voltjo", name: "VoltJo Max" },
-  { id: "gemini", name: "Gemini" },
-  { id: "kimi", name: "Kimi AI" },
+  {
+    id: "voltjo",
+    name: "VoltJo Max",
+    description: "الأفضل لتحليل السيارات والسوق الأردني",
+  },
+  {
+    id: "gemini",
+    name: "Gemini",
+    description: "مناسب للأسئلة العامة والسريعة",
+  },
+  {
+    id: "kimi",
+    name: "Kimi AI",
+    description: "مناسب للنصوص الطويلة والتحليل",
+  },
 ];
+
+export type ChatModel = (typeof CHAT_MODELS)[number];
 
 export function ChatShell({
   account,
@@ -61,6 +75,8 @@ export function ChatShell({
   const [isLoading, setIsLoading] = useState(false);
   const [hasHydratedConversations, setHasHydratedConversations] = useState(false);
   const [selectedModel, setSelectedModel] = useState(CHAT_MODELS[0]);
+  const [typingMessageId, setTypingMessageId] = useState<string | null>(null);
+  const [thinkingMode, setThinkingMode] = useState(false);
 
   const searchInputRef = useRef<HTMLInputElement>(null);
   const hasSubmittedInitialPromptRef = useRef(false);
@@ -106,6 +122,7 @@ export function ChatShell({
     setComposerValue("");
     setAttachment(null);
     setNotice(null);
+    setTypingMessageId(null);
     setMobileSidebarOpen(false);
   };
 
@@ -115,6 +132,7 @@ export function ChatShell({
     setComposerValue("");
     setAttachment(null);
     setNotice(null);
+    setTypingMessageId(null);
   };
 
   const handleExportConversations = () => {
@@ -155,6 +173,8 @@ export function ChatShell({
       setNotice(LONG_MESSAGE_NOTICE);
       return;
     }
+
+    setTypingMessageId(null);
 
     if (att) {
       setNotice(ATTACHMENT_DEMO_NOTICE);
@@ -202,6 +222,7 @@ export function ChatShell({
     try {
       const response = await simulateChatResponse(trimmedPrompt || att?.name || "مرفق");
       const completed = completeAssistantMessage(placeholder, response);
+      setTypingMessageId(completed.id);
       setConversations((prev) =>
         prev.map((c) => {
           if (c.id === targetId) {
@@ -269,6 +290,7 @@ export function ChatShell({
           setComposerValue("");
           setAttachment(null);
           setNotice(null);
+          setTypingMessageId(null);
           setMobileSidebarOpen(false);
         }}
         onDeleteConversation={handleDeleteConversation}
@@ -294,6 +316,9 @@ export function ChatShell({
         onNotice={setNotice}
         selectedModel={selectedModel}
         onModelChange={setSelectedModel}
+        typingMessageId={typingMessageId}
+        thinkingMode={thinkingMode}
+        onThinkingModeChange={setThinkingMode}
       />
     </div>
   );

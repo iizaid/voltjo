@@ -20,6 +20,9 @@ export function ChatThread({
   onNotice,
   selectedModel,
   onModelChange,
+  typingMessageId,
+  thinkingMode,
+  onThinkingModeChange,
 }: {
   messages: ChatMessageType[];
   composerValue: string;
@@ -32,8 +35,11 @@ export function ChatThread({
   attachment: ChatAttachment | null;
   onAttachmentChange: (att: ChatAttachment | null) => void;
   onNotice: (message: string) => void;
-  selectedModel: { id: string; name: string };
-  onModelChange: (model: { id: string; name: string }) => void;
+  selectedModel: { id: string; name: string; description: string };
+  onModelChange: (model: { id: string; name: string; description: string }) => void;
+  typingMessageId: string | null;
+  thinkingMode: boolean;
+  onThinkingModeChange: (enabled: boolean) => void;
 }) {
   const hasMessages = messages.length > 0;
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -66,7 +72,11 @@ export function ChatThread({
               <div className="min-h-0 flex-1 overflow-y-auto">
                 <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-6">
                   {messages.map((message) => (
-                    <ChatMessage key={message.id} message={message} />
+                    <ChatMessage
+                      key={message.id}
+                      message={message}
+                      animateAssistant={message.id === typingMessageId}
+                    />
                   ))}
                   <div ref={bottomRef} className="h-4" />
                 </div>
@@ -84,6 +94,8 @@ export function ChatThread({
                   onNotice={onNotice}
                   selectedModel={selectedModel}
                   onModelChange={onModelChange}
+                  thinkingMode={thinkingMode}
+                  onThinkingModeChange={onThinkingModeChange}
                 />
                 {notice ? (
                   <p className="mx-auto mt-2.5 max-w-[820px] text-center text-[12px] font-semibold text-[#6F6A60]">
@@ -101,18 +113,20 @@ export function ChatThread({
               transition={{ duration: 0.2 }}
               className="w-full px-4"
             >
-              <ChatWelcome
-                composerValue={composerValue}
-                notice={notice}
+                <ChatWelcome
+                  composerValue={composerValue}
+                  notice={notice}
                 onComposerChange={onComposerChange}
                 onSubmit={onSubmit}
                 onSuggestionSelect={onSuggestionSelect}
                 attachment={attachment}
                 onAttachmentChange={onAttachmentChange}
-                onNotice={onNotice}
-                selectedModel={selectedModel}
-                onModelChange={onModelChange}
-              />
+                  onNotice={onNotice}
+                  selectedModel={selectedModel}
+                  onModelChange={onModelChange}
+                  thinkingMode={thinkingMode}
+                  onThinkingModeChange={onThinkingModeChange}
+                />
             </motion.div>
           )}
         </AnimatePresence>

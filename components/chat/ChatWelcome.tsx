@@ -1,5 +1,6 @@
 import { ChatComposer } from "@/components/chat/ChatComposer";
 import { ChatSuggestions } from "@/components/chat/ChatSuggestions";
+import { VoltJoChatMark } from "@/components/chat/VoltJoChatMark";
 import type { ChatAttachment } from "@/lib/chat/types";
 import { motion } from "motion/react";
 
@@ -14,6 +15,8 @@ export function ChatWelcome({
   onNotice,
   selectedModel,
   onModelChange,
+  thinkingMode,
+  onThinkingModeChange,
 }: {
   composerValue: string;
   notice: string | null;
@@ -23,8 +26,10 @@ export function ChatWelcome({
   attachment: ChatAttachment | null;
   onAttachmentChange: (att: ChatAttachment | null) => void;
   onNotice: (message: string) => void;
-  selectedModel: { id: string; name: string };
-  onModelChange: (model: { id: string; name: string }) => void;
+  selectedModel: { id: string; name: string; description: string };
+  onModelChange: (model: { id: string; name: string; description: string }) => void;
+  thinkingMode: boolean;
+  onThinkingModeChange: (enabled: boolean) => void;
 }) {
   return (
     <section className="mx-auto flex w-full max-w-[820px] flex-col items-center text-center" dir="rtl">
@@ -33,9 +38,13 @@ export function ChatWelcome({
         initial={{ opacity: 0, y: 5 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, ease: "easeOut" }}
-        className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-white shadow-sm border border-[rgba(13,13,13,0.06)]"
+        className="mb-4"
       >
-        <span className="text-lg font-black text-[var(--voltjo-orange)]">V</span>
+        <VoltJoChatMark
+          className="h-16 w-16"
+          imageClassName="h-14 w-14"
+          priority
+        />
       </motion.div>
 
       <motion.h1 
@@ -46,6 +55,15 @@ export function ChatWelcome({
       >
         كيف أقدر أساعدك؟
       </motion.h1>
+
+      <motion.p
+        initial={{ opacity: 0, y: 5 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, ease: "easeOut", delay: 0.08 }}
+        className="mt-3 max-w-xl text-[15px] font-medium leading-7 text-[#6F6A60]"
+      >
+        اسأل عن سيارة، تكلفة الشحن، المقارنة، الدعم أو الضمان داخل الأردن.
+      </motion.p>
 
       <motion.div 
         initial={{ opacity: 0, y: 5 }}
@@ -62,6 +80,8 @@ export function ChatWelcome({
           onNotice={onNotice}
           selectedModel={selectedModel}
           onModelChange={onModelChange}
+          thinkingMode={thinkingMode}
+          onThinkingModeChange={onThinkingModeChange}
         />
         {notice ? (
           <p className="mx-auto mt-3 max-w-[820px] text-center text-[12px] font-medium text-[#6F6A60]">

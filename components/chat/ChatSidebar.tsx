@@ -9,6 +9,7 @@ import {
   Download,
   Settings,
   MoreHorizontal,
+  Home,
 } from "lucide-react";
 import Link from "next/link";
 import { VoltJoLogo } from "@/components/brand/VoltJoLogo";
@@ -246,13 +247,19 @@ export function ChatSidebar({
                       type="button"
                       onDoubleClick={() => onRenameConversation(conversation.id)}
                       onClick={() => onSelectConversation(conversation.id)}
-                      className={`flex-1 overflow-hidden truncate rounded-xl px-3 py-2 text-right text-[13px] font-semibold leading-5 transition-colors ${
+                      title={conversation.title}
+                      className={`relative flex-1 overflow-hidden rounded-xl border py-2 text-right text-[13px] font-semibold leading-5 transition-colors ${
                         activeId === conversation.id
-                          ? "bg-white border border-[rgba(13,13,13,0.08)] shadow-[0_2px_8px_rgba(13,13,13,0.04)] text-[#1F1F1D]"
-                          : "text-[#6F6A60] border border-transparent hover:bg-[rgba(13,13,13,0.04)] hover:text-[#1F1F1D]"
+                          ? "border-[#1F1F1D] bg-[#1F1F1D] pl-9 pr-3.5 text-white shadow-[0_8px_18px_rgba(31,31,29,0.14)]"
+                          : "border-transparent pl-9 pr-3 text-[#6F6A60] hover:border-[rgba(13,13,13,0.06)] hover:bg-[rgba(13,13,13,0.04)] hover:text-[#1F1F1D]"
                       }`}
                     >
-                      {conversation.title}
+                      <span
+                        className="block overflow-hidden text-ellipsis whitespace-nowrap [unicode-bidi:plaintext]"
+                        dir="auto"
+                      >
+                        {conversation.title}
+                      </span>
                     </button>
                     <button
                       type="button"
@@ -291,7 +298,16 @@ export function ChatSidebar({
                 onClick={() => setAccountMenuOpen(false)}
               >
                 <Settings size={15} className="text-[#6F6A60]" />
-                {account ? "إعدادات الحساب" : "إنشاء ملف ذكي"}
+                {account ? "الملف الشخصي" : "إنشاء ملف ذكي"}
+              </Link>
+
+              <Link
+                href="/"
+                className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-[13px] font-semibold text-[#1F1F1D] transition hover:bg-[#F8F7F4]"
+                onClick={() => setAccountMenuOpen(false)}
+              >
+                <Home size={15} className="text-[#6F6A60]" />
+                العودة للموقع
               </Link>
               
               <button
@@ -339,7 +355,7 @@ export function ChatSidebar({
             {!collapsed && (
               <div className="min-w-0 text-right">
                 <p className="truncate text-[13px] font-bold text-[#1F1F1D]">{account?.label ?? "حساب VoltJo"}</p>
-                <p className="truncate text-[11px] font-semibold text-[#6F6A60]">{account?.sublabel ?? "نسخة تجريبية"}</p>
+                <p className="truncate text-[11px] font-semibold text-[#6F6A60]">{account?.sublabel ?? "ابدأ ملفك الذكي"}</p>
               </div>
             )}
           </div>
