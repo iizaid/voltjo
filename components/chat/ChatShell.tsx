@@ -3,8 +3,8 @@
 import { useState, useEffect, useRef } from "react";
 import { ChatSidebar } from "@/components/chat/ChatSidebar";
 import { ChatThread } from "@/components/chat/ChatThread";
-import { simulateChatResponse } from "@/lib/chat/mock-chat";
 import type { ChatConversation, ChatAttachment } from "@/lib/chat/types";
+import { sendChatMessage } from "@/lib/chat/api-client";
 import {
   loadConversations,
   saveConversations,
@@ -233,7 +233,12 @@ export function ChatShell({
     setMobileSidebarOpen(false);
 
     try {
-      const response = await simulateChatResponse(trimmedPrompt || att?.name || "مرفق", requestOptions);
+      const response = await sendChatMessage({
+        message: trimmedPrompt || att?.name || "مرفق",
+        modelId: requestOptions.modelId,
+        thinkingMode: requestOptions.thinkingMode,
+        attachment: requestOptions.attachment,
+      });
       const completed = completeAssistantMessage(placeholder, response);
       setTypingMessageId(completed.id);
       setConversations((prev) =>

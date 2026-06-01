@@ -10,6 +10,7 @@ export interface ChatAttachment {
 export interface ChatMessageMetadata {
   modelId?: string;
   thinkingMode?: boolean;
+  provider?: string;
 }
 
 export interface ChatMessage {
