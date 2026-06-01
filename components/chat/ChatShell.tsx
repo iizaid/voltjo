@@ -37,6 +37,12 @@ export type ChatAccount = {
   initial: string;
 };
 
+export const CHAT_MODELS = [
+  { id: "voltjo", name: "VoltJo Max" },
+  { id: "gemini", name: "Gemini" },
+  { id: "kimi", name: "Kimi AI" },
+];
+
 export function ChatShell({
   account,
   initialPrompt,
@@ -54,6 +60,7 @@ export function ChatShell({
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [hasHydratedConversations, setHasHydratedConversations] = useState(false);
+  const [selectedModel, setSelectedModel] = useState(CHAT_MODELS[0]);
 
   const searchInputRef = useRef<HTMLInputElement>(null);
   const hasSubmittedInitialPromptRef = useRef(false);
@@ -240,12 +247,12 @@ export function ChatShell({
   }, [hasHydratedConversations, initialPrompt]);
 
   return (
-    <div className="flex h-dvh w-full overflow-hidden bg-[#161614] text-white" dir="rtl">
+    <div className="flex h-dvh w-full overflow-hidden bg-[#F8F7F4] text-[#1F1F1D]" dir="rtl">
       {mobileSidebarOpen ? (
         <button
           type="button"
           aria-label="إغلاق القائمة"
-          className="fixed inset-0 z-40 bg-black/40 lg:hidden"
+          className="fixed inset-0 z-40 bg-black/10 lg:hidden"
           onClick={() => setMobileSidebarOpen(false)}
         />
       ) : null}
@@ -272,10 +279,6 @@ export function ChatShell({
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         searchInputRef={searchInputRef}
-        onQuickPrompt={(prompt) => {
-          handleCreateNew();
-          void submitPrompt(prompt, undefined, { forceNew: true });
-        }}
       />
       <ChatThread
         messages={messages}
@@ -289,6 +292,8 @@ export function ChatShell({
         attachment={attachment}
         onAttachmentChange={setAttachment}
         onNotice={setNotice}
+        selectedModel={selectedModel}
+        onModelChange={setSelectedModel}
       />
     </div>
   );

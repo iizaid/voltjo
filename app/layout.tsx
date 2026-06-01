@@ -32,6 +32,7 @@ export default function RootLayout({
     <html
       lang="ar"
       dir="rtl"
+      suppressHydrationWarning
       className={`${readexPro.variable} ${displayFont.variable}`}
     >
       <body>

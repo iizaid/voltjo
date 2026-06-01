@@ -1,18 +1,14 @@
 "use client";
 
 import {
-  ChevronsLeft,
+  ChevronsRight,
   MessageSquarePlus,
   Search,
   X,
   Trash2,
   Download,
   Settings,
-  Home,
-  Zap,
-  GitCompare,
-  BatteryCharging,
-  ShieldCheck,
+  MoreHorizontal,
 } from "lucide-react";
 import Link from "next/link";
 import { VoltJoLogo } from "@/components/brand/VoltJoLogo";
@@ -20,18 +16,12 @@ import type { ChatAccount } from "@/components/chat/ChatShell";
 import type { ChatConversation } from "@/lib/chat/types";
 import { getVisibleConversations } from "@/lib/chat/conversation-utils";
 import { useState, useRef, useCallback, useEffect } from "react";
+import { motion, AnimatePresence } from "motion/react";
 
 const MIN_WIDTH = 220;
 const MAX_WIDTH = 480;
-const DEFAULT_WIDTH = 272;
+const DEFAULT_WIDTH = 288;
 const STORAGE_KEY = "voltjo:sidebar:width";
-
-const quickTools = [
-  { icon: GitCompare, label: "مقارنة السيارات", prompt: "أريد مقارنة بين سيارتين كهربائيتين أو هايبرد" },
-  { icon: BatteryCharging, label: "تكلفة الشحن", prompt: "احسب لي تكلفة شحن سيارة كهربائية أو هايبرد" },
-  { icon: Zap, label: "دليل السوق", prompt: "أعطني دليلاً عن سوق السيارات الكهربائية في الأردن" },
-  { icon: ShieldCheck, label: "الدعم والضمان", prompt: "ما هي شروط الدعم والضمان على السيارات الكهربائية؟" },
-];
 
 export function ChatSidebar({
   collapsed,
@@ -50,7 +40,6 @@ export function ChatSidebar({
   searchQuery,
   onSearchChange,
   searchInputRef,
-  onQuickPrompt,
 }: {
   collapsed: boolean;
   mobileOpen: boolean;
@@ -68,27 +57,39 @@ export function ChatSidebar({
   searchQuery: string;
   onSearchChange: (q: string) => void;
   searchInputRef: React.RefObject<HTMLInputElement | null>;
-  onQuickPrompt: (prompt: string) => void;
 }) {
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
   const [confirmingDeleteId, setConfirmingDeleteId] = useState<string | null>(null);
   const [confirmingClearAll, setConfirmingClearAll] = useState(false);
   const [sidebarWidth, setSidebarWidth] = useState<number>(DEFAULT_WIDTH);
   const [isMounted, setIsMounted] = useState(false);
+  
+  const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setIsMounted(true);
     try {
       const saved = window.localStorage.getItem(STORAGE_KEY);
       if (saved) {
-        const parsed = Number.parseInt(saved, 10);
-        if (Number.isFinite(parsed)) {
-          setSidebarWidth(Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, parsed)));
+        const parsedWidth = Number.parseInt(saved, 10);
+        if (Number.isFinite(parsedWidth)) {
+          setSidebarWidth(Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, parsedWidth)));
         }
       }
     } catch {
-      // best-effort
+      // Sidebar width persistence is best-effort only.
     }
+  }, []);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setAccountMenuOpen(false);
+        setConfirmingClearAll(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
   }, []);
 
   const isResizing = useRef(false);
@@ -111,25 +112,22 @@ export function ChatSidebar({
     window.removeEventListener("mouseup", onMouseUp);
   }, [onMouseMove]);
 
-  const startResize = useCallback(
-    (e: React.MouseEvent) => {
-      isResizing.current = true;
-      startX.current = e.clientX;
-      startWidth.current = sidebarWidth;
-      document.body.style.cursor = "col-resize";
-      document.body.style.userSelect = "none";
-      window.addEventListener("mousemove", onMouseMove);
-      window.addEventListener("mouseup", onMouseUp);
-    },
-    [sidebarWidth, onMouseMove, onMouseUp]
-  );
+  const startResize = useCallback((e: React.MouseEvent) => {
+    isResizing.current = true;
+    startX.current = e.clientX;
+    startWidth.current = sidebarWidth;
+    document.body.style.cursor = "col-resize";
+    document.body.style.userSelect = "none";
+    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mouseup", onMouseUp);
+  }, [sidebarWidth, onMouseMove, onMouseUp]);
 
   useEffect(() => {
     if (isMounted) {
       try {
         window.localStorage.setItem(STORAGE_KEY, String(sidebarWidth));
       } catch {
-        // best-effort
+        // Sidebar width persistence is best-effort only.
       }
     }
   }, [sidebarWidth, isMounted]);
@@ -140,190 +138,129 @@ export function ChatSidebar({
     selectedCategory: "all",
   });
 
-  const sidebarBase =
-    "fixed inset-y-0 right-0 z-50 flex h-full shrink-0 flex-col border-l border-white/[0.06] bg-[#111110] transition-[transform] duration-200 lg:static lg:translate-x-0";
-  const mobileClass = mobileOpen ? "translate-x-0" : "translate-x-full lg:translate-x-0";
-  const collapsedClass = collapsed ? "lg:w-[72px]" : "";
-
   return (
     <aside
-      style={!collapsed ? { width: mobileOpen ? 288 : sidebarWidth } : undefined}
-      className={`${sidebarBase} ${mobileClass} ${collapsedClass} w-[288px]`}
+      style={!collapsed ? { width: sidebarWidth } : undefined}
+      className={`fixed inset-y-0 right-0 z-50 flex h-full shrink-0 flex-col border-l border-[rgba(31,31,29,0.08)] bg-[#FAFAFD] transition-[transform] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] lg:static lg:translate-x-0 ${
+        collapsed ? "lg:w-[76px]" : ""
+      } ${mobileOpen ? "translate-x-0 w-[288px]" : "translate-x-full lg:translate-x-0 w-[288px]"}`}
       dir="rtl"
     >
-      {/* Resize handle – desktop only */}
+      {/* ── Resize handle (desktop only) ── */}
       {!collapsed && (
         <div
           onMouseDown={startResize}
-          className="absolute left-0 top-0 hidden h-full w-1 cursor-col-resize select-none lg:flex items-center justify-center group"
+          className="absolute left-0 top-0 hidden h-full w-1 cursor-col-resize select-none items-center justify-center lg:flex group"
           title="اسحب لتغيير العرض"
         >
-          <div className="h-12 w-[2px] rounded-full bg-white/10 opacity-0 transition group-hover:opacity-100" />
+          <div className="h-12 w-[3px] rounded-full bg-[rgba(31,31,29,0.12)] opacity-0 transition group-hover:opacity-100" />
         </div>
       )}
 
-      {/* ── Logo / header ── */}
-      <div className="flex h-14 shrink-0 items-center justify-between px-4">
-        <div>
-          {collapsed ? (
-            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--voltjo-orange)] text-white text-sm font-black">V</span>
-          ) : (
+      {/* ── Header ── */}
+      <div className="flex items-center justify-between gap-3 px-4 pt-5 pb-2">
+        <div className="cursor-pointer">
+          <div className="lg:hidden">
             <VoltJoLogo />
-          )}
+          </div>
+          <div className="hidden lg:block">
+            {collapsed ? <VoltJoLogo compact /> : <VoltJoLogo />}
+          </div>
         </div>
-        <div className="flex items-center gap-1">
-          {/* Collapse toggle – desktop */}
-          <button
-            type="button"
-            aria-label={collapsed ? "توسيع القائمة" : "طي القائمة"}
-            onClick={onToggleCollapse}
-            className="hidden lg:flex h-8 w-8 items-center justify-center rounded-lg text-white/40 transition hover:bg-white/[0.06] hover:text-white/80"
-          >
-            <ChevronsLeft size={16} className={`transition ${collapsed ? "rotate-180" : ""}`} />
-          </button>
-          {/* Close – mobile */}
-          <button
-            type="button"
-            aria-label="إغلاق القائمة"
-            onClick={onCloseMobile}
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-white/40 transition hover:bg-white/[0.06] hover:text-white/80 lg:hidden"
-          >
-            <X size={16} />
-          </button>
-        </div>
+        <button
+          type="button"
+          aria-label={collapsed ? "توسيع القائمة" : "طي القائمة"}
+          onClick={onToggleCollapse}
+          className="hidden lg:flex h-8 w-8 items-center justify-center rounded-lg text-[#6F6A60] transition hover:bg-[rgba(31,31,29,0.06)]"
+        >
+          <ChevronsRight size={17} className={`transition-transform duration-300 ${collapsed ? "rotate-180" : ""}`} />
+        </button>
+        <button
+          type="button"
+          onClick={onCloseMobile}
+          className="flex h-8 w-8 items-center justify-center rounded-lg text-[#6F6A60] transition hover:bg-[rgba(31,31,29,0.06)] lg:hidden"
+        >
+          <X size={18} />
+        </button>
       </div>
 
-      {/* ── New chat ── */}
-      <div className="px-3 pb-2">
+      {/* ── New Chat ── */}
+      <div className="px-3 mt-4">
         <button
           type="button"
           onClick={onNewChat}
           title={collapsed ? "محادثة جديدة" : undefined}
-          className={`flex h-9 w-full items-center gap-2.5 rounded-lg bg-[var(--voltjo-orange)] px-3 text-sm font-bold text-white transition hover:bg-[#e85e00] ${collapsed ? "lg:justify-center lg:px-0" : ""}`}
+          className={`flex h-10 w-full items-center gap-2.5 rounded-xl bg-[#1F1F1D] px-3 text-[14px] font-semibold text-white transition hover:-translate-y-0.5 hover:shadow-md ${
+            collapsed ? "lg:justify-center lg:px-0" : ""
+          }`}
         >
-          <MessageSquarePlus size={15} strokeWidth={2} />
+          <MessageSquarePlus size={16} strokeWidth={2} />
           <span className={collapsed ? "lg:hidden" : ""}>محادثة جديدة</span>
         </button>
       </div>
 
       {/* ── Search ── */}
       {!collapsed && (
-        <div className="px-3 pb-3">
-          <div className="flex h-8 items-center gap-2 rounded-lg bg-white/[0.06] px-3 text-white/40">
-            <Search size={13} />
+        <div className="px-3 mt-4">
+          <div className="flex h-9 items-center gap-2 rounded-xl bg-white border border-[rgba(31,31,29,0.08)] px-3 text-[#6F6A60] shadow-[0_2px_8px_rgba(13,13,13,0.02)] focus-within:border-[rgba(31,31,29,0.15)] transition-colors">
+            <Search size={14} />
             <input
               ref={searchInputRef}
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
-              className="min-w-0 flex-1 bg-transparent text-[13px] font-medium text-white/80 outline-none placeholder:text-white/30"
-              placeholder="ابحث في المحادثات"
+              className="min-w-0 flex-1 bg-transparent text-[13px] font-medium outline-none placeholder:text-[#6F6A60]"
+              placeholder="ابحث في المحادثات..."
             />
             {searchQuery && (
-              <button
-                type="button"
-                onClick={() => onSearchChange("")}
-                className="shrink-0 rounded-full p-0.5 hover:bg-white/10"
-                aria-label="مسح البحث"
-              >
-                <X size={11} />
+              <button type="button" onClick={() => onSearchChange("")} className="shrink-0 rounded p-0.5 hover:bg-[#F8F7F4]">
+                <X size={12} />
               </button>
             )}
           </div>
         </div>
       )}
 
-      {/* ── Nav items ── */}
-      {!collapsed && (
-        <div className="px-3 pb-1">
-          <Link
-            href="/"
-            className="flex h-8 items-center gap-2.5 rounded-lg px-2 text-[13px] font-semibold text-white/50 transition hover:bg-white/[0.06] hover:text-white/80"
-          >
-            <Home size={14} />
-            <span>العودة للرئيسية</span>
-          </Link>
-        </div>
-      )}
-
-      <div className="mx-3 my-2 h-px bg-white/[0.06]" />
-
-      {/* ── Quick tools ── */}
-      {!collapsed && (
-        <div className="px-3 pb-2">
-          <p className="mb-1.5 px-1 text-[11px] font-bold uppercase tracking-wider text-white/25">
-            أدوات سريعة
-          </p>
-          <div className="grid gap-0.5">
-            {quickTools.map((tool) => (
-              <button
-                key={tool.label}
-                type="button"
-                onClick={() => onQuickPrompt(tool.prompt)}
-                className="flex h-8 items-center gap-2.5 rounded-lg px-2 text-[13px] font-semibold text-white/50 transition hover:bg-white/[0.06] hover:text-white/80"
-              >
-                <tool.icon size={13} className="shrink-0" />
-                <span>{tool.label}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
-      <div className="mx-3 my-2 h-px bg-white/[0.06]" />
-
       {/* ── Conversations ── */}
-      <div className="min-h-0 flex-1 overflow-y-auto px-3">
-        {!collapsed && (
-          <p className="mb-1.5 px-1 text-[11px] font-bold uppercase tracking-wider text-white/25">
-            المحادثات
-          </p>
-        )}
-
+      <div className="mt-4 min-h-0 flex-1 overflow-y-auto px-3 pb-4">
+        {!collapsed && <p className="mb-2 px-1 text-[11px] font-bold uppercase tracking-wider text-[#6F6A60]/80">المحادثات السابقة</p>}
+        
         {!collapsed && visibleConversations.length > 0 ? (
-          <div className="grid gap-0.5">
-            {visibleConversations.map((conv) => (
-              <div key={conv.id} className="group relative flex w-full items-center">
-                {confirmingDeleteId === conv.id ? (
-                  <div className="flex w-full items-center justify-between gap-2 rounded-lg bg-red-950/60 px-3 py-1.5 border border-red-500/20">
-                    <span className="text-[12px] font-semibold text-red-400">حذف؟</span>
-                    <div className="flex gap-1">
-                      <button
-                        type="button"
-                        onClick={() => { onDeleteConversation(conv.id); setConfirmingDeleteId(null); }}
-                        className="rounded-md bg-red-600 px-2.5 py-0.5 text-[11px] font-bold text-white transition hover:bg-red-700"
-                      >
-                        نعم
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setConfirmingDeleteId(null)}
-                        className="rounded-md bg-white/[0.06] px-2.5 py-0.5 text-[11px] font-bold text-white/60 transition hover:bg-white/10"
-                      >
-                        إلغاء
-                      </button>
+          <div className="grid gap-1">
+            {visibleConversations.map((conversation) => (
+              <div key={conversation.id} className="group relative flex w-full items-center">
+                {confirmingDeleteId === conversation.id ? (
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="flex w-full items-center justify-between gap-2 rounded-xl bg-red-50/80 border border-red-100 px-3 py-2"
+                  >
+                    <span className="text-[13px] font-semibold text-red-600">تأكيد الحذف؟</span>
+                    <div className="flex gap-1.5">
+                      <button onClick={() => { onDeleteConversation(conversation.id); setConfirmingDeleteId(null); }} className="rounded-md bg-red-600 px-3 py-1 text-[12px] font-bold text-white hover:bg-red-700">حذف</button>
+                      <button onClick={() => setConfirmingDeleteId(null)} className="rounded-md bg-white px-3 py-1 text-[12px] font-bold text-[#1F1F1D] shadow-sm border border-[rgba(13,13,13,0.08)]">إلغاء</button>
                     </div>
-                  </div>
+                  </motion.div>
                 ) : (
                   <>
                     <button
                       type="button"
-                      onDoubleClick={() => onRenameConversation(conv.id)}
-                      onClick={() => onSelectConversation(conv.id)}
-                      className={`flex-1 overflow-hidden truncate rounded-lg px-2 py-1.5 text-right text-[13px] font-semibold leading-5 transition ${
-                        activeId === conv.id
-                          ? "bg-white/[0.10] text-white"
-                          : "text-white/50 hover:bg-white/[0.05] hover:text-white/80"
+                      onDoubleClick={() => onRenameConversation(conversation.id)}
+                      onClick={() => onSelectConversation(conversation.id)}
+                      className={`flex-1 overflow-hidden truncate rounded-xl px-3 py-2 text-right text-[13px] font-semibold leading-5 transition-colors ${
+                        activeId === conversation.id
+                          ? "bg-white border border-[rgba(13,13,13,0.08)] shadow-[0_2px_8px_rgba(13,13,13,0.04)] text-[#1F1F1D]"
+                          : "text-[#6F6A60] border border-transparent hover:bg-[rgba(13,13,13,0.04)] hover:text-[#1F1F1D]"
                       }`}
                     >
-                      {conv.title}
+                      {conversation.title}
                     </button>
                     <button
                       type="button"
                       aria-label="حذف المحادثة"
-                      onClick={(e) => { e.stopPropagation(); setConfirmingDeleteId(conv.id); }}
-                      className="absolute left-1.5 hidden p-1 text-white/25 transition hover:text-red-400 group-hover:block"
+                      onClick={(e) => { e.stopPropagation(); setConfirmingDeleteId(conversation.id); }}
+                      className="absolute left-2 hidden p-1.5 text-[#6F6A60] transition hover:text-red-500 group-hover:block"
                     >
-                      <Trash2 size={12} />
+                      <Trash2 size={13} />
                     </button>
                   </>
                 )}
@@ -331,91 +268,85 @@ export function ChatSidebar({
             ))}
           </div>
         ) : !collapsed && searchQuery ? (
-          <p className="px-2 py-2 text-[12px] font-medium text-white/30">لا توجد نتائج مطابقة.</p>
+          <p className="px-1 py-4 text-[13px] font-medium text-[#6F6A60] text-center">لا توجد نتائج.</p>
         ) : !collapsed ? (
-          <p className="px-2 py-2 text-[12px] font-medium text-white/30">لا توجد محادثات بعد.</p>
+          <p className="px-1 py-4 text-[13px] font-medium text-[#6F6A60] text-center">لا توجد محادثات بعد.</p>
         ) : null}
       </div>
 
-      {/* ── Account footer ── */}
-      <div className="relative mx-3 mt-2 mb-3">
-        {accountMenuOpen && !collapsed && (
-          <div className="absolute bottom-full right-0 z-50 mb-1 w-full rounded-xl border border-white/[0.08] bg-[#1C1C1A] p-1.5 shadow-xl">
-            <Link
-              href={account ? "/account" : "/start"}
-              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-[13px] font-semibold text-white/70 transition hover:bg-white/[0.06] hover:text-white"
-              onClick={() => setAccountMenuOpen(false)}
+      {/* ── Simplified Account Footer ── */}
+      <div className="relative border-t border-[rgba(31,31,29,0.08)] p-3" ref={menuRef}>
+        <AnimatePresence>
+          {accountMenuOpen && !collapsed && (
+            <motion.div
+              initial={{ opacity: 0, y: 10, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 10, scale: 0.98 }}
+              transition={{ duration: 0.15, ease: "easeOut" }}
+              className="absolute bottom-full right-3 left-3 mb-2 overflow-hidden rounded-2xl border border-[rgba(31,31,29,0.08)] bg-white p-1.5 shadow-[0_12px_40px_rgba(13,13,13,0.12)]"
             >
-              <Settings size={13} />
-              {account ? "الملف الشخصي" : "إنشاء ملف ذكي"}
-            </Link>
-            <button
-              type="button"
-              onClick={() => { setAccountMenuOpen(false); onExportConversations(); }}
-              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-[13px] font-semibold text-white/70 transition hover:bg-white/[0.06] hover:text-white"
-            >
-              <Download size={13} />
-              تصدير المحادثات
-            </button>
-            <div className="my-1 h-px bg-white/[0.06]" />
-            {confirmingClearAll ? (
-              <div className="flex items-center justify-between gap-2 rounded-lg bg-red-950/60 px-3 py-2 border border-red-500/20">
-                <span className="text-[12px] font-semibold text-red-400">متأكد؟</span>
-                <div className="flex gap-1">
-                  <button
-                    type="button"
-                    onClick={() => { onClearConversations(); setConfirmingClearAll(false); setAccountMenuOpen(false); }}
-                    className="rounded-md bg-red-600 px-2.5 py-0.5 text-[11px] font-bold text-white hover:bg-red-700"
-                  >
-                    نعم
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setConfirmingClearAll(false)}
-                    className="rounded-md bg-white/[0.06] px-2.5 py-0.5 text-[11px] font-bold text-white/60 hover:bg-white/10"
-                  >
-                    إلغاء
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <button
-                type="button"
-                onClick={() => setConfirmingClearAll(true)}
-                className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-[13px] font-semibold text-red-400/80 transition hover:bg-red-950/40 hover:text-red-400"
+              <Link
+                href={account ? "/account" : "/start"}
+                className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-[13px] font-semibold text-[#1F1F1D] transition hover:bg-[#F8F7F4]"
+                onClick={() => setAccountMenuOpen(false)}
               >
-                <Trash2 size={13} />
-                مسح المحادثات
+                <Settings size={15} className="text-[#6F6A60]" />
+                {account ? "إعدادات الحساب" : "إنشاء ملف ذكي"}
+              </Link>
+              
+              <button
+                onClick={() => { setAccountMenuOpen(false); onExportConversations(); }}
+                className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-[13px] font-semibold text-[#1F1F1D] transition hover:bg-[#F8F7F4]"
+              >
+                <Download size={15} className="text-[#6F6A60]" />
+                تصدير المحادثات
               </button>
+
+              <div className="mx-2 my-1 h-px bg-[rgba(31,31,29,0.06)]" />
+
+              {confirmingClearAll ? (
+                <div className="flex items-center justify-between gap-2 rounded-xl bg-red-50/80 px-3 py-2">
+                  <span className="text-[12px] font-bold text-red-600">تأكيد المسح؟</span>
+                  <div className="flex gap-1">
+                    <button onClick={() => { onClearConversations(); setConfirmingClearAll(false); setAccountMenuOpen(false); }} className="rounded-md bg-red-600 px-2.5 py-1 text-[11px] font-bold text-white">مسح</button>
+                    <button onClick={() => setConfirmingClearAll(false)} className="rounded-md bg-white border border-[rgba(13,13,13,0.08)] px-2.5 py-1 text-[11px] font-bold text-[#1F1F1D]">إلغاء</button>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  onClick={() => setConfirmingClearAll(true)}
+                  className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-[13px] font-semibold text-red-600 transition hover:bg-red-50"
+                >
+                  <Trash2 size={15} />
+                  مسح جميع المحادثات
+                </button>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <button
+          type="button"
+          onClick={() => { setAccountMenuOpen(!accountMenuOpen); setConfirmingClearAll(false); }}
+          className={`flex w-full items-center justify-between rounded-xl p-2 transition hover:bg-[rgba(13,13,13,0.04)] ${
+            accountMenuOpen ? "bg-[rgba(13,13,13,0.04)]" : ""
+          }`}
+        >
+          <div className="flex items-center gap-3 min-w-0">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#1F1F1D] text-[13px] font-black text-white shadow-sm">
+              {account?.initial ?? "V"}
+            </span>
+            {!collapsed && (
+              <div className="min-w-0 text-right">
+                <p className="truncate text-[13px] font-bold text-[#1F1F1D]">{account?.label ?? "حساب VoltJo"}</p>
+                <p className="truncate text-[11px] font-semibold text-[#6F6A60]">{account?.sublabel ?? "نسخة تجريبية"}</p>
+              </div>
             )}
           </div>
-        )}
-
-        <div className="flex items-center gap-2.5 rounded-xl border border-white/[0.06] bg-white/[0.03] px-2.5 py-2">
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--voltjo-orange)] text-sm font-black text-white">
-            {account?.initial ?? "V"}
-          </span>
           {!collapsed && (
-            <>
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-[13px] font-bold text-white/80">
-                  {account?.label ?? "حساب VoltJo"}
-                </p>
-                <p className="truncate text-[11px] font-semibold text-white/30">
-                  {account?.sublabel ?? "نسخة تجريبية"}
-                </p>
-              </div>
-              <button
-                type="button"
-                aria-label="إعدادات الحساب"
-                onClick={() => { setAccountMenuOpen(!accountMenuOpen); setConfirmingClearAll(false); }}
-                className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-white/30 transition hover:bg-white/[0.06] hover:text-white/70 ${accountMenuOpen ? "bg-white/[0.06] text-white/70" : ""}`}
-              >
-                <span className="text-base leading-none">···</span>
-              </button>
-            </>
+            <MoreHorizontal size={16} className="text-[#6F6A60] shrink-0 mr-2" />
           )}
-        </div>
+        </button>
       </div>
     </aside>
   );

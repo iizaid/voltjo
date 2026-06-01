@@ -12,7 +12,7 @@ export function ChatSuggestions({
   onSelect: (suggestion: string) => void;
 }) {
   return (
-    <div className="mx-auto mt-5 w-full max-w-[820px] px-1">
+    <div className="mx-auto mt-6 w-full max-w-[820px] px-1">
       {/* Mobile: 2-column grid */}
       <div className="grid grid-cols-2 gap-2 sm:hidden">
         {suggestions.map((suggestion) => (
@@ -20,20 +20,20 @@ export function ChatSuggestions({
             key={suggestion}
             type="button"
             onClick={() => onSelect(suggestion)}
-            className="rounded-xl border border-white/[0.07] bg-white/[0.04] px-3 py-2.5 text-right text-[12px] font-semibold leading-snug text-white/45 transition hover:border-white/[0.12] hover:bg-white/[0.07] hover:text-white/70 active:scale-95"
+            className="rounded-xl border border-[rgba(13,13,13,0.06)] bg-[#FEFEFC] px-3 py-3 text-right text-[12px] font-semibold leading-snug text-[#3A3732] shadow-[0_2px_8px_rgba(13,13,13,0.02)] transition hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(13,13,13,0.04)] active:scale-[0.98]"
           >
             {suggestion}
           </button>
         ))}
       </div>
       {/* sm+: pill wrap */}
-      <div className="hidden flex-wrap justify-center gap-2 sm:flex">
+      <div className="hidden flex-wrap justify-center gap-2.5 sm:flex">
         {suggestions.map((suggestion) => (
           <button
             key={suggestion}
             type="button"
             onClick={() => onSelect(suggestion)}
-            className="rounded-full border border-white/[0.07] bg-white/[0.04] px-4 py-2 text-[13px] font-semibold text-white/40 transition hover:border-white/[0.12] hover:bg-white/[0.07] hover:text-white/70"
+            className="rounded-full border border-[rgba(13,13,13,0.06)] bg-[#FEFEFC] px-4 py-2.5 text-[13px] font-semibold text-[#3A3732] shadow-[0_2px_8px_rgba(13,13,13,0.02)] transition hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(13,13,13,0.04)] active:scale-[0.98]"
           >
             {suggestion}
           </button>
