@@ -193,6 +193,7 @@ export function ChatShell({
     const requestOptions = {
       modelId: selectedModel.id,
       thinkingMode,
+      conversationId: account ? activeConversation?.serverId ?? null : null,
       attachment: att ?? null,
     };
 
@@ -237,15 +238,17 @@ export function ChatShell({
         message: trimmedPrompt || att?.name || "مرفق",
         modelId: requestOptions.modelId,
         thinkingMode: requestOptions.thinkingMode,
+        conversationId: requestOptions.conversationId,
         attachment: requestOptions.attachment,
       });
-      const completed = completeAssistantMessage(placeholder, response);
+      const completed = completeAssistantMessage(placeholder, response.message);
       setTypingMessageId(completed.id);
       setConversations((prev) =>
         prev.map((c) => {
           if (c.id === targetId) {
             return {
               ...c,
+              serverId: response.conversationId ?? c.serverId,
               messages: c.messages.map((m) => (m.id === placeholder.id ? completed : m)),
               updatedAt: new Date().toISOString(),
             };

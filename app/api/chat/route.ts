@@ -1,5 +1,6 @@
 import { getAiProvider } from "@/lib/ai/provider";
 import { validateAiChatRequest } from "@/lib/ai/validation";
+import { createChatConversation, createChatMessage } from "@/lib/chat/server-persistence";
 import { getCurrentUser } from "@/lib/server/auth";
 import { apiError, apiSuccess } from "@/lib/server/api-response";
 import { checkRateLimit } from "@/lib/server/rate-limit";
@@ -88,14 +89,66 @@ export async function POST(request: Request) {
 
   try {
     const provider = getAiProvider();
+    let persistedConversationId: string | null = null;
+    let canPersistAssistantMessage = false;
+
+    if (user) {
+      if (validation.data.conversationId) {
+        persistedConversationId = validation.data.conversationId;
+      } else {
+        const createdConversation = await createChatConversation({
+          title: validation.data.message.slice(0, 160),
+          modelId: validation.data.modelId,
+          thinkingMode: validation.data.thinkingMode,
+        });
+
+        if (createdConversation.ok) {
+          persistedConversationId = createdConversation.data.id;
+        }
+      }
+
+      if (persistedConversationId) {
+        const userMessageResult = await createChatMessage({
+          conversationId: persistedConversationId,
+          role: "user",
+          content: validation.data.message,
+          attachment: validation.data.attachment ?? null,
+          metadata: {
+            modelId: validation.data.modelId,
+            thinkingMode: validation.data.thinkingMode,
+            provider: "mock",
+          },
+          status: "done",
+        });
+
+        if (userMessageResult.ok) {
+          canPersistAssistantMessage = true;
+        } else {
+          persistedConversationId = null;
+        }
+      }
+    }
+
     const message = await withTimeout({
       promise: provider.generateChatResponse(validation.data),
       timeoutMs: 30_000,
       errorMessage: "AI provider timed out",
     });
 
+    if (user && persistedConversationId && canPersistAssistantMessage) {
+      await createChatMessage({
+        conversationId: persistedConversationId,
+        role: "assistant",
+        content: message.content,
+        bullets: message.bullets ?? null,
+        metadata: message.metadata,
+        status: message.status,
+      });
+    }
+
     return apiSuccess({
       message,
+      conversationId: persistedConversationId,
     }, {
       headers: buildRateLimitHeaders(rateLimit.limit, rateLimit.remaining, rateLimit.resetAt),
     });

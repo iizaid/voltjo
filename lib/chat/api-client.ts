@@ -6,12 +6,18 @@ export type SendChatRequest = {
   message: string;
   modelId: string;
   thinkingMode: boolean;
+  conversationId?: string | null;
   attachment?: ChatAttachment | null;
+};
+
+export type SendChatResponse = {
+  message: ChatMessage;
+  conversationId?: string | null;
 };
 
 export async function sendChatMessage(
   request: SendChatRequest,
-): Promise<ChatMessage> {
+): Promise<SendChatResponse> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), CHAT_REQUEST_TIMEOUT_MS);
 
@@ -33,7 +39,13 @@ export async function sendChatMessage(
       throw new Error(message);
     }
 
-    return payload.data.message as ChatMessage;
+    return {
+      message: payload.data.message as ChatMessage,
+      conversationId:
+        typeof payload.data.conversationId === "string"
+          ? payload.data.conversationId
+          : null,
+    };
   } catch (error) {
     if (error instanceof DOMException && error.name === "AbortError") {
       throw new Error("استغرق الرد وقتًا أطول من المتوقع. حاول مرة أخرى.", {

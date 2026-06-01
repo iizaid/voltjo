@@ -66,8 +66,7 @@ Ownership is enforced with `auth.uid()` and `exists (...)` checks against `chat_
 1. Open Supabase Dashboard.
 2. Go to **SQL Editor**.
 3. Create a new query.
-4. Open:
-   - [supabase/migrations/001_chat_persistence.sql](</C:/Main Folder/IT/Programing Works/Electric car/supabase/migrations/001_chat_persistence.sql>)
+4. Open `supabase/migrations/001_chat_persistence.sql`.
 5. Paste the SQL into the editor.
 6. Click **Run**.
 7. Open **Table Editor**.
@@ -77,9 +76,9 @@ Ownership is enforced with `auth.uid()` and `exists (...)` checks against `chat_
 
 ## Current app behavior
 
-- `/assistant` still reads and writes localStorage only.
+- Authenticated `/api/chat` writes can now save new messages to Supabase, while frontend history loading is still localStorage-first.
+- Guests still use localStorage only.
 - `/api/chat` still uses the server-side mock provider.
-- No Supabase chat sync is active yet.
 
 ## Next step
 

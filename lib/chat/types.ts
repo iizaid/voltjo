@@ -28,6 +28,7 @@ export type ChatCategory = "السيارات" | "الشحن" | "المقارنة
 
 export interface ChatConversation {
   id: string;
+  serverId?: string;
   title: string;
   category: ChatCategory;
   messages: ChatMessage[];

@@ -12,6 +12,7 @@ export type AiChatRequest = {
   message: string;
   modelId: AiModelId;
   thinkingMode: boolean;
+  conversationId?: string | null;
   attachment?: AiChatAttachment | null;
 };
 

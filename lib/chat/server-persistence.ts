@@ -34,6 +34,16 @@ function sanitizeConversationTitle(title: string) {
   return title.trim().slice(0, 160);
 }
 
+async function touchChatConversation(
+  supabase: NonNullable<Awaited<ReturnType<typeof createClient>>>,
+  conversationId: string,
+) {
+  await supabase
+    .from("chat_conversations")
+    .update({ updated_at: new Date().toISOString() })
+    .eq("id", conversationId);
+}
+
 export async function createChatConversation(input: {
   title: string;
   category?: string | null;
@@ -107,6 +117,8 @@ export async function createChatMessage(input: {
   if (insertError || !data) {
     return { ok: false, error: "Failed to create chat message." };
   }
+
+  await touchChatConversation(supabase, input.conversationId);
 
   return { ok: true, data };
 }

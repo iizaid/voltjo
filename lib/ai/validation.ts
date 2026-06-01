@@ -10,6 +10,8 @@ type ValidationResult =
   | { ok: false; code: string; message: string; status: number };
 
 const VALID_MODELS: AiModelId[] = ["voltjo", "gemini", "kimi"];
+const UUID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
@@ -34,6 +36,7 @@ export function validateAiChatRequest(input: unknown): ValidationResult {
   const rawMessage = input.message;
   const rawModelId = input.modelId;
   const rawThinkingMode = input.thinkingMode;
+  const rawConversationId = input.conversationId;
   const rawAttachment = input.attachment;
 
   if (typeof rawMessage !== "string") {
@@ -72,6 +75,30 @@ export function validateAiChatRequest(input: unknown): ValidationResult {
       message: "قيمة وضع التفكير غير صالحة.",
       status: 400,
     };
+  }
+
+  let conversationId: string | null = null;
+  if (rawConversationId !== undefined && rawConversationId !== null) {
+    if (typeof rawConversationId !== "string") {
+      return {
+        ok: false,
+        code: "INVALID_CONVERSATION_ID",
+        message: "معرّف المحادثة غير صالح.",
+        status: 400,
+      };
+    }
+
+    const sanitizedConversationId = rawConversationId.trim();
+    if (!UUID_PATTERN.test(sanitizedConversationId)) {
+      return {
+        ok: false,
+        code: "INVALID_CONVERSATION_ID",
+        message: "معرّف المحادثة غير صالح.",
+        status: 400,
+      };
+    }
+
+    conversationId = sanitizedConversationId;
   }
 
   let attachment: AiChatRequest["attachment"] = null;
@@ -196,6 +223,7 @@ export function validateAiChatRequest(input: unknown): ValidationResult {
       message,
       modelId: rawModelId as AiModelId,
       thinkingMode: rawThinkingMode,
+      conversationId,
       attachment,
     },
   };
