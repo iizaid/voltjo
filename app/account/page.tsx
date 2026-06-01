@@ -11,6 +11,7 @@ import {
   JORDAN_CITY_OPTIONS,
   normalizePrivacySettings,
 } from "@/lib/account/settings";
+import { resolveAccountAvatarUrl } from "@/lib/account/avatar";
 import {
   signOutAction,
   updateAccountProfileAction,
@@ -20,7 +21,6 @@ import {
   type CurrentProfile,
 } from "@/lib/auth/session";
 import { getOptionLabel, getPriorityLabels, UNKNOWN_LABEL } from "@/lib/auth/profile-display";
-import { createClient } from "@/lib/supabase/server";
 
 type Props = {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -219,16 +219,6 @@ function InfoGrid({
       ))}
     </div>
   );
-}
-
-async function getAvatarUrl(profile: CurrentProfile | null) {
-  if (!profile?.avatar_path) return null;
-
-  const supabase = await createClient();
-  if (!supabase) return null;
-
-  const { data } = supabase.storage.from("avatars").getPublicUrl(profile.avatar_path);
-  return `${data.publicUrl}?v=${encodeURIComponent(profile.updated_at)}`;
 }
 
 function ProfileSummary({
@@ -599,7 +589,7 @@ export default async function AccountPage({ searchParams }: Props) {
 
   const displayName = getDisplayName(profile?.full_name, user.email ?? null);
   const createdAt = formatDate(user.created_at);
-  const avatarUrl = await getAvatarUrl(profile);
+  const avatarUrl = await resolveAccountAvatarUrl(profile);
 
   return (
     <main

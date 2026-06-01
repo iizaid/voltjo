@@ -350,7 +350,15 @@ export function ChatSidebar({
         >
           <div className="flex items-center gap-3 min-w-0">
             <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#1F1F1D] text-[13px] font-black text-white shadow-sm">
-              {account?.initial ?? "V"}
+              {account?.avatarUrl ? (
+                <img
+                  src={account.avatarUrl}
+                  alt={account.label ?? "حساب VoltJo"}
+                  className="h-full w-full rounded-full object-cover"
+                />
+              ) : (
+                account?.initial ?? "V"
+              )}
             </span>
             {!collapsed && (
               <div className="min-w-0 text-right">

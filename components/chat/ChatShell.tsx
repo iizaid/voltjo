@@ -35,6 +35,7 @@ export type ChatAccount = {
   label: string;
   sublabel: string;
   initial: string;
+  avatarUrl?: string | null;
 };
 
 export const CHAT_MODELS = [

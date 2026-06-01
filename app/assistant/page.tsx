@@ -1,4 +1,5 @@
 import { ChatShell } from "@/components/chat/ChatShell";
+import { resolveAccountAvatarUrl } from "@/lib/account/avatar";
 import { getCurrentUserAndProfile } from "@/lib/auth/session";
 import { MAX_CHAT_MESSAGE_LENGTH } from "@/lib/chat/constants";
 
@@ -17,6 +18,7 @@ export default async function AssistantPage({ searchParams }: Props) {
 
   const { user, profile } = await getCurrentUserAndProfile();
   const label = profile?.full_name || user?.email || undefined;
+  const avatarUrl = await resolveAccountAvatarUrl(profile);
 
   return (
     <ChatShell
@@ -29,6 +31,7 @@ export default async function AssistantPage({ searchParams }: Props) {
                 ? "ملف ذكي محفوظ"
                 : "أكمل ملفك الذكي",
               initial: label.trim().charAt(0).toUpperCase() || "V",
+              avatarUrl,
             }
           : null
       }

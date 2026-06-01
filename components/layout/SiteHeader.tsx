@@ -1,5 +1,6 @@
 import { AnnouncementBar } from "@/components/layout/AnnouncementBar";
 import { Navbar, type NavbarAuthState } from "@/components/layout/Navbar";
+import { resolveAccountAvatarUrl } from "@/lib/account/avatar";
 import { getCurrentUserAndProfile } from "@/lib/auth/session";
 
 function getEmailName(email: string | null | undefined) {
@@ -22,6 +23,7 @@ export async function SiteHeader() {
   const { user, profile } = await getCurrentUserAndProfile();
   const displayName = profile?.full_name || getEmailName(user?.email) || null;
   const firstName = getFirstName(displayName);
+  const avatarUrl = await resolveAccountAvatarUrl(profile);
 
   const auth: NavbarAuthState | null = user
     ? {
@@ -29,6 +31,7 @@ export async function SiteHeader() {
         displayName: displayName ?? firstName ?? "حسابي",
         email: user.email ?? null,
         initial: getInitial(displayName ?? user.email),
+        avatarUrl,
         profileCompleted: Boolean(profile?.onboarding_completed),
       }
     : null;

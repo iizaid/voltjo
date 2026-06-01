@@ -12,6 +12,7 @@ export type NavbarAuthState = {
   displayName: string;
   email: string | null;
   initial: string;
+  avatarUrl?: string | null;
   profileCompleted: boolean;
 };
 
@@ -154,8 +155,16 @@ export function Navbar({ auth }: { auth?: NavbarAuthState | null }) {
                   onClick={() => setOpenMenu(null)}
                   className="flex h-10 items-center gap-2 rounded-[8px] border border-[var(--voltjo-border)] bg-white px-3.5 text-sm font-bold text-[var(--voltjo-black)] transition hover:bg-[rgba(13,13,13,0.04)]"
                 >
-                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--voltjo-black)] text-[11px] font-black text-white">
-                    {auth.initial}
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[var(--voltjo-black)] text-[11px] font-black text-white">
+                    {auth.avatarUrl ? (
+                      <img
+                        src={auth.avatarUrl}
+                        alt={auth.displayName}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      auth.initial
+                    )}
                   </span>
                   <span>{getAccountLabel(auth)}</span>
                 </Link>
@@ -201,8 +210,16 @@ export function Navbar({ auth }: { auth?: NavbarAuthState | null }) {
                       href="/account"
                       className="flex w-full items-center justify-center gap-2 rounded-[8px] border border-[var(--voltjo-border)] bg-white px-4 py-2.5 text-sm font-bold text-[var(--voltjo-black)] transition hover:bg-[rgba(13,13,13,0.04)]"
                     >
-                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--voltjo-black)] text-[10px] font-black text-white">
-                        {auth.initial}
+                      <span className="flex h-6 w-6 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[var(--voltjo-black)] text-[10px] font-black text-white">
+                        {auth.avatarUrl ? (
+                          <img
+                            src={auth.avatarUrl}
+                            alt={auth.displayName}
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          auth.initial
+                        )}
                       </span>
                       {auth.profileCompleted ? "حسابي" : "إكمال الملف الذكي"}
                     </Link>
