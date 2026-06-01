@@ -16,7 +16,7 @@ import { VoltJoLogo } from "@/components/brand/VoltJoLogo";
 import type { ChatAccount } from "@/components/chat/ChatShell";
 import type { ChatConversation } from "@/lib/chat/types";
 import { getVisibleConversations } from "@/lib/chat/conversation-utils";
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "motion/react";
 
 const MIN_WIDTH = 220;
@@ -133,11 +133,15 @@ export function ChatSidebar({
     }
   }, [sidebarWidth, isMounted]);
 
-  const visibleConversations = getVisibleConversations({
-    conversations,
-    searchQuery,
-    selectedCategory: "all",
-  });
+  const visibleConversations = useMemo(
+    () =>
+      getVisibleConversations({
+        conversations,
+        searchQuery,
+        selectedCategory: "all",
+      }),
+    [conversations, searchQuery],
+  );
 
   return (
     <aside

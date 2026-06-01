@@ -127,6 +127,27 @@ export async function createChatMessage(input: {
   return { ok: true, data };
 }
 
+export async function findOwnedChatConversation(
+  conversationId: string,
+): Promise<ServerResult<Pick<ChatConversationRow, "id"> | null>> {
+  const { supabase, user, error } = await getAuthenticatedServerContext();
+  if (!supabase || !user) {
+    return { ok: false, error: error ?? "Authentication is required." };
+  }
+
+  const { data, error: selectError } = await supabase
+    .from("chat_conversations")
+    .select("id")
+    .eq("id", conversationId)
+    .maybeSingle();
+
+  if (selectError) {
+    return { ok: false, error: "Failed to load chat conversation." };
+  }
+
+  return { ok: true, data };
+}
+
 export async function listUserChatConversations(): Promise<
   ServerResult<ChatConversationRow[]>
 > {

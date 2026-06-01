@@ -23,7 +23,7 @@ export async function SiteHeader() {
   const { user, profile } = await getCurrentUserAndProfile();
   const displayName = profile?.full_name || getEmailName(user?.email) || null;
   const firstName = getFirstName(displayName);
-  const avatarUrl = await resolveAccountAvatarUrl(profile);
+  const avatarUrl = resolveAccountAvatarUrl(profile);
 
   const auth: NavbarAuthState | null = user
     ? {

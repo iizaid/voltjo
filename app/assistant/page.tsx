@@ -18,7 +18,7 @@ export default async function AssistantPage({ searchParams }: Props) {
 
   const { user, profile } = await getCurrentUserAndProfile();
   const label = profile?.full_name || user?.email || undefined;
-  const avatarUrl = await resolveAccountAvatarUrl(profile);
+  const avatarUrl = resolveAccountAvatarUrl(profile);
 
   return (
     <ChatShell

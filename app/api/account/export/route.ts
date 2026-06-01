@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { checkRateLimit } from "@/lib/server/rate-limit";
 import { createClient } from "@/lib/supabase/server";
 
 export async function GET() {
@@ -18,6 +19,26 @@ export async function GET() {
 
   if (userError || !user) {
     return NextResponse.json({ error: "غير مصرح." }, { status: 401 });
+  }
+
+  const rateLimit = checkRateLimit({
+    key: user.id,
+    action: "account-export",
+    limit: 5,
+    windowMs: 10 * 60 * 1000,
+  });
+
+  if (!rateLimit.ok) {
+    return NextResponse.json(
+      { error: "محاولات كثيرة. حاول بعد قليل." },
+      {
+        status: 429,
+        headers: {
+          "Cache-Control": "no-store, max-age=0",
+          "Retry-After": String(Math.max(1, Math.ceil((rateLimit.resetAt - Date.now()) / 1000))),
+        },
+      },
+    );
   }
 
   const { data: profile } = await supabase
@@ -41,6 +62,7 @@ export async function GET() {
   return new NextResponse(JSON.stringify(payload, null, 2), {
     status: 200,
     headers: {
+      "Cache-Control": "no-store, max-age=0",
       "Content-Type": "application/json; charset=utf-8",
       "Content-Disposition": 'attachment; filename="voltjo-account-data.json"',
     },

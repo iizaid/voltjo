@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { ChatSidebar } from "@/components/chat/ChatSidebar";
 import { ChatThread } from "@/components/chat/ChatThread";
 import type { ChatConversation, ChatAttachment } from "@/lib/chat/types";
@@ -115,8 +115,14 @@ export function ChatShell({
     saveSidebarCollapsed(sidebarCollapsed);
   }, [sidebarCollapsed, hasHydratedConversations]);
 
-  const activeConversation = conversations.find((c) => c.id === activeId);
-  const messages = activeConversation?.messages ?? [];
+  const activeConversation = useMemo(
+    () => conversations.find((c) => c.id === activeId),
+    [conversations, activeId],
+  );
+  const messages = useMemo(
+    () => activeConversation?.messages ?? [],
+    [activeConversation],
+  );
 
   const handleCreateNew = () => {
     setActiveId(null);

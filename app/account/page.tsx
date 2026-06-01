@@ -589,7 +589,7 @@ export default async function AccountPage({ searchParams }: Props) {
 
   const displayName = getDisplayName(profile?.full_name, user.email ?? null);
   const createdAt = formatDate(user.created_at);
-  const avatarUrl = await resolveAccountAvatarUrl(profile);
+  const avatarUrl = resolveAccountAvatarUrl(profile);
 
   return (
     <main

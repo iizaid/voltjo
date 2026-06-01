@@ -19,6 +19,7 @@ import {
   checkAuthRateLimit,
   clearAuthRateLimit,
 } from "@/lib/security/rate-limit";
+import { checkRateLimit } from "@/lib/server/rate-limit";
 
 type AuthActionState = {
   ok: boolean;
@@ -389,6 +390,17 @@ export async function sendPasswordResetLinkAction(
 
   if (userError || !user?.email) {
     return { ok: false, message: "يجب تسجيل الدخول قبل إرسال رابط التغيير." };
+  }
+
+  const rateLimit = checkRateLimit({
+    key: user.id,
+    action: "password-reset",
+    limit: 3,
+    windowMs: 15 * 60 * 1000,
+  });
+
+  if (!rateLimit.ok) {
+    return { ok: false, message: "محاولات كثيرة. حاول مرة أخرى بعد قليل." };
   }
 
   const headerStore = await headers();

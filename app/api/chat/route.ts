@@ -1,6 +1,10 @@
 import { getAiProvider } from "@/lib/ai/provider";
 import { validateAiChatRequest } from "@/lib/ai/validation";
-import { createChatConversation, createChatMessage } from "@/lib/chat/server-persistence";
+import {
+  createChatConversation,
+  createChatMessage,
+  findOwnedChatConversation,
+} from "@/lib/chat/server-persistence";
 import { getCurrentUser } from "@/lib/server/auth";
 import { apiError, apiSuccess } from "@/lib/server/api-response";
 import { checkRateLimit } from "@/lib/server/rate-limit";
@@ -23,6 +27,7 @@ function getIpFromRequest(request: Request) {
 
 function buildRateLimitHeaders(limit: number, remaining: number, resetAt: number) {
   return {
+    "Cache-Control": "no-store, max-age=0",
     "X-RateLimit-Limit": String(limit),
     "X-RateLimit-Remaining": String(remaining),
     "X-RateLimit-Reset": String(Math.ceil(resetAt / 1000)),
@@ -49,6 +54,14 @@ async function tryCreateMessage(input: Parameters<typeof createChatMessage>[0]) 
   }
 }
 
+async function tryFindOwnedConversation(conversationId: string) {
+  try {
+    return await findOwnedChatConversation(conversationId);
+  } catch {
+    return { ok: false as const, error: "Failed to load chat conversation." };
+  }
+}
+
 export async function POST(request: Request) {
   const contentLength = request.headers.get("content-length");
   if (contentLength) {
@@ -58,6 +71,9 @@ export async function POST(request: Request) {
         code: "PAYLOAD_TOO_LARGE",
         message: "حجم الطلب كبير جدًا.",
         status: 413,
+        headers: {
+          "Cache-Control": "no-store, max-age=0",
+        },
       });
     }
   }
@@ -71,6 +87,9 @@ export async function POST(request: Request) {
       code: "INVALID_JSON",
       message: "تعذر قراءة الطلب.",
       status: 400,
+      headers: {
+        "Cache-Control": "no-store, max-age=0",
+      },
     });
   }
 
@@ -80,6 +99,9 @@ export async function POST(request: Request) {
       code: validation.code,
       message: validation.message,
       status: validation.status,
+      headers: {
+        "Cache-Control": "no-store, max-age=0",
+      },
     });
   }
 
@@ -114,7 +136,12 @@ export async function POST(request: Request) {
 
     if (user) {
       if (validation.data.conversationId) {
-        persistedConversationId = validation.data.conversationId;
+        const existingConversation = await tryFindOwnedConversation(
+          validation.data.conversationId,
+        );
+        if (existingConversation.ok && existingConversation.data?.id) {
+          persistedConversationId = existingConversation.data.id;
+        }
       } else {
         const createdConversation = await tryCreateConversation({
           title: validation.data.message.slice(0, 160),
@@ -177,6 +204,9 @@ export async function POST(request: Request) {
       code: "CHAT_GENERATION_FAILED",
       message: "تعذر تجهيز الرد الآن. حاول مرة أخرى.",
       status: 500,
+      headers: {
+        "Cache-Control": "no-store, max-age=0",
+      },
     });
   }
 }
@@ -186,5 +216,8 @@ export async function GET() {
     code: "METHOD_NOT_ALLOWED",
     message: "استخدم POST لإرسال رسالة.",
     status: 405,
+    headers: {
+      "Cache-Control": "no-store, max-age=0",
+    },
   });
 }
