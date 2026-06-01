@@ -111,6 +111,8 @@ export type Database = {
         Row: {
           id: string;
           full_name: string | null;
+          avatar_config: Json;
+          avatar_path: string | null;
           age_range: string | null;
           country: string | null;
           city: string | null;
@@ -120,6 +122,7 @@ export type Database = {
           driving_pattern: string | null;
           home_charging_access: string | null;
           priorities: string[];
+          privacy_settings: Json;
           onboarding_completed: boolean;
           onboarding_completed_at: string | null;
           profile_version: number;
@@ -129,6 +132,8 @@ export type Database = {
         Insert: {
           id: string;
           full_name?: string | null;
+          avatar_config?: Json;
+          avatar_path?: string | null;
           age_range?: string | null;
           country?: string | null;
           city?: string | null;
@@ -138,6 +143,7 @@ export type Database = {
           driving_pattern?: string | null;
           home_charging_access?: string | null;
           priorities?: string[];
+          privacy_settings?: Json;
           onboarding_completed?: boolean;
           onboarding_completed_at?: string | null;
           profile_version?: number;
@@ -147,6 +153,8 @@ export type Database = {
         Update: {
           id?: string;
           full_name?: string | null;
+          avatar_config?: Json;
+          avatar_path?: string | null;
           age_range?: string | null;
           country?: string | null;
           city?: string | null;
@@ -156,6 +164,7 @@ export type Database = {
           driving_pattern?: string | null;
           home_charging_access?: string | null;
           priorities?: string[];
+          privacy_settings?: Json;
           onboarding_completed?: boolean;
           onboarding_completed_at?: string | null;
           profile_version?: number;

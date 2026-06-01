@@ -2,6 +2,15 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ArrowLeft, BadgeCheck, ChevronLeft, LogOut } from "lucide-react";
+import { AvatarCustomizer } from "@/components/account/AvatarCustomizer";
+import { DeleteAccountRequest } from "@/components/account/DeleteAccountRequest";
+import { PasswordResetAction } from "@/components/account/PasswordResetAction";
+import { PrivacySettingsForm } from "@/components/account/PrivacySettingsForm";
+import {
+  COUNTRY_OPTIONS,
+  JORDAN_CITY_OPTIONS,
+  normalizePrivacySettings,
+} from "@/lib/account/settings";
 import {
   signOutAction,
   updateAccountProfileAction,
@@ -10,25 +19,14 @@ import {
   getCurrentUserAndProfile,
   type CurrentProfile,
 } from "@/lib/auth/session";
-import {
-  getOptionLabel,
-  getPriorityLabels,
-  getUserInitial,
-  UNKNOWN_LABEL,
-} from "@/lib/auth/profile-display";
+import { getOptionLabel, getPriorityLabels, UNKNOWN_LABEL } from "@/lib/auth/profile-display";
+import { createClient } from "@/lib/supabase/server";
 
 type Props = {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
-const ACCOUNT_SECTIONS = [
-  "profile",
-  "account",
-  "security",
-  "notifications",
-  "privacy",
-  "preferences",
-] as const;
+const ACCOUNT_SECTIONS = ["profile", "account", "security", "privacy"] as const;
 
 type AccountSection = (typeof ACCOUNT_SECTIONS)[number];
 
@@ -38,12 +36,10 @@ function resolveString(value: string | string[] | undefined) {
 
 function resolveSection(value: string | string[] | undefined): AccountSection {
   const normalized = resolveString(value);
-  if (
-    normalized &&
-    ACCOUNT_SECTIONS.includes(normalized as AccountSection)
-  ) {
+  if (normalized && ACCOUNT_SECTIONS.includes(normalized as AccountSection)) {
     return normalized as AccountSection;
   }
+
   return "profile";
 }
 
@@ -61,10 +57,7 @@ function formatDate(value: string | undefined) {
   }
 }
 
-function getDisplayName(
-  fullName: string | null | undefined,
-  email: string | null,
-) {
+function getDisplayName(fullName: string | null | undefined, email: string | null) {
   const trimmed = fullName?.trim();
   if (trimmed) return trimmed;
 
@@ -72,42 +65,27 @@ function getDisplayName(
   return emailName || "مستخدم VoltJo";
 }
 
-function getProfileValue(questionId: string, value: string | null | undefined) {
-  const label = getOptionLabel(questionId, value);
-  return label || UNKNOWN_LABEL;
-}
-
 function getSectionMeta(section: AccountSection) {
   switch (section) {
     case "profile":
       return {
         title: "الملف الشخصي",
-        subtitle: "مراجعة هويتك داخل VoltJo وملخص الملف الذكي الحالي.",
+        subtitle: "مراجعة هويتك الحالية وبيانات الملف الذكي المرتبطة بحسابك.",
       };
     case "account":
       return {
         title: "معلومات الحساب",
-        subtitle: "إدارة البيانات الأساسية المرتبطة بحسابك الحالي.",
+        subtitle: "تحديث الاسم وبعض البيانات الأساسية المرتبطة بحسابك.",
       };
     case "security":
       return {
         title: "الأمان",
-        subtitle: "تنظيم الوصول إلى الحساب والخروج الآمن من الجلسة الحالية.",
-      };
-    case "notifications":
-      return {
-        title: "الإشعارات",
-        subtitle: "عرض طريقة تنظيم الإشعارات قبل ربط إعدادات الإرسال المتقدمة.",
+        subtitle: "إرسال رابط تغيير كلمة المرور وإدارة الخروج من الجلسة الحالية.",
       };
     case "privacy":
       return {
         title: "الخصوصية والبيانات",
-        subtitle: "إدارة طلبات البيانات والخيارات الحساسة بطريقة واضحة وآمنة.",
-      };
-    case "preferences":
-      return {
-        title: "التفضيلات",
-        subtitle: "التفضيلات العامة لتجربة الاستخدام داخل VoltJo.",
+        subtitle: "التحكم في استخدام بياناتك وتنزيل نسخة من معلومات حسابك.",
       };
   }
 }
@@ -117,17 +95,22 @@ function getStatusMessage(status: string | undefined) {
     case "saved":
       return {
         tone: "success" as const,
-        message: "تم تحديث الاسم الكامل بنجاح.",
+        message: "تم حفظ معلومات الحساب بنجاح.",
       };
     case "invalid-name":
       return {
         tone: "error" as const,
         message: "أدخل اسمًا صحيحًا قبل الحفظ.",
       };
+    case "invalid-location":
+      return {
+        tone: "error" as const,
+        message: "اختر بلدًا ومدينة صحيحتين قبل الحفظ.",
+      };
     case "unavailable":
       return {
         tone: "error" as const,
-        message: "الخدمة غير جاهزة الآن. حاول مرة أخرى لاحقًا.",
+        message: "الخدمة غير جاهزة الآن. حاول لاحقًا.",
       };
     case "failed":
       return {
@@ -137,6 +120,10 @@ function getStatusMessage(status: string | undefined) {
     default:
       return null;
   }
+}
+
+function getProfileValue(questionId: string, value: string | null | undefined) {
+  return getOptionLabel(questionId, value) || UNKNOWN_LABEL;
 }
 
 function SidebarItem({
@@ -191,6 +178,26 @@ function SettingsCard({
   );
 }
 
+function StatusNotice({
+  tone,
+  message,
+}: {
+  tone: "success" | "error";
+  message: string;
+}) {
+  return (
+    <div
+      className={`rounded-[16px] border px-4 py-3 text-sm font-bold ${
+        tone === "success"
+          ? "border-emerald-200 bg-emerald-50 text-emerald-800"
+          : "border-red-200 bg-red-50 text-red-700"
+      }`}
+    >
+      {message}
+    </div>
+  );
+}
+
 function InfoGrid({
   items,
 }: {
@@ -214,106 +221,320 @@ function InfoGrid({
   );
 }
 
-function PlaceholderButton({
-  children,
-  tone = "secondary",
-}: {
-  children: ReactNode;
-  tone?: "secondary" | "danger";
-}) {
-  return (
-    <button
-      type="button"
-      disabled
-      className={`inline-flex h-10 items-center justify-center rounded-[14px] border px-4 text-sm font-bold disabled:cursor-not-allowed ${
-        tone === "danger"
-          ? "border-red-200 bg-white text-red-600 opacity-90"
-          : "border-[rgba(13,13,13,0.08)] bg-white text-[var(--voltjo-muted)] opacity-90"
-      }`}
-    >
-      {children}
-    </button>
-  );
+async function getAvatarUrl(profile: CurrentProfile | null) {
+  if (!profile?.avatar_path) return null;
+
+  const supabase = await createClient();
+  if (!supabase) return null;
+
+  const { data } = supabase.storage.from("avatars").getPublicUrl(profile.avatar_path);
+  return `${data.publicUrl}?v=${encodeURIComponent(profile.updated_at)}`;
 }
 
-function PlaceholderRow({
-  title,
-  description,
-  buttonLabel,
-  danger = false,
+function ProfileSummary({
+  profile,
 }: {
-  title: string;
-  description: string;
-  buttonLabel: string;
-  danger?: boolean;
+  profile: CurrentProfile | null;
 }) {
+  const priorities = getPriorityLabels(profile?.priorities);
+  const items = [
+    {
+      label: "الهدف الرئيسي",
+      value: getProfileValue("mainGoal", profile?.main_goal),
+      muted: !profile?.main_goal,
+    },
+    {
+      label: "نمط الاستخدام",
+      value: getProfileValue("drivingPattern", profile?.driving_pattern),
+      muted: !profile?.driving_pattern,
+    },
+    {
+      label: "إمكانية الشحن المنزلي",
+      value: getProfileValue("homeChargingAccess", profile?.home_charging_access),
+      muted: !profile?.home_charging_access,
+    },
+    {
+      label: "حالة الامتلاك",
+      value: getProfileValue("ownershipStatus", profile?.ownership_status),
+      muted: !profile?.ownership_status,
+    },
+  ];
+
   return (
-    <div
-      className={`flex flex-col gap-4 rounded-[18px] border p-4 sm:flex-row sm:items-center sm:justify-between ${
-        danger
-          ? "border-red-200 bg-red-50/60"
-          : "border-[rgba(13,13,13,0.08)] bg-[#FBFBF9]"
-      }`}
-    >
-      <div>
-        <p
-          className={`text-sm font-black ${
-            danger ? "text-red-700" : "text-[var(--voltjo-black)]"
-          }`}
-        >
-          {title}
-        </p>
-        <p
-          className={`mt-1 text-sm font-medium leading-6 ${
-            danger ? "text-red-700/85" : "text-[var(--voltjo-muted)]"
-          }`}
-        >
-          {description}
-        </p>
+    <div className="space-y-5">
+      <InfoGrid items={items} />
+
+      <div className="border-t border-[rgba(13,13,13,0.06)] pt-5">
+        <p className="text-sm font-bold text-[var(--voltjo-muted)]">الأولويات</p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {(priorities.length ? priorities : [UNKNOWN_LABEL]).map((priority) => (
+            <span
+              key={priority}
+              className="rounded-full border border-[rgba(13,13,13,0.08)] bg-[#FAFAF7] px-3 py-1.5 text-sm font-bold text-[var(--voltjo-black)]"
+            >
+              {priority}
+            </span>
+          ))}
+        </div>
       </div>
-      <PlaceholderButton tone={danger ? "danger" : "secondary"}>
-        {buttonLabel}
-      </PlaceholderButton>
+
+      <div className="pt-1">
+        <Link
+          href="/start"
+          className="inline-flex h-11 items-center justify-center rounded-[14px] border border-[rgba(13,13,13,0.08)] bg-white px-5 text-sm font-bold text-[var(--voltjo-black)] transition hover:bg-[#FAFAF7]"
+        >
+          تعديل الملف الذكي
+        </Link>
+      </div>
     </div>
   );
 }
 
-function NotificationRow({
-  title,
-  description,
+function AccountSectionContent({
+  status,
+  profile,
+  displayName,
+  userEmail,
 }: {
-  title: string;
-  description: string;
+  status?: string;
+  profile: CurrentProfile | null;
+  displayName: string;
+  userEmail: string;
 }) {
-  return (
-    <div className="rounded-[18px] border border-[rgba(13,13,13,0.08)] bg-[#FBFBF9] p-4">
-      <p className="text-sm font-black text-[var(--voltjo-black)]">{title}</p>
-      <p className="mt-1 text-sm font-medium leading-6 text-[var(--voltjo-muted)]">
-        {description}
-      </p>
-      <p className="mt-3 text-xs font-extrabold text-[var(--voltjo-muted)]">
-        للعرض فقط
-      </p>
-    </div>
-  );
-}
+  const statusMessage = getStatusMessage(status);
+  const selectedCountry = profile?.country && COUNTRY_OPTIONS.some((item) => item.value === profile.country)
+    ? profile.country
+    : "jordan";
+  const selectedCity = profile?.city && JORDAN_CITY_OPTIONS.some((item) => item.value === profile.city)
+    ? profile.city
+    : "amman";
 
-function StatusNotice({
-  tone,
-  message,
-}: {
-  tone: "success" | "error";
-  message: string;
-}) {
   return (
-    <div
-      className={`rounded-[16px] border px-4 py-3 text-sm font-bold ${
-        tone === "success"
-          ? "border-emerald-200 bg-emerald-50 text-emerald-800"
-          : "border-red-200 bg-red-50 text-red-700"
-      }`}
+    <SettingsCard
+      title="معلومات الحساب"
+      description="يمكنك تعديل الاسم والبلد والمدينة من هذه الصفحة، بينما يبقى البريد الإلكتروني للعرض فقط."
     >
-      {message}
+      <div className="space-y-6">
+        {statusMessage ? (
+          <StatusNotice tone={statusMessage.tone} message={statusMessage.message} />
+        ) : null}
+
+        <form action={updateAccountProfileAction} className="space-y-6">
+          <div className="grid gap-5 sm:grid-cols-2">
+            <label className="grid gap-2 text-sm font-bold text-[var(--voltjo-black)]">
+              الاسم الكامل
+              <input
+                name="fullName"
+                defaultValue={profile?.full_name ?? ""}
+                placeholder={displayName}
+                className="h-12 rounded-[14px] border border-[rgba(13,13,13,0.08)] bg-white px-4 text-base font-semibold text-[var(--voltjo-black)] outline-none transition focus:border-[rgba(255,106,0,0.35)]"
+              />
+            </label>
+
+            <label className="grid gap-2 text-sm font-bold text-[var(--voltjo-black)]">
+              البريد الإلكتروني
+              <input
+                value={userEmail}
+                readOnly
+                className="h-12 rounded-[14px] border border-[rgba(13,13,13,0.08)] bg-[#F8F8F4] px-4 text-base font-semibold text-[var(--voltjo-muted)] outline-none"
+              />
+            </label>
+
+            <label className="grid gap-2 text-sm font-bold text-[var(--voltjo-black)]">
+              البلد
+              <select
+                name="country"
+                defaultValue={selectedCountry}
+                className="h-12 rounded-[14px] border border-[rgba(13,13,13,0.08)] bg-white px-4 text-base font-semibold text-[var(--voltjo-black)] outline-none transition focus:border-[rgba(255,106,0,0.35)]"
+              >
+                {COUNTRY_OPTIONS.map((item) => (
+                  <option key={item.value} value={item.value}>
+                    {item.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="grid gap-2 text-sm font-bold text-[var(--voltjo-black)]">
+              المدينة داخل الأردن
+              <select
+                name="city"
+                defaultValue={selectedCity}
+                className="h-12 rounded-[14px] border border-[rgba(13,13,13,0.08)] bg-white px-4 text-base font-semibold text-[var(--voltjo-black)] outline-none transition focus:border-[rgba(255,106,0,0.35)]"
+              >
+                {JORDAN_CITY_OPTIONS.map((item) => (
+                  <option key={item.value} value={item.value}>
+                    {item.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+
+          <p className="text-sm font-medium leading-6 text-[var(--voltjo-muted)]">
+            إذا اخترت بلدًا غير الأردن، سيتم تجاهل قيمة المدينة الحالية تلقائيًا.
+          </p>
+
+          <button
+            type="submit"
+            className="inline-flex h-11 items-center justify-center rounded-[14px] bg-[var(--voltjo-black)] px-5 text-sm font-bold text-white transition hover:opacity-95"
+          >
+            حفظ معلومات الحساب
+          </button>
+        </form>
+      </div>
+    </SettingsCard>
+  );
+}
+
+function SecuritySection() {
+  return (
+    <div className="space-y-6">
+      <SettingsCard
+        title="تغيير كلمة المرور"
+        description="سنرسل رابطًا آمنًا إلى بريدك الإلكتروني الحالي حتى تتمكن من تعيين كلمة مرور جديدة بنفسك."
+      >
+        <PasswordResetAction />
+      </SettingsCard>
+
+      <SettingsCard
+        title="تسجيل الخروج"
+        description="إنهاء الجلسة الحالية والعودة إلى الصفحة الرئيسية."
+      >
+        <form action={signOutAction}>
+          <button
+            type="submit"
+            className="inline-flex h-11 items-center justify-center rounded-[14px] bg-[var(--voltjo-black)] px-5 text-sm font-bold text-white transition hover:opacity-95"
+          >
+            تسجيل الخروج
+          </button>
+        </form>
+      </SettingsCard>
+    </div>
+  );
+}
+
+function PrivacySection({
+  profile,
+}: {
+  profile: CurrentProfile | null;
+}) {
+  const privacySettings = normalizePrivacySettings(profile?.privacy_settings);
+
+  return (
+    <div className="space-y-6">
+      <SettingsCard
+        title="إعدادات الخصوصية"
+        description="يمكنك إدارة بعض خيارات استخدام بيانات حسابك داخل التجربة الحالية."
+      >
+        <PrivacySettingsForm initialValues={privacySettings} />
+      </SettingsCard>
+
+      <SettingsCard
+        title="البيانات"
+        description="يمكنك تنزيل نسخة JSON من بياناتك الحالية، من دون كلمات مرور أو جلسات أو مفاتيح خاصة."
+      >
+        <div className="space-y-4">
+          <div className="flex flex-col gap-4 rounded-[18px] border border-[rgba(13,13,13,0.08)] bg-[#FBFBF9] p-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-sm font-black text-[var(--voltjo-black)]">
+                تصدير البيانات
+              </p>
+              <p className="mt-1 text-sm font-medium leading-6 text-[var(--voltjo-muted)]">
+                تنزيل نسخة من بيانات الحساب والملف الذكي بصيغة JSON.
+              </p>
+            </div>
+            <Link
+              href="/api/account/export"
+              className="inline-flex h-10 items-center justify-center rounded-[14px] border border-[rgba(13,13,13,0.08)] bg-white px-4 text-sm font-bold text-[var(--voltjo-black)] transition hover:bg-[#FAFAF7]"
+            >
+              تصدير بياناتي
+            </Link>
+          </div>
+
+          <DeleteAccountRequest />
+        </div>
+      </SettingsCard>
+    </div>
+  );
+}
+
+function ProfileSection({
+  profile,
+  avatarUrl,
+  displayName,
+  emailConfirmed,
+  userEmail,
+  createdAt,
+}: {
+  profile: CurrentProfile | null;
+  avatarUrl: string | null;
+  displayName: string;
+  emailConfirmed: boolean;
+  userEmail: string;
+  createdAt: string;
+}) {
+  const identityLine = [
+    getProfileValue("country", profile?.country),
+    getProfileValue("city", profile?.city),
+    getProfileValue("mainGoal", profile?.main_goal),
+  ]
+    .filter((value) => value !== UNKNOWN_LABEL)
+    .join(" - ");
+
+  return (
+    <div className="space-y-6">
+      <SettingsCard title="الملف الشخصي">
+        <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-4">
+            <span className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[rgba(13,13,13,0.08)] bg-[#FFF1E8] text-3xl font-black text-[var(--voltjo-orange)]">
+              {avatarUrl ? (
+                <img
+                  src={avatarUrl}
+                  alt={displayName}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                displayName.trim().charAt(0).toUpperCase() || "V"
+              )}
+            </span>
+
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2">
+                <h2 className="text-[28px] font-black leading-tight text-[var(--voltjo-black)]">
+                  {displayName}
+                </h2>
+                {emailConfirmed ? (
+                  <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-extrabold text-emerald-700">
+                    <BadgeCheck size={14} />
+                    البريد مفعّل
+                  </span>
+                ) : null}
+              </div>
+              <p className="mt-1 text-base font-semibold text-[var(--voltjo-muted)]">
+                {userEmail}
+              </p>
+              <p className="mt-2 text-sm font-medium text-[var(--voltjo-muted)]">
+                عضو منذ {createdAt}
+              </p>
+              {identityLine ? (
+                <p className="mt-2 text-sm font-semibold text-[var(--voltjo-muted)]">
+                  {identityLine}
+                </p>
+              ) : null}
+            </div>
+          </div>
+
+          <AvatarCustomizer currentAvatarUrl={avatarUrl} displayName={displayName} />
+        </div>
+      </SettingsCard>
+
+      <SettingsCard
+        title="الملف الذكي"
+        description="هذا الملخص يعتمد على البيانات الحقيقية الحالية في حسابك ويستخدمه VoltJo لتخصيص التجربة."
+      >
+        <ProfileSummary profile={profile} />
+      </SettingsCard>
     </div>
   );
 }
@@ -324,281 +545,44 @@ function AccountSettingsContent({
   emailConfirmed,
   createdAt,
   displayName,
-  initial,
   profile,
   status,
+  avatarUrl,
 }: {
   section: AccountSection;
   userEmail: string;
   emailConfirmed: boolean;
   createdAt: string;
   displayName: string;
-  initial: string;
   profile: CurrentProfile | null;
   status?: string;
+  avatarUrl: string | null;
 }) {
-  const priorities = getPriorityLabels(profile?.priorities);
-  const accountInfo = [
-    { label: "البريد الإلكتروني", value: userEmail },
-    {
-      label: "البلد",
-      value: getProfileValue("country", profile?.country),
-      muted: !profile?.country,
-    },
-    {
-      label: "المدينة",
-      value: getProfileValue("city", profile?.city),
-      muted: !profile?.city,
-    },
-    {
-      label: "حالة الملف",
-      value: profile?.onboarding_completed ? "مكتمل" : "غير مكتمل",
-    },
-  ];
-
-  const preferencesInfo = [
-    { label: "اللغة", value: "العربية" },
-    { label: "المنطقة الزمنية", value: "Asia/Amman" },
-    { label: "واجهة الاستخدام", value: "الوضع الفاتح" },
-    {
-      label: "السوق المفضّل",
-      value:
-        profile?.country === "jordan"
-          ? "الأردن"
-          : getProfileValue("country", profile?.country),
-      muted: !profile?.country,
-    },
-  ];
-
-  const smartProfileItems = [
-    {
-      label: "الهدف الرئيسي",
-      value: getProfileValue("mainGoal", profile?.main_goal),
-    },
-    {
-      label: "نمط الاستخدام",
-      value: getProfileValue("drivingPattern", profile?.driving_pattern),
-    },
-    {
-      label: "الشحن المنزلي",
-      value: getProfileValue("homeChargingAccess", profile?.home_charging_access),
-    },
-  ];
-
-  const statusMessage = getStatusMessage(status);
-
   switch (section) {
     case "profile":
       return (
-        <div className="space-y-6">
-          <SettingsCard title="الملف الشخصي">
-            <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex items-center gap-4">
-                <span className="flex h-20 w-20 items-center justify-center rounded-full bg-[rgba(255,106,0,0.12)] text-3xl font-black text-[var(--voltjo-orange)]">
-                  {initial}
-                </span>
-                <div className="min-w-0">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <h2 className="text-[28px] font-black leading-tight text-[var(--voltjo-black)]">
-                      {displayName}
-                    </h2>
-                    {emailConfirmed ? (
-                      <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-extrabold text-emerald-700">
-                        <BadgeCheck size={14} />
-                        البريد مفعّل
-                      </span>
-                    ) : null}
-                  </div>
-                  <p className="mt-1 text-base font-semibold text-[var(--voltjo-muted)]">
-                    {userEmail}
-                  </p>
-                  <p className="mt-2 text-sm font-medium text-[var(--voltjo-muted)]">
-                    عضو منذ {createdAt}
-                  </p>
-                </div>
-              </div>
-
-              <PlaceholderButton>تغيير الصورة</PlaceholderButton>
-            </div>
-          </SettingsCard>
-
-          <SettingsCard
-            title="الملف الذكي"
-            description="ملخص قصير لأهم البيانات الحالية التي يعتمد عليها VoltJo في تخصيص التجربة."
-          >
-            <div className="space-y-5">
-              <InfoGrid items={smartProfileItems} />
-
-              <div className="border-t border-[rgba(13,13,13,0.06)] pt-5">
-                <p className="text-sm font-bold text-[var(--voltjo-muted)]">
-                  الأولويات
-                </p>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {(priorities.length ? priorities : [UNKNOWN_LABEL]).map((priority) => (
-                    <span
-                      key={priority}
-                      className="rounded-full border border-[rgba(13,13,13,0.08)] bg-[#FAFAF7] px-3 py-1.5 text-sm font-bold text-[var(--voltjo-black)]"
-                    >
-                      {priority}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              <div className="pt-1">
-                <Link
-                  href="/start"
-                  className="inline-flex h-11 items-center justify-center rounded-[14px] border border-[rgba(13,13,13,0.08)] bg-white px-5 text-sm font-bold text-[var(--voltjo-black)] transition hover:bg-[#FAFAF7]"
-                >
-                  تعديل الملف الذكي
-                </Link>
-              </div>
-            </div>
-          </SettingsCard>
-        </div>
+        <ProfileSection
+          profile={profile}
+          avatarUrl={avatarUrl}
+          displayName={displayName}
+          emailConfirmed={emailConfirmed}
+          userEmail={userEmail}
+          createdAt={createdAt}
+        />
       );
     case "account":
       return (
-        <SettingsCard
-          title="معلومات الحساب"
-          description="يمكن تعديل الاسم الكامل الآن. بقية الحقول للعرض فقط في هذه المرحلة."
-        >
-          <div className="space-y-6">
-            {statusMessage ? (
-              <StatusNotice tone={statusMessage.tone} message={statusMessage.message} />
-            ) : null}
-
-            <form action={updateAccountProfileAction} className="space-y-6">
-              <div className="grid gap-5 sm:grid-cols-2">
-                <label className="grid gap-2 text-sm font-bold text-[var(--voltjo-black)] sm:col-span-2">
-                  الاسم الكامل
-                  <input
-                    name="fullName"
-                    defaultValue={profile?.full_name ?? ""}
-                    placeholder={displayName}
-                    className="h-12 rounded-[14px] border border-[rgba(13,13,13,0.08)] bg-white px-4 text-base font-semibold text-[var(--voltjo-black)] outline-none transition focus:border-[rgba(255,106,0,0.35)]"
-                  />
-                </label>
-              </div>
-
-              <InfoGrid items={accountInfo} />
-
-              <div className="flex flex-wrap items-center gap-3">
-                <button
-                  type="submit"
-                  className="inline-flex h-11 items-center justify-center rounded-[14px] bg-[var(--voltjo-black)] px-5 text-sm font-bold text-white transition hover:opacity-95"
-                >
-                  حفظ التغييرات
-                </button>
-                <p className="text-sm font-medium text-[var(--voltjo-muted)]">
-                  البريد الإلكتروني للعرض فقط حاليًا.
-                </p>
-              </div>
-            </form>
-          </div>
-        </SettingsCard>
+        <AccountSectionContent
+          status={status}
+          profile={profile}
+          displayName={displayName}
+          userEmail={userEmail}
+        />
       );
     case "security":
-      return (
-        <SettingsCard
-          title="الأمان وتسجيل الدخول"
-          description="الإجراءات الحساسة غير مفعّلة من هذه الواجهة بعد، لكن الخروج من الحساب يعمل بشكل كامل."
-        >
-          <div className="space-y-4">
-            <div className="rounded-[18px] border border-[rgba(13,13,13,0.08)] bg-[#FBFBF9] p-4">
-              <p className="text-sm font-black text-[var(--voltjo-black)]">
-                كلمة المرور
-              </p>
-              <p className="mt-1 text-sm font-medium leading-6 text-[var(--voltjo-muted)]">
-                تغيير كلمة المرور يتم عبر رابط آمن يرسل إلى بريدك الإلكتروني عند
-                تفعيل إعدادات الحساب المتقدمة.
-              </p>
-            </div>
-
-            <div className="rounded-[18px] border border-[rgba(13,13,13,0.08)] bg-[#FBFBF9] p-4">
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <p className="text-sm font-black text-[var(--voltjo-black)]">
-                    تسجيل الخروج
-                  </p>
-                  <p className="mt-1 text-sm font-medium leading-6 text-[var(--voltjo-muted)]">
-                    إنهاء الجلسة الحالية والعودة إلى صفحة البداية.
-                  </p>
-                </div>
-                <form action={signOutAction}>
-                  <button
-                    type="submit"
-                    className="inline-flex h-11 items-center justify-center rounded-[14px] bg-[var(--voltjo-black)] px-5 text-sm font-bold text-white transition hover:opacity-95"
-                  >
-                    تسجيل الخروج
-                  </button>
-                </form>
-              </div>
-            </div>
-          </div>
-        </SettingsCard>
-      );
-    case "notifications":
-      return (
-        <SettingsCard
-          title="الإشعارات"
-          description="هذا القسم يوضح بنية الإشعارات المقصودة للحساب قبل ربط قنوات الإرسال والإدارة المتقدمة."
-        >
-          <div className="space-y-4">
-            <NotificationRow
-              title="إشعارات البريد الإلكتروني"
-              description="ستُستخدم لتنبيهات الحساب والرسائل الأساسية المرتبطة بأمان الوصول."
-            />
-            <NotificationRow
-              title="تنبيهات المقارنات"
-              description="ستعرض الإشعارات المتعلقة بالمقارنات المحفوظة عند تفعيل هذا المسار."
-            />
-            <NotificationRow
-              title="تحديثات السيارات والأسعار"
-              description="مخصصة لتلقي تنبيهات حول التغييرات المهمة في السوق عند ربط خدمة الإرسال."
-            />
-            <NotificationRow
-              title="تذكيرات الصيانة"
-              description="ستُربط لاحقًا بميزات الملكية والمتابعة بعد إضافة البيانات اللازمة."
-            />
-          </div>
-        </SettingsCard>
-      );
+      return <SecuritySection />;
     case "privacy":
-      return (
-        <SettingsCard
-          title="الخصوصية والبيانات"
-          description="هذه الإجراءات لا تنفذ أي تغييرات فعلية الآن، لكنها موضوعة هنا ضمن هيكلة واضحة للحساب."
-        >
-          <div className="space-y-4">
-            <PlaceholderRow
-              title="تصدير البيانات"
-              description="يمكن استخدام هذا المسار لاحقًا لطلب نسخة من بيانات حسابك."
-              buttonLabel="تصدير البيانات"
-            />
-            <PlaceholderRow
-              title="إعدادات الخصوصية"
-              description="سيتم تفعيل هذا الخيار بعد ربط إعدادات الحساب المتقدمة."
-              buttonLabel="إعدادات الخصوصية"
-            />
-            <PlaceholderRow
-              title="حذف الحساب"
-              description="حذف الحساب غير متاح من الواجهة الحالية. تواصل مع الدعم لمعالجة الطلب بشكل آمن."
-              buttonLabel="طلب حذف الحساب"
-              danger
-            />
-          </div>
-        </SettingsCard>
-      );
-    case "preferences":
-      return (
-        <SettingsCard
-          title="تفضيلات الحساب"
-          description="هذه التفضيلات معروضة بالحالة الحالية للحساب، من دون إجراءات حفظ إضافية."
-        >
-          <InfoGrid items={preferencesInfo} />
-        </SettingsCard>
-      );
+      return <PrivacySection profile={profile} />;
   }
 }
 
@@ -614,8 +598,8 @@ export default async function AccountPage({ searchParams }: Props) {
   }
 
   const displayName = getDisplayName(profile?.full_name, user.email ?? null);
-  const initial = getUserInitial(displayName);
   const createdAt = formatDate(user.created_at);
+  const avatarUrl = await getAvatarUrl(profile);
 
   return (
     <main
@@ -647,9 +631,9 @@ export default async function AccountPage({ searchParams }: Props) {
               emailConfirmed={Boolean(user.email_confirmed_at)}
               createdAt={createdAt}
               displayName={displayName}
-              initial={initial}
               profile={profile}
               status={status}
+              avatarUrl={avatarUrl}
             />
           </section>
 
@@ -677,19 +661,9 @@ export default async function AccountPage({ searchParams }: Props) {
                 active={activeSection === "security"}
               />
               <SidebarItem
-                href="/account?section=notifications"
-                label="الإشعارات"
-                active={activeSection === "notifications"}
-              />
-              <SidebarItem
                 href="/account?section=privacy"
                 label="الخصوصية والبيانات"
                 active={activeSection === "privacy"}
-              />
-              <SidebarItem
-                href="/account?section=preferences"
-                label="التفضيلات"
-                active={activeSection === "preferences"}
               />
             </nav>
 

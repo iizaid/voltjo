@@ -1,7 +1,13 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import {
+  allowedCountryValues,
+  allowedJordanCityValues,
+  DEFAULT_PRIVACY_SETTINGS,
+} from "@/lib/account/settings";
 import { createClient } from "@/lib/supabase/server";
 import type { CustomerProfileDraft } from "@/lib/onboarding/types";
 import {
@@ -19,6 +25,11 @@ type AuthActionState = {
   message: string;
   emailConfirmationRequired?: boolean;
   needsOnboarding?: boolean;
+};
+
+type AccountActionState = {
+  ok: boolean;
+  message: string;
 };
 
 type ParsedDraftResult =
@@ -48,6 +59,20 @@ function safeAuthErrorMessage() {
 function getFormString(formData: FormData, key: string) {
   const value = formData.get(key);
   return typeof value === "string" ? value : "";
+}
+
+function getFormBoolean(formData: FormData, key: string) {
+  return formData.get(key) === "on";
+}
+
+function getRequestOrigin(headerStore: Headers) {
+  const forwardedProto = headerStore.get("x-forwarded-proto");
+  const forwardedHost = headerStore.get("x-forwarded-host");
+  const host = forwardedHost || headerStore.get("host");
+  const protocol = forwardedProto || "http";
+
+  if (!host) return null;
+  return `${protocol}://${host}`;
 }
 
 function validateEmail(value: FormDataEntryValue | null) {
@@ -293,6 +318,22 @@ export async function updateAccountProfileAction(formData: FormData) {
     redirect("/account?section=account&status=invalid-name");
   }
 
+  const country = getFormString(formData, "country");
+  const city = getFormString(formData, "city");
+
+  if (!allowedCountryValues.has(country as "jordan" | "other")) {
+    redirect("/account?section=account&status=invalid-location");
+  }
+
+  if (
+    country === "jordan" &&
+    !allowedJordanCityValues.has(
+      city as "amman" | "irbid" | "zarqa" | "aqaba" | "other",
+    )
+  ) {
+    redirect("/account?section=account&status=invalid-location");
+  }
+
   const supabase = await createClient();
   if (!supabase) {
     redirect("/account?section=account&status=unavailable");
@@ -309,7 +350,11 @@ export async function updateAccountProfileAction(formData: FormData) {
 
   const { error } = await supabase
     .from("profiles")
-    .update({ full_name: nameResult.name })
+    .update({
+      full_name: nameResult.name,
+      country,
+      city: country === "jordan" ? city : null,
+    })
     .eq("id", user.id);
 
   if (error) {
@@ -318,4 +363,88 @@ export async function updateAccountProfileAction(formData: FormData) {
 
   revalidatePath("/account");
   redirect("/account?section=account&status=saved");
+}
+
+export async function sendPasswordResetLinkAction(
+  prevState: AccountActionState,
+): Promise<AccountActionState> {
+  void prevState;
+  const supabase = await createClient();
+  if (!supabase) {
+    return { ok: false, message: "الخدمة غير جاهزة حاليًا. حاول لاحقًا." };
+  }
+
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError || !user?.email) {
+    return { ok: false, message: "يجب تسجيل الدخول قبل إرسال رابط التغيير." };
+  }
+
+  const headerStore = await headers();
+  const origin = getRequestOrigin(headerStore);
+
+  const { error } = await supabase.auth.resetPasswordForEmail(user.email, {
+    ...(origin ? { redirectTo: `${origin}/auth/update-password` } : {}),
+  });
+
+  if (error) {
+    return { ok: false, message: "تعذر إرسال الرابط الآن. حاول مرة أخرى." };
+  }
+
+  return {
+    ok: true,
+    message: "أرسلنا رابط تغيير كلمة المرور إلى بريدك الإلكتروني.",
+  };
+}
+
+export async function savePrivacySettingsAction(
+  prevState: AccountActionState,
+  formData: FormData,
+): Promise<AccountActionState> {
+  void prevState;
+  const privacySettings = {
+    allowSmartProfileRecommendations: getFormBoolean(
+      formData,
+      "allowSmartProfileRecommendations",
+    ),
+    showDataInAssistant: getFormBoolean(formData, "showDataInAssistant"),
+    receiveImportantAccountEmails: getFormBoolean(
+      formData,
+      "receiveImportantAccountEmails",
+    ),
+  };
+
+  const supabase = await createClient();
+  if (!supabase) {
+    return { ok: false, message: "الخدمة غير جاهزة حاليًا. حاول لاحقًا." };
+  }
+
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError || !user) {
+    return { ok: false, message: "يجب تسجيل الدخول قبل حفظ إعدادات الخصوصية." };
+  }
+
+  const { error } = await supabase
+    .from("profiles")
+    .update({
+      privacy_settings: {
+        ...DEFAULT_PRIVACY_SETTINGS,
+        ...privacySettings,
+      },
+    })
+    .eq("id", user.id);
+
+  if (error) {
+    return { ok: false, message: "تعذر حفظ إعدادات الخصوصية الآن." };
+  }
+
+  revalidatePath("/account");
+  return { ok: true, message: "تم حفظ إعدادات الخصوصية بنجاح." };
 }
