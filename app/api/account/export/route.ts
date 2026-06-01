@@ -22,7 +22,9 @@ export async function GET() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("*")
+    .select(
+      "id,full_name,avatar_path,age_range,country,city,ownership_status,has_driven_ev_or_hybrid,main_goal,driving_pattern,home_charging_access,priorities,privacy_settings,onboarding_completed,onboarding_completed_at,profile_version,created_at,updated_at",
+    )
     .eq("id", user.id)
     .maybeSingle();
 

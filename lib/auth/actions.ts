@@ -66,6 +66,14 @@ function getFormBoolean(formData: FormData, key: string) {
 }
 
 function getRequestOrigin(headerStore: Headers) {
+  const explicitOrigin = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+  if (
+    explicitOrigin &&
+    (explicitOrigin.startsWith("http://") || explicitOrigin.startsWith("https://"))
+  ) {
+    return explicitOrigin.replace(/\/$/, "");
+  }
+
   const forwardedProto = headerStore.get("x-forwarded-proto");
   const forwardedHost = headerStore.get("x-forwarded-host");
   const host = forwardedHost || headerStore.get("host");
@@ -405,6 +413,7 @@ export async function savePrivacySettingsAction(
   formData: FormData,
 ): Promise<AccountActionState> {
   void prevState;
+  // These settings are persisted now so product surfaces can enforce them incrementally.
   const privacySettings = {
     allowSmartProfileRecommendations: getFormBoolean(
       formData,

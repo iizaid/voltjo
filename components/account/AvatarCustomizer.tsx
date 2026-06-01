@@ -35,7 +35,9 @@ export function AvatarCustomizer({
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement | null>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
+  const positionRef = useRef({ x: 0, y: 0 });
   const objectUrlRef = useRef<string | null>(null);
+  const rafRef = useRef<number | null>(null);
   const dragStateRef = useRef<{
     pointerId: number;
     startX: number;
@@ -51,11 +53,13 @@ export function AvatarCustomizer({
   const [zoom, setZoom] = useState(1);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [errorMessage, setErrorMessage] = useState("");
-  const [uploadState, setUploadState] = useState<UploadState | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     return () => {
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+      }
       if (objectUrlRef.current) {
         URL.revokeObjectURL(objectUrlRef.current);
       }
@@ -89,12 +93,15 @@ export function AvatarCustomizer({
   function closeModal() {
     setIsOpen(false);
     setErrorMessage("");
-    setUploadState(null);
     setIsSaving(false);
     setZoom(1);
     setPosition({ x: 0, y: 0 });
+    positionRef.current = { x: 0, y: 0 };
     setNaturalSize({ width: 0, height: 0 });
     setSelectedFileName("");
+    if (inputRef.current) {
+      inputRef.current.value = "";
+    }
     if (objectUrlRef.current) {
       URL.revokeObjectURL(objectUrlRef.current);
       objectUrlRef.current = null;
@@ -105,11 +112,17 @@ export function AvatarCustomizer({
   function handleFileSelection(file: File) {
     if (!ALLOWED_AVATAR_IMAGE_TYPES.includes(file.type as (typeof ALLOWED_AVATAR_IMAGE_TYPES)[number])) {
       setErrorMessage("الملف غير مدعوم. استخدم JPG أو PNG أو WEBP فقط.");
+      if (inputRef.current) {
+        inputRef.current.value = "";
+      }
       return;
     }
 
     if (file.size > MAX_AVATAR_IMAGE_SIZE_BYTES) {
       setErrorMessage("حجم الصورة أكبر من 3MB.");
+      if (inputRef.current) {
+        inputRef.current.value = "";
+      }
       return;
     }
 
@@ -122,10 +135,13 @@ export function AvatarCustomizer({
     setLocalPreviewUrl(objectUrl);
     setSelectedFileName(file.name);
     setErrorMessage("");
-    setUploadState(null);
     setZoom(1);
     setPosition({ x: 0, y: 0 });
+    positionRef.current = { x: 0, y: 0 };
     setNaturalSize({ width: 0, height: 0 });
+    if (inputRef.current) {
+      inputRef.current.value = "";
+    }
   }
 
   async function createCroppedBlob() {
@@ -193,7 +209,6 @@ export function AvatarCustomizer({
 
     setIsSaving(true);
     setErrorMessage("");
-    setUploadState(null);
 
     try {
       const blob = await createCroppedBlob();
@@ -215,7 +230,6 @@ export function AvatarCustomizer({
         return;
       }
 
-      setUploadState(payload);
       router.refresh();
       closeModal();
     } catch {
@@ -292,7 +306,13 @@ export function AvatarCustomizer({
                         if (!dragState || dragState.pointerId !== event.pointerId) return;
                         const nextX = dragState.originX + (event.clientX - dragState.startX);
                         const nextY = dragState.originY + (event.clientY - dragState.startY);
-                        setPosition(clampPosition(nextX, nextY));
+                        const clamped = clampPosition(nextX, nextY);
+                        positionRef.current = clamped;
+                        if (rafRef.current) return;
+                        rafRef.current = requestAnimationFrame(() => {
+                          rafRef.current = null;
+                          setPosition(positionRef.current);
+                        });
                       }}
                       onPointerUp={(event) => {
                         if (dragStateRef.current?.pointerId === event.pointerId) {
@@ -379,9 +399,11 @@ export function AvatarCustomizer({
                     onChange={(event) => {
                       const nextZoom = Number(event.target.value);
                       setZoom(nextZoom);
-                      setPosition((current) =>
-                        clampPosition(current.x, current.y, nextZoom),
-                      );
+                      setPosition((current) => {
+                        const clamped = clampPosition(current.x, current.y, nextZoom);
+                        positionRef.current = clamped;
+                        return clamped;
+                      });
                     }}
                     disabled={!hasLocalImage}
                     className="mt-4 h-2 w-full cursor-pointer appearance-none rounded-full bg-[rgba(13,13,13,0.08)] accent-[var(--voltjo-orange)] disabled:cursor-not-allowed"
@@ -398,12 +420,6 @@ export function AvatarCustomizer({
                 {errorMessage ? (
                   <div className="rounded-[16px] border border-red-200 bg-red-50 px-4 py-3 text-sm font-bold text-red-700">
                     {errorMessage}
-                  </div>
-                ) : null}
-
-                {uploadState?.message ? (
-                  <div className="rounded-[16px] border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-bold text-emerald-700">
-                    {uploadState.message}
                   </div>
                 ) : null}
 

@@ -1,40 +1,5 @@
 import type { Json } from "@/lib/supabase/database.types";
 
-export const AVATAR_STYLES = ["initials", "mark", "icon"] as const;
-export const AVATAR_SHAPES = ["circle", "rounded"] as const;
-
-export type AvatarStyle = (typeof AVATAR_STYLES)[number];
-export type AvatarShape = (typeof AVATAR_SHAPES)[number];
-
-export type AvatarConfig = {
-  style: AvatarStyle;
-  bgColor: string;
-  fgColor: string;
-  shape: AvatarShape;
-};
-
-export const AVATAR_BACKGROUND_OPTIONS = [
-  "#FFF1E8",
-  "#FFE4D1",
-  "#F3F1EA",
-  "#EFE7DE",
-  "#0D0D0D",
-] as const;
-
-export const AVATAR_FOREGROUND_OPTIONS = [
-  "#FF6A00",
-  "#0D0D0D",
-  "#FFFFFF",
-  "#7A6F63",
-] as const;
-
-export const DEFAULT_AVATAR_CONFIG: AvatarConfig = {
-  style: "initials",
-  bgColor: "#FFF1E8",
-  fgColor: "#FF6A00",
-  shape: "circle",
-};
-
 export type PrivacySettings = {
   allowSmartProfileRecommendations: boolean;
   showDataInAssistant: boolean;
@@ -75,37 +40,6 @@ export const MAX_AVATAR_IMAGE_SIZE_BYTES = 3 * 1024 * 1024;
 
 function isRecord(input: unknown): input is Record<string, unknown> {
   return Boolean(input) && typeof input === "object" && !Array.isArray(input);
-}
-
-export function normalizeAvatarConfig(input: Json | null | undefined): AvatarConfig {
-  if (!isRecord(input)) return DEFAULT_AVATAR_CONFIG;
-
-  const style = AVATAR_STYLES.includes(input.style as AvatarStyle)
-    ? (input.style as AvatarStyle)
-    : DEFAULT_AVATAR_CONFIG.style;
-
-  const shape = AVATAR_SHAPES.includes(input.shape as AvatarShape)
-    ? (input.shape as AvatarShape)
-    : DEFAULT_AVATAR_CONFIG.shape;
-
-  const bgColor = AVATAR_BACKGROUND_OPTIONS.includes(
-    input.bgColor as (typeof AVATAR_BACKGROUND_OPTIONS)[number],
-  )
-    ? (input.bgColor as string)
-    : DEFAULT_AVATAR_CONFIG.bgColor;
-
-  const fgColor = AVATAR_FOREGROUND_OPTIONS.includes(
-    input.fgColor as (typeof AVATAR_FOREGROUND_OPTIONS)[number],
-  )
-    ? (input.fgColor as string)
-    : DEFAULT_AVATAR_CONFIG.fgColor;
-
-  return {
-    style,
-    bgColor,
-    fgColor,
-    shape,
-  };
 }
 
 export function normalizePrivacySettings(
