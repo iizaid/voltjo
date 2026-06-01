@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import type { CustomerProfileDraft } from "@/lib/onboarding/types";
@@ -284,4 +285,37 @@ export async function signOutAction() {
   }
 
   redirect("/");
+}
+
+export async function updateAccountProfileAction(formData: FormData) {
+  const nameResult = validateFullName(getFormString(formData, "fullName"));
+  if (!nameResult.ok) {
+    redirect("/account?section=account&status=invalid-name");
+  }
+
+  const supabase = await createClient();
+  if (!supabase) {
+    redirect("/account?section=account&status=unavailable");
+  }
+
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError || !user) {
+    redirect("/start");
+  }
+
+  const { error } = await supabase
+    .from("profiles")
+    .update({ full_name: nameResult.name })
+    .eq("id", user.id);
+
+  if (error) {
+    redirect("/account?section=account&status=failed");
+  }
+
+  revalidatePath("/account");
+  redirect("/account?section=account&status=saved");
 }

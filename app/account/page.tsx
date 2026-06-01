@@ -2,7 +2,10 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ArrowLeft, BadgeCheck, ChevronLeft, LogOut } from "lucide-react";
-import { signOutAction } from "@/lib/auth/actions";
+import {
+  signOutAction,
+  updateAccountProfileAction,
+} from "@/lib/auth/actions";
 import {
   getCurrentUserAndProfile,
   type CurrentProfile,
@@ -29,10 +32,12 @@ const ACCOUNT_SECTIONS = [
 
 type AccountSection = (typeof ACCOUNT_SECTIONS)[number];
 
-function resolveSection(
-  value: string | string[] | undefined,
-): AccountSection {
-  const normalized = Array.isArray(value) ? value[0] : value;
+function resolveString(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+function resolveSection(value: string | string[] | undefined): AccountSection {
+  const normalized = resolveString(value);
   if (
     normalized &&
     ACCOUNT_SECTIONS.includes(normalized as AccountSection)
@@ -56,7 +61,10 @@ function formatDate(value: string | undefined) {
   }
 }
 
-function getDisplayName(fullName: string | null | undefined, email: string | null) {
+function getDisplayName(
+  fullName: string | null | undefined,
+  email: string | null,
+) {
   const trimmed = fullName?.trim();
   if (trimmed) return trimmed;
 
@@ -79,28 +87,55 @@ function getSectionMeta(section: AccountSection) {
     case "account":
       return {
         title: "معلومات الحساب",
-        subtitle: "عرض المعلومات الأساسية المرتبطة بحسابك الحالي.",
+        subtitle: "إدارة البيانات الأساسية المرتبطة بحسابك الحالي.",
       };
     case "security":
       return {
         title: "الأمان",
-        subtitle: "تنظيم خيارات تسجيل الدخول والجلسات والخروج الآمن.",
+        subtitle: "تنظيم الوصول إلى الحساب والخروج الآمن من الجلسة الحالية.",
       };
     case "notifications":
       return {
         title: "الإشعارات",
-        subtitle: "إعدادات الإشعارات ستتوفر لاحقًا ضمن صفحة الحساب.",
+        subtitle: "عرض طريقة تنظيم الإشعارات قبل ربط إعدادات الإرسال المتقدمة.",
       };
     case "privacy":
       return {
         title: "الخصوصية والبيانات",
-        subtitle: "خيارات الخصوصية وتصدير البيانات وإدارة الطلبات الحساسة.",
+        subtitle: "إدارة طلبات البيانات والخيارات الحساسة بطريقة واضحة وآمنة.",
       };
     case "preferences":
       return {
         title: "التفضيلات",
         subtitle: "التفضيلات العامة لتجربة الاستخدام داخل VoltJo.",
       };
+  }
+}
+
+function getStatusMessage(status: string | undefined) {
+  switch (status) {
+    case "saved":
+      return {
+        tone: "success" as const,
+        message: "تم تحديث الاسم الكامل بنجاح.",
+      };
+    case "invalid-name":
+      return {
+        tone: "error" as const,
+        message: "أدخل اسمًا صحيحًا قبل الحفظ.",
+      };
+    case "unavailable":
+      return {
+        tone: "error" as const,
+        message: "الخدمة غير جاهزة الآن. حاول مرة أخرى لاحقًا.",
+      };
+    case "failed":
+      return {
+        tone: "error" as const,
+        message: "تعذر حفظ التعديل الآن. حاول مرة أخرى.",
+      };
+    default:
+      return null;
   }
 }
 
@@ -193,7 +228,7 @@ function PlaceholderButton({
       className={`inline-flex h-10 items-center justify-center rounded-[14px] border px-4 text-sm font-bold disabled:cursor-not-allowed ${
         tone === "danger"
           ? "border-red-200 bg-white text-red-600 opacity-90"
-          : "border-[rgba(13,13,13,0.08)] bg-white text-[var(--voltjo-muted)] opacity-85"
+          : "border-[rgba(13,13,13,0.08)] bg-white text-[var(--voltjo-muted)] opacity-90"
       }`}
     >
       {children}
@@ -243,18 +278,42 @@ function PlaceholderRow({
   );
 }
 
-function NotificationItem({ label }: { label: string }) {
+function NotificationRow({
+  title,
+  description,
+}: {
+  title: string;
+  description: string;
+}) {
   return (
-    <div className="flex items-center justify-between rounded-[18px] border border-[rgba(13,13,13,0.08)] bg-[#FBFBF9] p-4">
-      <div>
-        <p className="text-sm font-black text-[var(--voltjo-black)]">{label}</p>
-        <p className="mt-1 text-sm font-medium text-[var(--voltjo-muted)]">
-          قريبًا
-        </p>
-      </div>
-      <span className="relative inline-flex h-7 w-12 items-center rounded-full bg-[#EAE8E2] opacity-80">
-        <span className="absolute right-1 h-5 w-5 rounded-full bg-white shadow-sm" />
-      </span>
+    <div className="rounded-[18px] border border-[rgba(13,13,13,0.08)] bg-[#FBFBF9] p-4">
+      <p className="text-sm font-black text-[var(--voltjo-black)]">{title}</p>
+      <p className="mt-1 text-sm font-medium leading-6 text-[var(--voltjo-muted)]">
+        {description}
+      </p>
+      <p className="mt-3 text-xs font-extrabold text-[var(--voltjo-muted)]">
+        للعرض فقط
+      </p>
+    </div>
+  );
+}
+
+function StatusNotice({
+  tone,
+  message,
+}: {
+  tone: "success" | "error";
+  message: string;
+}) {
+  return (
+    <div
+      className={`rounded-[16px] border px-4 py-3 text-sm font-bold ${
+        tone === "success"
+          ? "border-emerald-200 bg-emerald-50 text-emerald-800"
+          : "border-red-200 bg-red-50 text-red-700"
+      }`}
+    >
+      {message}
     </div>
   );
 }
@@ -267,6 +326,7 @@ function AccountSettingsContent({
   displayName,
   initial,
   profile,
+  status,
 }: {
   section: AccountSection;
   userEmail: string;
@@ -275,10 +335,10 @@ function AccountSettingsContent({
   displayName: string;
   initial: string;
   profile: CurrentProfile | null;
+  status?: string;
 }) {
   const priorities = getPriorityLabels(profile?.priorities);
   const accountInfo = [
-    { label: "الاسم الكامل", value: displayName },
     { label: "البريد الإلكتروني", value: userEmail },
     {
       label: "البلد",
@@ -324,6 +384,8 @@ function AccountSettingsContent({
       value: getProfileValue("homeChargingAccess", profile?.home_charging_access),
     },
   ];
+
+  const statusMessage = getStatusMessage(status);
 
   switch (section) {
     case "profile":
@@ -399,28 +461,60 @@ function AccountSettingsContent({
       return (
         <SettingsCard
           title="معلومات الحساب"
-          description="بعض الحقول للعرض فقط حاليًا، وسيتم تفعيل تعديلها لاحقًا."
+          description="يمكن تعديل الاسم الكامل الآن. بقية الحقول للعرض فقط في هذه المرحلة."
         >
-          <InfoGrid items={accountInfo} />
+          <div className="space-y-6">
+            {statusMessage ? (
+              <StatusNotice tone={statusMessage.tone} message={statusMessage.message} />
+            ) : null}
+
+            <form action={updateAccountProfileAction} className="space-y-6">
+              <div className="grid gap-5 sm:grid-cols-2">
+                <label className="grid gap-2 text-sm font-bold text-[var(--voltjo-black)] sm:col-span-2">
+                  الاسم الكامل
+                  <input
+                    name="fullName"
+                    defaultValue={profile?.full_name ?? ""}
+                    placeholder={displayName}
+                    className="h-12 rounded-[14px] border border-[rgba(13,13,13,0.08)] bg-white px-4 text-base font-semibold text-[var(--voltjo-black)] outline-none transition focus:border-[rgba(255,106,0,0.35)]"
+                  />
+                </label>
+              </div>
+
+              <InfoGrid items={accountInfo} />
+
+              <div className="flex flex-wrap items-center gap-3">
+                <button
+                  type="submit"
+                  className="inline-flex h-11 items-center justify-center rounded-[14px] bg-[var(--voltjo-black)] px-5 text-sm font-bold text-white transition hover:opacity-95"
+                >
+                  حفظ التغييرات
+                </button>
+                <p className="text-sm font-medium text-[var(--voltjo-muted)]">
+                  البريد الإلكتروني للعرض فقط حاليًا.
+                </p>
+              </div>
+            </form>
+          </div>
         </SettingsCard>
       );
     case "security":
       return (
         <SettingsCard
           title="الأمان وتسجيل الدخول"
-          description="خيارات الأمان التالية منظمة هنا، لكن الإجراءات الحساسة نفسها غير مفعّلة بعد."
+          description="الإجراءات الحساسة غير مفعّلة من هذه الواجهة بعد، لكن الخروج من الحساب يعمل بشكل كامل."
         >
           <div className="space-y-4">
-            <PlaceholderRow
-              title="كلمة المرور"
-              description="يمكنك تغيير كلمة المرور من رابط آمن لاحقًا."
-              buttonLabel="تغيير كلمة المرور"
-            />
-            <PlaceholderRow
-              title="الجلسات النشطة"
-              description="عرض الأجهزة المتصلة بحسابك."
-              buttonLabel="عرض الجلسات"
-            />
+            <div className="rounded-[18px] border border-[rgba(13,13,13,0.08)] bg-[#FBFBF9] p-4">
+              <p className="text-sm font-black text-[var(--voltjo-black)]">
+                كلمة المرور
+              </p>
+              <p className="mt-1 text-sm font-medium leading-6 text-[var(--voltjo-muted)]">
+                تغيير كلمة المرور يتم عبر رابط آمن يرسل إلى بريدك الإلكتروني عند
+                تفعيل إعدادات الحساب المتقدمة.
+              </p>
+            </div>
+
             <div className="rounded-[18px] border border-[rgba(13,13,13,0.08)] bg-[#FBFBF9] p-4">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
@@ -448,13 +542,25 @@ function AccountSettingsContent({
       return (
         <SettingsCard
           title="الإشعارات"
-          description="هذه التفضيلات ستصبح قابلة للتعديل لاحقًا. الواجهة الحالية للعرض فقط."
+          description="هذا القسم يوضح بنية الإشعارات المقصودة للحساب قبل ربط قنوات الإرسال والإدارة المتقدمة."
         >
           <div className="space-y-4">
-            <NotificationItem label="إشعارات البريد الإلكتروني" />
-            <NotificationItem label="تنبيهات المقارنات" />
-            <NotificationItem label="تحديثات السيارات والأسعار" />
-            <NotificationItem label="تذكيرات الصيانة" />
+            <NotificationRow
+              title="إشعارات البريد الإلكتروني"
+              description="ستُستخدم لتنبيهات الحساب والرسائل الأساسية المرتبطة بأمان الوصول."
+            />
+            <NotificationRow
+              title="تنبيهات المقارنات"
+              description="ستعرض الإشعارات المتعلقة بالمقارنات المحفوظة عند تفعيل هذا المسار."
+            />
+            <NotificationRow
+              title="تحديثات السيارات والأسعار"
+              description="مخصصة لتلقي تنبيهات حول التغييرات المهمة في السوق عند ربط خدمة الإرسال."
+            />
+            <NotificationRow
+              title="تذكيرات الصيانة"
+              description="ستُربط لاحقًا بميزات الملكية والمتابعة بعد إضافة البيانات اللازمة."
+            />
           </div>
         </SettingsCard>
       );
@@ -462,22 +568,22 @@ function AccountSettingsContent({
       return (
         <SettingsCard
           title="الخصوصية والبيانات"
-          description="جميع الإجراءات هنا placeholders فقط، ولا تقوم بأي تعديل حقيقي في هذه المرحلة."
+          description="هذه الإجراءات لا تنفذ أي تغييرات فعلية الآن، لكنها موضوعة هنا ضمن هيكلة واضحة للحساب."
         >
           <div className="space-y-4">
             <PlaceholderRow
               title="تصدير البيانات"
-              description="طلب نسخة من بيانات حسابك."
+              description="يمكن استخدام هذا المسار لاحقًا لطلب نسخة من بيانات حسابك."
               buttonLabel="تصدير البيانات"
             />
             <PlaceholderRow
               title="إعدادات الخصوصية"
-              description="مراجعة خيارات الخصوصية المتاحة لحسابك."
+              description="سيتم تفعيل هذا الخيار بعد ربط إعدادات الحساب المتقدمة."
               buttonLabel="إعدادات الخصوصية"
             />
             <PlaceholderRow
               title="حذف الحساب"
-              description="هذا الإجراء غير مفعّل بعد، وسيحتاج إلى تأكيد آمن عند تنفيذه لاحقًا."
+              description="حذف الحساب غير متاح من الواجهة الحالية. تواصل مع الدعم لمعالجة الطلب بشكل آمن."
               buttonLabel="طلب حذف الحساب"
               danger
             />
@@ -486,7 +592,10 @@ function AccountSettingsContent({
       );
     case "preferences":
       return (
-        <SettingsCard title="تفضيلات الحساب">
+        <SettingsCard
+          title="تفضيلات الحساب"
+          description="هذه التفضيلات معروضة بالحالة الحالية للحساب، من دون إجراءات حفظ إضافية."
+        >
           <InfoGrid items={preferencesInfo} />
         </SettingsCard>
       );
@@ -497,6 +606,7 @@ export default async function AccountPage({ searchParams }: Props) {
   const resolvedSearchParams = await searchParams;
   const activeSection = resolveSection(resolvedSearchParams.section);
   const sectionMeta = getSectionMeta(activeSection);
+  const status = resolveString(resolvedSearchParams.status);
   const { user, profile } = await getCurrentUserAndProfile();
 
   if (!user) {
@@ -539,6 +649,7 @@ export default async function AccountPage({ searchParams }: Props) {
               displayName={displayName}
               initial={initial}
               profile={profile}
+              status={status}
             />
           </section>
 
