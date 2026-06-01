@@ -29,6 +29,26 @@ function buildRateLimitHeaders(limit: number, remaining: number, resetAt: number
   };
 }
 
+async function tryCreateConversation(input: {
+  title: string;
+  modelId: string;
+  thinkingMode: boolean;
+}) {
+  try {
+    return await createChatConversation(input);
+  } catch {
+    return { ok: false as const, error: "Failed to create chat conversation." };
+  }
+}
+
+async function tryCreateMessage(input: Parameters<typeof createChatMessage>[0]) {
+  try {
+    return await createChatMessage(input);
+  } catch {
+    return { ok: false as const, error: "Failed to create chat message." };
+  }
+}
+
 export async function POST(request: Request) {
   const contentLength = request.headers.get("content-length");
   if (contentLength) {
@@ -96,7 +116,7 @@ export async function POST(request: Request) {
       if (validation.data.conversationId) {
         persistedConversationId = validation.data.conversationId;
       } else {
-        const createdConversation = await createChatConversation({
+        const createdConversation = await tryCreateConversation({
           title: validation.data.message.slice(0, 160),
           modelId: validation.data.modelId,
           thinkingMode: validation.data.thinkingMode,
@@ -108,7 +128,7 @@ export async function POST(request: Request) {
       }
 
       if (persistedConversationId) {
-        const userMessageResult = await createChatMessage({
+        const userMessageResult = await tryCreateMessage({
           conversationId: persistedConversationId,
           role: "user",
           content: validation.data.message,
@@ -136,7 +156,7 @@ export async function POST(request: Request) {
     });
 
     if (user && persistedConversationId && canPersistAssistantMessage) {
-      await createChatMessage({
+      await tryCreateMessage({
         conversationId: persistedConversationId,
         role: "assistant",
         content: message.content,

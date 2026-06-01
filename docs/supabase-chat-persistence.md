@@ -2,15 +2,17 @@
 
 ## What was added
 
-This phase adds database foundation only for authenticated chat persistence.
+This phase adds the first authenticated Supabase chat persistence foundation.
 
 New tables:
 
 - `public.chat_conversations`
 - `public.chat_messages`
 
-Frontend chat still uses localStorage in this phase.
-Nothing in `/assistant` has been switched to Supabase chat reads/writes yet.
+Frontend history loading is still localStorage-first in this phase.
+Guests still use localStorage only.
+Authenticated `/api/chat` can now write new messages to Supabase.
+Supabase history loading into the sidebar is not implemented yet.
 
 ## Table summary
 

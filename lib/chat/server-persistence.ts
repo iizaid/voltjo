@@ -38,10 +38,14 @@ async function touchChatConversation(
   supabase: NonNullable<Awaited<ReturnType<typeof createClient>>>,
   conversationId: string,
 ) {
-  await supabase
-    .from("chat_conversations")
-    .update({ updated_at: new Date().toISOString() })
-    .eq("id", conversationId);
+  try {
+    await supabase
+      .from("chat_conversations")
+      .update({ updated_at: new Date().toISOString() })
+      .eq("id", conversationId);
+  } catch {
+    // Touching updated_at is best-effort only in this phase.
+  }
 }
 
 export async function createChatConversation(input: {

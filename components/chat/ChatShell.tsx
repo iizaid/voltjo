@@ -190,10 +190,17 @@ export function ChatShell({
     let newConversations = [...conversations];
 
     const userMessage = createUserMessage(trimmedPrompt, att);
+    const shouldUseExistingServerConversation =
+      Boolean(account) &&
+      !options?.forceNew &&
+      Boolean(activeConversation?.serverId);
+
     const requestOptions = {
       modelId: selectedModel.id,
       thinkingMode,
-      conversationId: account ? activeConversation?.serverId ?? null : null,
+      conversationId: shouldUseExistingServerConversation
+        ? activeConversation?.serverId ?? null
+        : null,
       attachment: att ?? null,
     };
 
