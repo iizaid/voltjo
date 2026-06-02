@@ -586,9 +586,10 @@ export default async function AccountPage({ searchParams }: Props) {
   if (!user) {
     redirect("/start");
   }
+  const currentUser = user;
 
-  const displayName = getDisplayName(profile?.full_name, user.email ?? null);
-  const createdAt = formatDate(user.created_at);
+  const displayName = getDisplayName(profile?.full_name, currentUser.email ?? null);
+  const createdAt = formatDate(currentUser.created_at);
   const avatarUrl = resolveAccountAvatarUrl(profile);
 
   return (
@@ -617,8 +618,8 @@ export default async function AccountPage({ searchParams }: Props) {
 
             <AccountSettingsContent
               section={activeSection}
-              userEmail={user.email ?? UNKNOWN_LABEL}
-              emailConfirmed={Boolean(user.email_confirmed_at)}
+              userEmail={currentUser.email ?? UNKNOWN_LABEL}
+              emailConfirmed={Boolean(currentUser.email_confirmed_at)}
               createdAt={createdAt}
               displayName={displayName}
               profile={profile}

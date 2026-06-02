@@ -29,32 +29,33 @@ export default async function VehicleDetailPage({
   if (!vehicle) {
     notFound();
   }
+  const currentVehicle = vehicle;
 
   const facts = [
-    { label: "النوع", value: vehicleTypeLabels[vehicle.vehicleType] },
-    { label: "سنة الموديل", value: String(vehicle.modelYear) },
-    { label: "البطارية", value: vehicle.batteryKwh ? `${vehicle.batteryKwh} kWh` : null },
-    { label: "خزان الوقود", value: vehicle.fuelTankLiters ? `${vehicle.fuelTankLiters} لتر` : null },
-    { label: "المحرك", value: vehicle.engineLiters ? `${vehicle.engineLiters} لتر` : null },
-    { label: "المدى الكهربائي", value: vehicle.electricRangeKm ? `${vehicle.electricRangeKm} كم` : null },
-    { label: "المدى الكلي", value: vehicle.totalRangeKm ? `${vehicle.totalRangeKm} كم` : null },
-    { label: "السعر التقريبي", value: formatPriceRange(vehicle.priceJodMin, vehicle.priceJodMax) },
-    { label: "منفذ الشحن", value: vehicle.chargingPort },
+    { label: "النوع", value: vehicleTypeLabels[currentVehicle.vehicleType] },
+    { label: "سنة الموديل", value: String(currentVehicle.modelYear) },
+    { label: "البطارية", value: currentVehicle.batteryKwh ? `${currentVehicle.batteryKwh} kWh` : null },
+    { label: "خزان الوقود", value: currentVehicle.fuelTankLiters ? `${currentVehicle.fuelTankLiters} لتر` : null },
+    { label: "المحرك", value: currentVehicle.engineLiters ? `${currentVehicle.engineLiters} لتر` : null },
+    { label: "المدى الكهربائي", value: currentVehicle.electricRangeKm ? `${currentVehicle.electricRangeKm} كم` : null },
+    { label: "المدى الكلي", value: currentVehicle.totalRangeKm ? `${currentVehicle.totalRangeKm} كم` : null },
+    { label: "السعر التقريبي", value: formatPriceRange(currentVehicle.priceJodMin, currentVehicle.priceJodMax) },
+    { label: "منفذ الشحن", value: currentVehicle.chargingPort },
     {
       label: "الشحن المنزلي",
       value:
-        vehicle.homeChargingSupported === true
+        currentVehicle.homeChargingSupported === true
           ? "مدعوم"
-          : vehicle.homeChargingSupported === false
+          : currentVehicle.homeChargingSupported === false
             ? "غير مدعوم"
             : null,
     },
     {
       label: "الشحن السريع DC",
       value:
-        vehicle.dcFastCharging === true
+        currentVehicle.dcFastCharging === true
           ? "مدعوم"
-          : vehicle.dcFastCharging === false
+          : currentVehicle.dcFastCharging === false
             ? "غير مؤكد"
             : null,
     },
@@ -68,15 +69,15 @@ export default async function VehicleDetailPage({
           <div className="rounded-[24px] border border-[var(--voltjo-border)] bg-white p-6 shadow-[0_18px_50px_rgba(13,13,13,0.05)]">
             <div className="flex flex-wrap items-center gap-3">
               <span className="rounded-full border border-[rgba(255,106,0,0.18)] bg-[rgba(255,106,0,0.06)] px-3 py-1 text-xs font-black text-[var(--voltjo-orange)]">
-                {vehicleTypeLabels[vehicle.vehicleType]}
+                {vehicleTypeLabels[currentVehicle.vehicleType]}
               </span>
               <span className="text-xs font-bold text-[var(--voltjo-muted)]">
-                مستوى الثقة: {confidenceLabels[vehicle.dataConfidence]}
+                مستوى الثقة: {confidenceLabels[currentVehicle.dataConfidence]}
               </span>
             </div>
 
             <h1 className="mt-4 text-4xl font-black text-[var(--voltjo-black)]">
-              {vehicle.nameAr}
+              {currentVehicle.nameAr}
             </h1>
             <p className="mt-2 text-base font-semibold text-[var(--voltjo-muted)]">
               {vehicle.brand.nameAr} • {vehicle.modelYear}

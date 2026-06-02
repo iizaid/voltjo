@@ -347,24 +347,26 @@ export async function updateAccountProfileAction(formData: FormData) {
   if (!supabase) {
     redirect("/account?section=account&status=unavailable");
   }
+  const supabaseClient = supabase;
 
   const {
     data: { user },
     error: userError,
-  } = await supabase.auth.getUser();
+  } = await supabaseClient.auth.getUser();
 
   if (userError || !user) {
     redirect("/start");
   }
+  const currentUser = user;
 
-  const { error } = await supabase
+  const { error } = await supabaseClient
     .from("profiles")
     .update({
       full_name: nameResult.name,
       country,
       city: country === "jordan" ? city : null,
     })
-    .eq("id", user.id);
+    .eq("id", currentUser.id);
 
   if (error) {
     redirect("/account?section=account&status=failed");
