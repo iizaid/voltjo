@@ -4,10 +4,11 @@ import { VoltJoLogo } from "@/components/brand/VoltJoLogo";
 
 const navLinks = [
   { label: "الرئيسية", href: "/" },
-  { label: "السيارات", href: "/cars" },
-  { label: "المقارنة", href: "/compare" },
+  { label: "السيارات المدعومة", href: "/vehicles" },
+  { label: "خريطة الشحن", href: "/charging-map" },
+  { label: "حاسبة الشحن", href: "/charging-calculator" },
   { label: "المساعد الذكي", href: "/assistant" },
-  { label: "الأسعار", href: "/pricing" },
+  { label: "الأسعار", href: "/#pricing" },
 ];
 
 export function Footer() {

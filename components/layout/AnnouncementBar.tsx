@@ -5,10 +5,10 @@ export function AnnouncementBar() {
     <div className="w-full px-4 pt-3 sm:px-6 lg:px-8">
       <div className="mx-auto flex h-10 max-w-[1240px] items-center justify-center rounded-[8px] bg-[var(--voltjo-orange)] px-5 text-center text-sm font-medium on-dark-fg">
         <span className="leading-6">
-          دليل 2024 لامتلاك السيارات الكهربائية والهايبرد في الأردن أصبح متاحاً
-          الآن — قارن تكاليف الشحن والدعم والضمانات.{" "}
+          قاعدة السيارات المدعومة في VoltJo أصبحت جاهزة للإطلاق — راجع
+          الموديلات الأساسية قبل استخدام المساعد والحاسبة.{" "}
           <Link
-            href="/resources"
+            href="/vehicles"
             className="font-bold underline decoration-white/45 underline-offset-4 transition hover:decoration-white"
           >
             اطّلع عليه ←

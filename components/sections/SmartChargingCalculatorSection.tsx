@@ -228,11 +228,11 @@ export function SmartChargingCalculatorSection() {
           </div>
 
           <div className="mt-8 flex flex-wrap justify-center gap-3">
-            <Button href="/calculators?tool=charging-cost">
+            <Button href="/charging-calculator">
               جرّب الحاسبة
             </Button>
-            <Button href="/compare" variant="secondary">
-              قارن بين سيارتين
+            <Button href="/charging-map" variant="secondary">
+              خريطة الشحن
             </Button>
           </div>
         </div>

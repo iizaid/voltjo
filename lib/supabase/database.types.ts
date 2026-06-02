@@ -107,6 +107,60 @@ export type Database = {
           },
         ];
       };
+      charging_locations: {
+        Row: {
+          id: string;
+          name_ar: string;
+          name_en: string | null;
+          city: string | null;
+          area: string | null;
+          latitude: number | null;
+          longitude: number | null;
+          plug_types: string[] | null;
+          power_kw: number | null;
+          is_verified: boolean;
+          source: string | null;
+          notes_ar: string | null;
+          is_active: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          name_ar: string;
+          name_en?: string | null;
+          city?: string | null;
+          area?: string | null;
+          latitude?: number | null;
+          longitude?: number | null;
+          plug_types?: string[] | null;
+          power_kw?: number | null;
+          is_verified?: boolean;
+          source?: string | null;
+          notes_ar?: string | null;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          name_ar?: string;
+          name_en?: string | null;
+          city?: string | null;
+          area?: string | null;
+          latitude?: number | null;
+          longitude?: number | null;
+          plug_types?: string[] | null;
+          power_kw?: number | null;
+          is_verified?: boolean;
+          source?: string | null;
+          notes_ar?: string | null;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       profiles: {
         Row: {
           id: string;
@@ -177,6 +231,169 @@ export type Database = {
             columns: ["id"];
             isOneToOne: true;
             referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      supported_vehicles: {
+        Row: {
+          id: string;
+          brand_id: string;
+          slug: string;
+          name_en: string;
+          name_ar: string;
+          model_year: number;
+          vehicle_type: "ev" | "phev" | "hev";
+          body_type: string | null;
+          market: string;
+          battery_kwh: number | null;
+          fuel_tank_liters: number | null;
+          engine_liters: number | null;
+          electric_range_km: number | null;
+          total_range_km: number | null;
+          price_jod_min: number | null;
+          price_jod_max: number | null;
+          charging_port: string | null;
+          dc_fast_charging: boolean | null;
+          home_charging_supported: boolean | null;
+          is_active: boolean;
+          summary_ar: string | null;
+          jordan_notes_ar: string | null;
+          data_confidence: "official" | "dealer" | "owner_reported" | "estimate";
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          brand_id: string;
+          slug: string;
+          name_en: string;
+          name_ar: string;
+          model_year: number;
+          vehicle_type: "ev" | "phev" | "hev";
+          body_type?: string | null;
+          market?: string;
+          battery_kwh?: number | null;
+          fuel_tank_liters?: number | null;
+          engine_liters?: number | null;
+          electric_range_km?: number | null;
+          total_range_km?: number | null;
+          price_jod_min?: number | null;
+          price_jod_max?: number | null;
+          charging_port?: string | null;
+          dc_fast_charging?: boolean | null;
+          home_charging_supported?: boolean | null;
+          is_active?: boolean;
+          summary_ar?: string | null;
+          jordan_notes_ar?: string | null;
+          data_confidence?: "official" | "dealer" | "owner_reported" | "estimate";
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          brand_id?: string;
+          slug?: string;
+          name_en?: string;
+          name_ar?: string;
+          model_year?: number;
+          vehicle_type?: "ev" | "phev" | "hev";
+          body_type?: string | null;
+          market?: string;
+          battery_kwh?: number | null;
+          fuel_tank_liters?: number | null;
+          engine_liters?: number | null;
+          electric_range_km?: number | null;
+          total_range_km?: number | null;
+          price_jod_min?: number | null;
+          price_jod_max?: number | null;
+          charging_port?: string | null;
+          dc_fast_charging?: boolean | null;
+          home_charging_supported?: boolean | null;
+          is_active?: boolean;
+          summary_ar?: string | null;
+          jordan_notes_ar?: string | null;
+          data_confidence?: "official" | "dealer" | "owner_reported" | "estimate";
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "supported_vehicles_brand_id_fkey";
+            columns: ["brand_id"];
+            isOneToOne: false;
+            referencedRelation: "vehicle_brands";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      vehicle_brands: {
+        Row: {
+          id: string;
+          slug: string;
+          name_en: string;
+          name_ar: string;
+          country: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          slug: string;
+          name_en: string;
+          name_ar: string;
+          country?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          slug?: string;
+          name_en?: string;
+          name_ar?: string;
+          country?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      vehicle_cost_profiles: {
+        Row: {
+          id: string;
+          vehicle_id: string;
+          scenario: string;
+          electricity_kwh_100km: number | null;
+          fuel_l_100km: number | null;
+          notes_ar: string | null;
+          confidence: "official" | "dealer" | "owner_reported" | "estimate";
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          vehicle_id: string;
+          scenario: string;
+          electricity_kwh_100km?: number | null;
+          fuel_l_100km?: number | null;
+          notes_ar?: string | null;
+          confidence?: "official" | "dealer" | "owner_reported" | "estimate";
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          vehicle_id?: string;
+          scenario?: string;
+          electricity_kwh_100km?: number | null;
+          fuel_l_100km?: number | null;
+          notes_ar?: string | null;
+          confidence?: "official" | "dealer" | "owner_reported" | "estimate";
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_cost_profiles_vehicle_id_fkey";
+            columns: ["vehicle_id"];
+            isOneToOne: false;
+            referencedRelation: "supported_vehicles";
             referencedColumns: ["id"];
           },
         ];

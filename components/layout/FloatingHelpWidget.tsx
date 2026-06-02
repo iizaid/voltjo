@@ -2,7 +2,7 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
-import { Bot, HelpCircle, Mail, MessageCircle, X } from "lucide-react";
+import { Bot, CarFront, Mail, MessageCircle, X } from "lucide-react";
 import Link from "next/link";
 
 const useIsomorphicLayoutEffect =
@@ -18,11 +18,11 @@ const actions = [
     external: false,
   },
   {
-    id: "faq",
-    title: "الأسئلة الشائعة",
-    description: "إجابات سريعة عن الشحن، المقارنة، والدعم.",
-    href: "/resources",
-    Icon: HelpCircle,
+    id: "vehicles",
+    title: "السيارات المدعومة",
+    description: "تصفح قاعدة السيارات التي يعتمد عليها VoltJo في الإطلاق.",
+    href: "/vehicles",
+    Icon: CarFront,
     external: false,
   },
   {

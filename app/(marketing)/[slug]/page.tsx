@@ -4,10 +4,6 @@ import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 
 const pages = {
-  cars: "السيارات",
-  compare: "المقارنة",
-  calculators: "الحاسبات",
-  resources: "المصادر",
   pricing: "الأسعار",
 } as const;
 

@@ -35,6 +35,12 @@ supabase/schema.sql
 
 This creates the `public.profiles` smart profile table and RLS policies.
 
+For launch vehicle data, also run:
+
+```txt
+supabase/migrations/005_supported_vehicles_mvp.sql
+```
+
 ## Development
 
 ```bash
@@ -55,12 +61,14 @@ Implemented:
 - protected account/security page
 - auth callback redirect hardening
 - basic in-memory auth rate limiting
+- supported vehicles MVP foundation
+- charging calculator MVP page
+- charging map placeholder page with database-backed list support
 
 Not implemented yet:
 
 - AI provider integration
 - chat database persistence
-- vehicle database
 - saved cars
 - comparison persistence
 - reports
@@ -73,6 +81,7 @@ Not implemented yet:
 ## Production Security Checklist
 
 - Run `supabase/schema.sql` in Supabase.
+- Run `supabase/migrations/005_supported_vehicles_mvp.sql` for launch vehicle data.
 - Configure Supabase Site URL and Redirect URLs, including `/auth/callback` for email and OAuth.
 - Enable Google and GitHub providers in Supabase Auth dashboard with their respective credentials.
 - Decide whether email confirmation is enabled.
@@ -93,3 +102,4 @@ More details are in `docs/supabase-auth-foundation.md`.
 - `/account` is the main Smart Profile page: identity, onboarding preferences, completion status, and account/security information.
 - `/dashboard` is intentionally lightweight until product databases exist. Future modules can include saved cars, comparisons, reports, and chat history.
 - Login rate-limit buckets reset after successful login, but the in-memory limiter is still temporary and must be replaced before public launch.
+- Vehicle data in the MVP seed is sample launch data and still requires business verification before making public claims.
