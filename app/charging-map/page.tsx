@@ -9,14 +9,14 @@ export default async function ChargingMapPage() {
   const user = await getCurrentUser();
 
   return (
-    <section className="pb-20 pt-6" dir="rtl">
+    <section className="pb-16 pt-4 sm:pb-20 sm:pt-6" dir="rtl">
       <PageReturnBar />
       <Container>
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <h1 className="text-4xl font-black text-[var(--voltjo-black)] sm:text-5xl">
+          <h1 className="text-3xl font-black text-[var(--voltjo-black)] sm:text-5xl">
             خريطة الشحن في الأردن
           </h1>
-          <p className="mt-3 max-w-3xl text-base font-semibold leading-8 text-[var(--voltjo-muted)] sm:text-lg">
+          <p className="mt-3 max-w-2xl text-sm font-semibold leading-7 text-[var(--voltjo-muted)] sm:text-lg sm:leading-8">
             استعرض موقعك ونقاط الشحن المتاحة داخل الأردن على خريطة تفاعلية واحدة.
           </p>
 

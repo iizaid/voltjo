@@ -5,10 +5,12 @@
 - geolocation is initiated from the browser only after the user clicks `تفعيل موقعي`
 - the first visit to `/charging-map` shows a centered permission modal
 - the modal can be dismissed with `المتابعة بدون تحديد الموقع`
+- closing the modal with `X` behaves like dismissal without location
 - dismissal is remembered in `localStorage` only through:
   - `voltjo_charging_map_location_prompt_dismissed`
   - a dismissal timestamp
 - coordinates are not stored in `localStorage`
+- a custom locate control remains available on the map for requesting location later
 
 ## Guest behavior
 

@@ -258,7 +258,7 @@ export function ChargingMapClient({ locations, isAuthenticated }: Props) {
           disabled={requestingLocation}
         />
 
-        <div className="relative h-[620px] min-h-[620px] md:h-[720px] md:min-h-[720px]">
+        <div className="relative h-[640px] min-h-[640px] md:h-[740px] md:min-h-[740px]">
           <Map
             center={[jordanCenter.longitude, jordanCenter.latitude]}
             zoom={jordanCenter.zoom}
@@ -357,7 +357,7 @@ export function ChargingMapClient({ locations, isAuthenticated }: Props) {
                       <p className="text-base font-black">موقعك الحالي</p>
                     </div>
                     <p className="text-sm font-semibold leading-7 text-[var(--voltjo-muted)]">
-                      يُستخدم هذا الموقع فقط داخل المتصفح لتسهيل استعراض أقرب محطات الشحن على الخريطة.
+                      يُستخدم هذا الموقع داخل المتصفح فقط ما لم تختر حفظه لهذا الحساب.
                     </p>
                     {typeof userLocation.accuracyMeters === "number" ? (
                       <p className="text-sm font-semibold text-[var(--voltjo-muted)]">
@@ -373,7 +373,7 @@ export function ChargingMapClient({ locations, isAuthenticated }: Props) {
       </div>
 
       {promptVisible ? (
-        <div className="absolute inset-0 z-40 flex items-center justify-center bg-black/10 p-4">
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/10 p-4">
           <div className="w-full max-w-[620px] rounded-[24px] border border-[var(--voltjo-border)] bg-white p-6 shadow-[0_20px_60px_rgba(13,13,13,0.12)] sm:p-7">
             <div className="flex items-start justify-between gap-4">
               <div className="text-right">

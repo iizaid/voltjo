@@ -26,11 +26,16 @@
 ## Charging map MVP
 
 - `/charging-map` now includes an interactive MapLibre MVP
-- user geolocation is browser-only and is not stored in localStorage, Supabase, or the server
+- geolocation is browser-initiated only from the first-visit modal or the map locate control
+- coordinates are not stored in localStorage
+- guest location is not persisted server-side
+- authenticated users can optionally save location only with explicit consent
+- location persistence depends on `supabase/migrations/006_user_location_preferences.sql`
 - charging station visibility still depends on verified rows in `charging_locations`
+- no fake charging stations are rendered when no verified rows exist
 - public UI must not show developer setup or migration messages
 - the first-visit geolocation prompt is dismissible and remembered without storing coordinates
-- authenticated users can optionally save location only with explicit consent
+- the charging map page should not contain developer empty-state cards or extra assistant CTA buttons
 
 ## Navigation policy for launch
 
