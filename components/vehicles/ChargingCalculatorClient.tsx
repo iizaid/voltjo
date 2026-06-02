@@ -33,6 +33,7 @@ export function ChargingCalculatorClient({
     () => vehicles.find((vehicle) => vehicle.slug === selectedVehicle) ?? null,
     [vehicles, selectedVehicle],
   );
+  const hasVehicleOptions = vehicles.length > 0;
 
   useEffect(() => {
     if (selectedVehicleData) {
@@ -89,21 +90,36 @@ export function ChargingCalculatorClient({
   return (
     <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]" dir="rtl">
       <div className="rounded-[20px] border border-[var(--voltjo-border)] bg-white p-5 shadow-[0_18px_50px_rgba(13,13,13,0.05)]">
+        <div className="mb-5 rounded-[16px] border border-[rgba(255,106,0,0.12)] bg-[rgba(255,106,0,0.05)] px-4 py-4">
+          <p className="text-sm font-black text-[var(--voltjo-black)]">
+            {hasVehicleOptions ? "يمكنك الاختيار من السيارات المتاحة أو إدخال القيم يدويًا." : "الوضع اليدوي متاح بالكامل حتى لو لم تظهر سيارات في القائمة."}
+          </p>
+          <p className="mt-2 text-sm font-semibold leading-7 text-[var(--voltjo-muted)]">
+            إذا لم تظهر سيارات، يمكنك إدخال حجم البطارية يدويًا.
+          </p>
+        </div>
+
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="grid gap-2 text-sm font-bold text-[var(--voltjo-black)] sm:col-span-2">
             اختر سيارة مدعومة
             <select
               value={selectedVehicle}
               onChange={(event) => setSelectedVehicle(event.target.value)}
+              disabled={!hasVehicleOptions}
               className="h-12 rounded-[14px] border border-[var(--voltjo-border)] bg-white px-4 text-base font-semibold text-[var(--voltjo-black)] outline-none"
             >
-              <option value="">بدون اختيار سيارة</option>
+              <option value="">
+                {hasVehicleOptions ? "بدون اختيار سيارة" : "لا توجد سيارات مضافة حاليًا"}
+              </option>
               {vehicles.map((vehicle) => (
                 <option key={vehicle.slug} value={vehicle.slug}>
                   {vehicle.label}
                 </option>
               ))}
             </select>
+            <span className="text-xs font-semibold leading-6 text-[var(--voltjo-muted)]">
+              يمكنك إدخال حجم البطارية يدويًا إذا لم تكن سيارتك موجودة في القائمة.
+            </span>
           </label>
 
           <label className="grid gap-2 text-sm font-bold text-[var(--voltjo-black)]">
@@ -114,6 +130,7 @@ export function ChargingCalculatorClient({
               step="0.1"
               value={batteryKwh}
               onChange={(event) => setBatteryKwh(event.target.value)}
+              placeholder="مثال: 60"
               className="h-12 rounded-[14px] border border-[var(--voltjo-border)] bg-white px-4 text-base font-semibold text-[var(--voltjo-black)] outline-none"
             />
           </label>
@@ -177,6 +194,9 @@ export function ChargingCalculatorClient({
         </h2>
         <p className="mt-2 text-sm font-semibold leading-7 text-[var(--voltjo-muted)]">
           الحسبة محلية داخل المتصفح فقط، والقيم الافتراضية قابلة للتعديل قبل الاعتماد عليها.
+        </p>
+        <p className="mt-2 text-sm font-semibold leading-7 text-[var(--voltjo-muted)]">
+          السعر الافتراضي قابل للتعديل حسب تعرفة الكهرباء لديك.
         </p>
 
         {calculation.ok ? (

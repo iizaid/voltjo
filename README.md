@@ -63,7 +63,7 @@ Implemented:
 - basic in-memory auth rate limiting
 - supported vehicles MVP foundation
 - charging calculator MVP page
-- charging map placeholder page with database-backed list support
+- interactive charging map MVP with browser-only geolocation and no map API key
 
 Not implemented yet:
 

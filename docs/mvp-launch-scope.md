@@ -14,7 +14,6 @@
 - saved cars
 - reports
 - payments
-- full interactive charging map integration
 - real AI provider integration
 - admin CMS
 
@@ -23,6 +22,13 @@
 - run `supabase/migrations/005_supported_vehicles_mvp.sql`
 - seed data is MVP/sample data only
 - all public claims must still be verified before marketing or dealer-facing publication
+
+## Charging map MVP
+
+- `/charging-map` now includes an interactive MapLibre MVP
+- user geolocation is browser-only and is not stored in localStorage, Supabase, or the server
+- charging station visibility still depends on verified rows in `charging_locations`
+- public UI must not show developer setup or migration messages
 
 ## Navigation policy for launch
 

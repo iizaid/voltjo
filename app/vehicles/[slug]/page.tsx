@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { Container } from "@/components/ui/Container";
+import { PageActionRow } from "@/components/vehicles/PageActionRow";
 import { getSupportedVehicleBySlug } from "@/lib/vehicles/queries";
 import { confidenceLabels, vehicleTypeLabels } from "@/lib/vehicles/types";
 
@@ -62,6 +63,14 @@ export default async function VehicleDetailPage({
     <section className="px-4 pb-20 pt-16 sm:px-6 lg:px-8" dir="rtl">
       <Container>
         <div className="mx-auto max-w-5xl">
+          <PageActionRow
+            actions={[
+              { href: "/", label: "العودة للرئيسية", icon: "home" },
+              { href: "/vehicles", label: "العودة للسيارات", icon: "vehicles" },
+              { href: "/assistant", label: "العودة للمساعد", icon: "assistant" },
+            ]}
+          />
+
           <div className="rounded-[24px] border border-[var(--voltjo-border)] bg-white p-6 shadow-[0_18px_50px_rgba(13,13,13,0.05)]">
             <div className="flex flex-wrap items-center gap-3">
               <span className="rounded-full border border-[rgba(255,106,0,0.18)] bg-[rgba(255,106,0,0.06)] px-3 py-1 text-xs font-black text-[var(--voltjo-orange)]">
