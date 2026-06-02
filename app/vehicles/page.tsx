@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Container } from "@/components/ui/Container";
-import { PageActionRow } from "@/components/vehicles/PageActionRow";
+import { PageReturnBar } from "@/components/ui/PageReturnBar";
 import { listSupportedVehicles } from "@/lib/vehicles/queries";
 import { confidenceLabels, vehicleTypeLabels } from "@/lib/vehicles/types";
 
@@ -8,17 +8,10 @@ export default async function VehiclesPage() {
   const vehicles = await listSupportedVehicles();
 
   return (
-    <section className="px-4 pb-20 pt-16 sm:px-6 lg:px-8" dir="rtl">
+    <section className="pb-20 pt-6" dir="rtl">
+      <PageReturnBar />
       <Container>
-        <div className="mx-auto max-w-6xl">
-          <PageActionRow
-            actions={[
-              { href: "/", label: "العودة للرئيسية", icon: "home" },
-              { href: "/charging-calculator", label: "فتح حاسبة الشحن", icon: "back" },
-              { href: "/assistant", label: "اسأل المساعد", icon: "assistant" },
-            ]}
-          />
-
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <div className="mb-10 text-right">
             <h1 className="text-4xl font-black text-[var(--voltjo-black)] sm:text-5xl">
               السيارات المدعومة
@@ -37,26 +30,6 @@ export default async function VehiclesPage() {
                 <p className="mx-auto mt-3 max-w-2xl text-sm font-semibold leading-7 text-[var(--voltjo-muted)]">
                   نعمل على مراجعة بيانات السيارات المدعومة قبل عرضها للعامة. يمكنك العودة قريبًا أو استخدام حاسبة الشحن يدويًا.
                 </p>
-                <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-                  <Link
-                    href="/"
-                    className="inline-flex h-11 items-center rounded-full border border-[var(--voltjo-border)] px-5 text-sm font-black text-[var(--voltjo-black)] transition hover:border-[rgba(255,106,0,0.2)] hover:text-[var(--voltjo-orange)]"
-                  >
-                    العودة للرئيسية
-                  </Link>
-                  <Link
-                    href="/charging-calculator"
-                    className="inline-flex h-11 items-center rounded-full bg-[var(--voltjo-black)] px-5 text-sm font-black text-white transition hover:bg-[#1f1f1f]"
-                  >
-                    فتح حاسبة الشحن
-                  </Link>
-                  <Link
-                    href="/assistant"
-                    className="inline-flex h-11 items-center rounded-full border border-[var(--voltjo-border)] px-5 text-sm font-black text-[var(--voltjo-black)] transition hover:border-[rgba(255,106,0,0.2)] hover:text-[var(--voltjo-orange)]"
-                  >
-                    اسأل المساعد
-                  </Link>
-                </div>
               </div>
 
               <div className="rounded-[24px] border border-[var(--voltjo-border)] bg-white p-6 shadow-[0_18px_50px_rgba(13,13,13,0.05)]">

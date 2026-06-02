@@ -29,6 +29,8 @@
 - user geolocation is browser-only and is not stored in localStorage, Supabase, or the server
 - charging station visibility still depends on verified rows in `charging_locations`
 - public UI must not show developer setup or migration messages
+- the first-visit geolocation prompt is dismissible and remembered without storing coordinates
+- authenticated users can optionally save location only with explicit consent
 
 ## Navigation policy for launch
 

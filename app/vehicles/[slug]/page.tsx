@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { Container } from "@/components/ui/Container";
-import { PageActionRow } from "@/components/vehicles/PageActionRow";
+import { PageReturnBar } from "@/components/ui/PageReturnBar";
 import { getSupportedVehicleBySlug } from "@/lib/vehicles/queries";
 import { confidenceLabels, vehicleTypeLabels } from "@/lib/vehicles/types";
 
@@ -60,17 +61,10 @@ export default async function VehicleDetailPage({
   ].filter((item) => item.value);
 
   return (
-    <section className="px-4 pb-20 pt-16 sm:px-6 lg:px-8" dir="rtl">
+    <section className="pb-20 pt-6" dir="rtl">
+      <PageReturnBar />
       <Container>
-        <div className="mx-auto max-w-5xl">
-          <PageActionRow
-            actions={[
-              { href: "/", label: "العودة للرئيسية", icon: "home" },
-              { href: "/vehicles", label: "العودة للسيارات", icon: "vehicles" },
-              { href: "/assistant", label: "العودة للمساعد", icon: "assistant" },
-            ]}
-          />
-
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
           <div className="rounded-[24px] border border-[var(--voltjo-border)] bg-white p-6 shadow-[0_18px_50px_rgba(13,13,13,0.05)]">
             <div className="flex flex-wrap items-center gap-3">
               <span className="rounded-full border border-[rgba(255,106,0,0.18)] bg-[rgba(255,106,0,0.06)] px-3 py-1 text-xs font-black text-[var(--voltjo-orange)]">
@@ -159,6 +153,26 @@ export default async function VehicleDetailPage({
             <p className="mt-8 text-sm font-semibold leading-7 text-[var(--voltjo-muted)]">
               هذه البيانات قيد المراجعة وقد تختلف حسب النسخة والسوق.
             </p>
+            <div className="mt-6 flex flex-wrap items-center gap-4 text-sm font-bold">
+              <Link
+                href="/vehicles"
+                className="text-[var(--voltjo-black)] transition hover:text-[var(--voltjo-orange)]"
+              >
+                العودة للسيارات
+              </Link>
+              <Link
+                href="/charging-calculator"
+                className="text-[var(--voltjo-black)] transition hover:text-[var(--voltjo-orange)]"
+              >
+                حاسبة الشحن
+              </Link>
+              <Link
+                href="/assistant"
+                className="text-[var(--voltjo-black)] transition hover:text-[var(--voltjo-orange)]"
+              >
+                اسأل المساعد
+              </Link>
+            </div>
           </div>
         </div>
       </Container>

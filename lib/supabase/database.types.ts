@@ -175,6 +175,7 @@ export type Database = {
           main_goal: string | null;
           driving_pattern: string | null;
           home_charging_access: string | null;
+          location_preferences: Json;
           priorities: string[];
           privacy_settings: Json;
           onboarding_completed: boolean;
@@ -196,6 +197,7 @@ export type Database = {
           main_goal?: string | null;
           driving_pattern?: string | null;
           home_charging_access?: string | null;
+          location_preferences?: Json;
           priorities?: string[];
           privacy_settings?: Json;
           onboarding_completed?: boolean;
@@ -217,6 +219,7 @@ export type Database = {
           main_goal?: string | null;
           driving_pattern?: string | null;
           home_charging_access?: string | null;
+          location_preferences?: Json;
           priorities?: string[];
           privacy_settings?: Json;
           onboarding_completed?: boolean;

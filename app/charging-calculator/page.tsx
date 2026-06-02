@@ -1,23 +1,16 @@
 import { Container } from "@/components/ui/Container";
 import { ChargingCalculatorClient } from "@/components/vehicles/ChargingCalculatorClient";
-import { PageActionRow } from "@/components/vehicles/PageActionRow";
+import { PageReturnBar } from "@/components/ui/PageReturnBar";
 import { getChargingCostInputs } from "@/lib/vehicles/queries";
 
 export default async function ChargingCalculatorPage() {
   const inputs = await getChargingCostInputs();
 
   return (
-    <section className="px-4 pb-20 pt-16 sm:px-6 lg:px-8" dir="rtl">
+    <section className="pb-20 pt-6" dir="rtl">
+      <PageReturnBar />
       <Container>
-        <div className="mx-auto max-w-5xl">
-          <PageActionRow
-            actions={[
-              { href: "/", label: "العودة للرئيسية", icon: "home" },
-              { href: "/vehicles", label: "السيارات المدعومة", icon: "vehicles" },
-              { href: "/assistant", label: "العودة للمساعد", icon: "assistant" },
-            ]}
-          />
-
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
           <div className="mb-10 text-right">
             <h1 className="text-4xl font-black text-[var(--voltjo-black)] sm:text-5xl">
               حاسبة الشحن
