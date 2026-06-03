@@ -44,10 +44,29 @@ export async function GET() {
   const { data: profile } = await supabase
     .from("profiles")
     .select(
-      "id,full_name,avatar_path,age_range,country,city,ownership_status,has_driven_ev_or_hybrid,main_goal,driving_pattern,home_charging_access,priorities,privacy_settings,onboarding_completed,onboarding_completed_at,profile_version,created_at,updated_at",
+      "id,full_name,avatar_path,age_range,country,city,ownership_status,has_driven_ev_or_hybrid,main_goal,driving_pattern,home_charging_access,priorities,privacy_settings,location_preferences,onboarding_completed,onboarding_completed_at,profile_version,created_at,updated_at",
     )
     .eq("id", user.id)
     .maybeSingle();
+
+  // Chat history. RLS already scopes these to the current user; the explicit
+  // user_id filter is defense-in-depth. user.id comes from the authenticated
+  // session (supabase.auth.getUser), never from the client request body.
+  const { data: conversations } = await supabase
+    .from("chat_conversations")
+    .select(
+      "id,title,category,model_id,thinking_mode,archived,created_at,updated_at",
+    )
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: true });
+
+  const { data: messages } = await supabase
+    .from("chat_messages")
+    .select(
+      "id,conversation_id,role,content,bullets,metadata,attachment,status,created_at",
+    )
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: true });
 
   const payload = {
     account: {
@@ -57,6 +76,8 @@ export async function GET() {
       email_confirmed_at: user.email_confirmed_at ?? null,
     },
     profile,
+    chat_conversations: conversations ?? [],
+    chat_messages: messages ?? [],
   };
 
   return new NextResponse(JSON.stringify(payload, null, 2), {
