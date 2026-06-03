@@ -21,25 +21,109 @@ Fill:
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
+# Public site origin, no trailing slash (e.g. https://voltjo.com).
+# Local dev: http://localhost:3000. Used for the password-reset redirect.
+NEXT_PUBLIC_SITE_URL=
 ```
 
 Never place a Supabase service role key in client code.
 
+See the [Production Deployment Runbook](#production-deployment-runbook) below for the full, ordered setup (migrations, storage bucket, auth redirects) and the [environment variable reference](#environment-variables).
+
 ## Supabase
 
-Run the initial database schema:
+> For the full, ordered production setup, follow the [Production Deployment Runbook](#production-deployment-runbook).
+> The short version: run `schema.sql`, then every migration `001`–`006` in order, then create the public `avatars` storage bucket and configure Auth redirect URLs.
+
+Run the initial database schema first:
 
 ```txt
 supabase/schema.sql
 ```
 
-This creates the `public.profiles` smart profile table and RLS policies.
+This creates the `public.profiles` smart profile table, its RLS policies, and the
+`set_updated_at()` trigger. Running only `schema.sql` is **not** enough for the app to
+work end to end — the account, avatar, chat, vehicles, and location features each depend
+on a later migration (see the runbook table below). Run all migrations in order.
 
-For launch vehicle data, also run:
+## Production Deployment Runbook
+
+This is the authoritative, ordered setup. Following it produces a fully working backend
+for the current MVP. Skipping a step causes the matching feature to fail at runtime
+(for example, the avatar upload route returns an Arabic "run the database upgrade first"
+message if the avatar migrations or bucket are missing).
+
+### 1. Database migrations — run in this exact order
+
+Run each file once, top to bottom, in the Supabase SQL editor (or your migration tool):
 
 ```txt
+supabase/schema.sql
+supabase/migrations/001_chat_persistence.sql
+supabase/migrations/002_account_settings.sql
+supabase/migrations/003_profile_avatar_path.sql
+supabase/migrations/004_avatar_storage_policies.sql
 supabase/migrations/005_supported_vehicles_mvp.sql
+supabase/migrations/006_user_location_preferences.sql
 ```
+
+All migrations are additive and idempotent (`add column if not exists`, `create ... if not
+exists`, `on conflict do update`), so re-running them is safe.
+
+### Migration → feature reference
+
+| File | Creates / changes | Powers (breaks if missing) |
+| --- | --- | --- |
+| `schema.sql` | `public.profiles` table, RLS, `set_updated_at()` trigger | Auth profile, onboarding (Smart Profile), `/account`, `/dashboard` |
+| `001_chat_persistence.sql` | `chat_conversations`, `chat_messages` tables + RLS | Authenticated chat persistence in `/api/chat`; chat data in account export |
+| `002_account_settings.sql` | `profiles.avatar_config`, `profiles.privacy_settings` (jsonb) | Privacy settings form on `/account` |
+| `003_profile_avatar_path.sql` | `profiles.avatar_path` column | Avatar upload + display (`/api/account/avatar`, navbar, `/assistant`, `/account`) |
+| `004_avatar_storage_policies.sql` | `storage.objects` RLS for the `avatars` bucket | Avatar upload security (per-user folder access) |
+| `005_supported_vehicles_mvp.sql` | `vehicle_brands`, `supported_vehicles`, `vehicle_cost_profiles`, `charging_locations` tables + RLS + sample vehicle seed | `/vehicles`, `/vehicles/[slug]`, `/charging-calculator` options, `/charging-map` station source |
+| `006_user_location_preferences.sql` | `profiles.location_preferences` (jsonb) | Saving map location to a profile (`/api/account/location-preferences`) |
+
+> Note: `005` seeds **sample** vehicle data only (all rows are `data_confidence = 'estimate'`)
+> and seeds **no** charging stations — `charging_locations` is created empty. Verify vehicle
+> data and add verified charging stations before making public claims.
+
+### 2. Storage bucket (manual, Supabase dashboard)
+
+The avatar migrations set RLS policies but do **not** create the bucket. Create it manually:
+
+- Supabase Dashboard → Storage → New bucket
+- Name: `avatars`
+- Visibility: **Public** (the current MVP resolves avatars via public object URLs)
+- The per-user access rules come from `004_avatar_storage_policies.sql`
+  (`(storage.foldername(name))[1] = auth.uid()::text`), so confirm that migration ran.
+
+### 3. Auth configuration (manual, Supabase dashboard)
+
+- Supabase Dashboard → Authentication → URL Configuration
+- **Site URL:** your production origin (e.g. `https://voltjo.com`)
+- **Redirect URLs:** add each of these (and their `http://localhost:3000` equivalents for dev):
+  - `https://<your-domain>/auth/callback` — email and OAuth sign-in
+  - `https://<your-domain>/auth/update-password` — password-reset link target
+- Decide whether email confirmation is enabled (the signup flow supports both modes).
+- Configure a production SMTP provider for auth email; the default Supabase SMTP is
+  rate-limited and not intended for production.
+- Enable Google / GitHub providers only if you actually launch them, using credentials
+  set inside the Supabase Auth dashboard (never in the repo).
+
+### 4. Environment variables
+
+Set these in `.env.local` for development and in your hosting provider for production
+(see [`.env.example`](.env.example)):
+
+| Variable | Required | Notes |
+| --- | --- | --- |
+| `NEXT_PUBLIC_SUPABASE_URL` | Yes | Public Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Public anon key |
+| `NEXT_PUBLIC_SITE_URL` | Yes (prod) | Public origin, no trailing slash. Used by `lib/auth/actions.ts` (`getRequestOrigin`) to build the password-reset redirect. Safe to expose. |
+| `AI_PROVIDER` | Yes | Keep `mock` for launch |
+| `OPENAI_API_KEY` / `GEMINI_API_KEY` / `KIMI_API_KEY` | No | Leave empty for launch (assistant is mock-only). Server-only — never `NEXT_PUBLIC_*` |
+
+Never place a Supabase `service_role` key in client code or any `NEXT_PUBLIC_*` variable;
+it bypasses RLS and must stay server-only.
 
 ## Development
 
@@ -80,9 +164,11 @@ Not implemented yet:
 
 ## Production Security Checklist
 
-- Run `supabase/schema.sql` in Supabase.
-- Run `supabase/migrations/005_supported_vehicles_mvp.sql` for launch vehicle data.
-- Configure Supabase Site URL and Redirect URLs, including `/auth/callback` for email and OAuth.
+- Run `supabase/schema.sql` then migrations `001`–`006` in order (see the [Production Deployment Runbook](#production-deployment-runbook) and migration table).
+- Create the public `avatars` storage bucket and confirm `004_avatar_storage_policies.sql` ran.
+- Verify vehicle data and add verified `charging_locations` rows before public claims (the `005` seed is sample/estimate data only).
+- Configure Supabase Site URL and Redirect URLs, including `/auth/callback` (email and OAuth) and `/auth/update-password` (password reset).
+- Set `NEXT_PUBLIC_SITE_URL` to the production origin so password-reset links resolve correctly.
 - Enable Google and GitHub providers in Supabase Auth dashboard with their respective credentials.
 - Decide whether email confirmation is enabled.
 - Use a production SMTP provider for auth email.
