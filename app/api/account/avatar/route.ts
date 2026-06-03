@@ -9,8 +9,12 @@ import { createClient } from "@/lib/supabase/server";
 const AVATAR_BUCKET = "avatars";
 const MAX_AVATAR_REQUEST_BYTES = MAX_AVATAR_IMAGE_SIZE_BYTES + 256 * 1024;
 
+// The object path keeps the user id as the first folder segment so the storage
+// RLS policy ((storage.foldername(name))[1] = auth.uid()::text) still applies,
+// but uses a random filename so public avatar URLs are not guessable/enumerable.
+// crypto.randomUUID() is a Node global in this (Node runtime) route — no new dependency.
 function getAvatarPath(userId: string) {
-  return `${userId}/avatar.webp`;
+  return `${userId}/${crypto.randomUUID()}.webp`;
 }
 
 function getIpFromRequest(request: Request) {
