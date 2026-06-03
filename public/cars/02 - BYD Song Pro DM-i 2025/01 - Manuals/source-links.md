@@ -2,10 +2,19 @@
 
 Research pass 1. Access date: 2026-06-04.
 
-> **No exact BYD Song Pro DM-i 2025 owner's manual was obtained.** Important: the BYD **Song Pro**
-> is a *different, smaller* vehicle than the **Song Plus** — do not substitute a Song Plus / Seal U
-> manual as if it were the Song Pro manual. No PDF was downloaded into this folder (no correct-model
-> official manual located; avoids a mislabeled/wrong-model file and repo bloat). Links recorded below.
+> **No exact BYD Song Pro DM-i 2025 owner's manual was obtained.** An official **Song Pro EV**
+> (pure-electric) owner's manual WAS found (P9 below) and is useful as an *older EV-sibling* reference
+> for powertrain-agnostic chapters — but it is **not** a DM-i manual. Do not copy its EV/NMC/EV-spec
+> data into the DM-i record. Also: the Song Pro is a different vehicle than the Song **Plus** — never
+> substitute a Song Plus / Seal U manual either.
+
+## Found: BYD Song Pro EV Owner's Manual (older EV sibling — ALIAS) — P9
+- **URL:** https://www.byd.com/content/dam/byd-site/bs/support/SONG%20Pro%20EV%20Owner%27s%20manual.PDF
+- **Suggested local name (if downloaded):** `SONG-Pro-EV-Owner-Manual-source-alias.pdf` (not downloaded in this patch — link-only)
+- **Model in source:** SONG Pro **EV** (pure electric) · **Version:** 201902 · **Region:** export (BYD official)
+- **Confidence:** official (for Song Pro **EV**) → **needs_review** (for Song Pro **DM-i 2025**)
+- **Useful for (powertrain-agnostic):** general BYD/Song Pro safety, warning lights, charging workflow/etiquette, emergency handling, towing, HV precautions.
+- **NOT usable for DM-i:** engine/fuel/hybrid system, DM-i 2025 trims, DM-i maintenance intervals, **battery chemistry (EV = NMC; DM-i = LFP)**, EV dimensions (4560×1860×1700 — note the DM-i is 4735 mm), **EV tire pressure 230 kPa**, or any Jordan-specific fact.
 
 ## Official manual portals (no confirmed Song Pro DM-i English manual)
 - **BYD Middle East & Africa — Owner's Manual portal** (official)

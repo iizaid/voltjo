@@ -55,6 +55,17 @@ Confidence labels: official / dealer / database / owner_reported / forum / unkno
 - **Source type:** official · **Confidence:** official (portal)
 - **Notes:** No exact Song Pro DM-i manual retrieved; China portal is the likely host (Chinese).
 
+## P9 — BYD "Song Pro EV" Owner's Manual (official PDF) — OLDER EV SIBLING / ALIAS
+- **URL:** https://www.byd.com/content/dam/byd-site/bs/support/SONG%20Pro%20EV%20Owner%27s%20manual.PDF
+- **Source type:** official owner's manual PDF · **Region:** export (BYD official) · **Version:** 201902
+- **Model in source:** SONG Pro **EV** (pure-electric passenger car) — **NOT DM-i**
+- **Downloaded:** none (link-only this patch) · suggested name `SONG-Pro-EV-Owner-Manual-source-alias.pdf`
+- **Confidence:** official (Song Pro **EV**) → **needs_review** (Song Pro **DM-i 2025**)
+- **Notes:** Contains charging/discharging, battery, service & maintenance, emergency procedures, and EV
+  vehicle specs (BYD6461SBEV/SBEV1, 4560×1860×1700, WB 2712, tires 225/60 R18 & 235/50 R19, **tire pressure
+  230 kPa**, **NMC/ternary battery**). **These EV specs must NOT be copied as Song Pro DM-i 2025 facts**
+  (DM-i is PHEV/LFP, different dimensions 4735 mm). Useful only for powertrain-agnostic safety/charging/emergency workflow.
+
 ---
 
 ## Rejected / down-weighted sources

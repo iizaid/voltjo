@@ -18,6 +18,8 @@ Compact, labeled context for VoltJo AI. Source IDs → `03 - Jordan Market/sourc
 ## Market-specific facts
 - China: GB/T, CLTC, trims 75KM/115KM (领先/超越/卓越). Brazil: "Song Pro" GL/GS. No confirmed GCC official Song Pro; no Seal-style alias.
 - **2026 Song Pro** is a different redesigned car (133 km) — not this record.
+- A **Song Pro EV** (pure-electric) sibling exists with an official manual (P9). It is **NMC battery**,
+  different car — only its powertrain-agnostic safety/charging/emergency guidance transfers (needs_review).
 
 ## Unknowns
 - Jordan: official-new availability, imported trim(s), connector per unit, warranty, service intervals.
@@ -29,6 +31,7 @@ Compact, labeled context for VoltJo AI. Source IDs → `03 - Jordan Market/sourc
 - Do NOT present CLTC range as real-world.
 - Do NOT quote maintenance intervals, tire pressure, or safety instructions (none sourced for Song Pro).
 - Do NOT confuse the 2025 car with the 2026 redesign.
+- Do NOT use **Song Pro EV** manual specs (NMC battery, 230 kPa tire pressure, 4560 mm EV dimensions, EV maintenance intervals) as DM-i facts — EV is a different powertrain.
 
 ## Suggested assistant behaviour
 - **Charging port:** "Jordan Song Pro units are likely China-spec GB/T (often parallel imports). Is your car from the official dealer or an importer, and is it a 75KM or 115KM trim?" — don't state as final.

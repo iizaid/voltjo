@@ -43,5 +43,10 @@ Access date: 2026-06-04.
   4) official Jordan/GCC Song Pro spec/manual; 5) physical inspection. (See `03 - Jordan Market/jordan-verification-needed.md`.)
 
 ## Battery/charging safety
-- value: unknown for Song Pro specifically — no Song Pro manual obtained · source: pending · confidence: unknown
-- notes: Do NOT import the Song Plus manual's charging-safety text as Song Pro fact; see `safety-and-warnings.md`.
+- value: General charging workflow/etiquette and HV precautions available from the **Song Pro EV** manual (P9, v201902) — EV-sibling guidance only.
+- source: P9 · ref: SONG Pro EV Owner's manual (link in `01 - Manuals/source-links.md`) · page: unknown · market: export EV · confidence: official (EV) → needs_review (DM-i)
+- notes: Use only powertrain-agnostic charging *behaviour* (see `safety-and-warnings.md`). Do NOT import the EV manual's **battery chemistry (NMC)** or EV charging-hardware specifics — the DM-i uses **LFP** with the trim-gated charging below. Do NOT use the Song Plus manual either.
+
+## DM-i 2025 battery facts (keep — from spec sources, not the EV manual)
+- value: 12.9 kWh (75KM) / 18.3 kWh (115KM), **LFP** Blade; EV range 75 / 115 km **CLTC** · source: P2/P3 · market: China · confidence: database
+- notes: These remain the DM-i battery/range facts. The EV manual (P9) does NOT change them (EV = NMC, different car).

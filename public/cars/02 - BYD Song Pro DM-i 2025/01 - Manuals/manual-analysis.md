@@ -3,15 +3,22 @@
 Research pass 1. Access date: 2026-06-04.
 
 ## Was an exact Song Pro DM-i manual found?
-- **No.** No exact BYD Song Pro DM-i 2025 owner's manual (any market, EN or AR) was located or downloaded.
-- An exact China manual (宋Pro DM-i) very likely exists on BYD's China portal (P8/cn), but it is
-  Chinese-language and portal-gated; not retrieved this pass.
+- **No — the exact Song Pro DM-i 2025 owner's manual is still not found.** An exact China manual
+  (宋Pro DM-i) very likely exists on BYD's China portal (P8/cn), Chinese-language and portal-gated; not retrieved.
+- **However, an official BYD "Song Pro EV" owner's manual WAS found (P9, version 201902).** It is a
+  *pure-electric* sibling — useful as an **older EV-sibling / Song Pro family reference**, NOT a DM-i manual.
 
 ## Which manuals were used / downloaded?
-- **None downloaded.** Unlike vehicle 01 (Song Plus = Seal U, where the Seal U EU manual is the
-  *same vehicle* under an export name), the Song Pro has **no same-vehicle export manual**. The only
-  BYD manuals readily available in English are for the **Song Plus** (a different, larger model) and
-  for older years — using them as Song Pro facts would be incorrect.
+- **Song Pro EV manual (P9)** — official BYD, link recorded (not downloaded in this patch). Useful as
+  an EV-sibling reference for powertrain-agnostic content.
+- **No DM-i manual** and **no Song Plus manual** used as Song Pro DM-i facts (Plus is a different, larger model).
+
+## Song Pro EV manual (P9) — what it is useful for vs not
+- **Useful (powertrain-agnostic, label official EV → needs_review DM-i):** broad BYD/Song Pro safety,
+  warning lights, charging workflow/etiquette, emergency handling, towing, HV precautions, general layout.
+- **NOT usable for DM-i:** engine/fuel/hybrid system, DM-i 2025 trims, DM-i maintenance intervals,
+  **battery chemistry (EV = NMC/ternary vs DM-i = LFP)**, EV vehicle specs (BYD6461SBEV, 4560×1860×1700,
+  **tire pressure 230 kPa**), or any Jordan-specific fact. Note the EV body (4560 mm) is shorter than the DM-i (4735 mm).
 
 ## Source market / model name in each candidate
 - BYD ME&A / EU / China manual portals — official, but no confirmed Song Pro DM-i entry retrieved.

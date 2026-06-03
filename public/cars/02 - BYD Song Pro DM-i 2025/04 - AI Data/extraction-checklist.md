@@ -2,8 +2,8 @@
 
 Status as of 2026-06-04. [x] = done · [~] = partial/needs_review · [ ] = not done.
 
-- [ ] Exact manual found — no Song Pro DM-i owner's manual obtained (China portal P8 likely host, not retrieved).
-- [ ] Alias manual found/downloaded — none appropriate (Song Plus manual is a DIFFERENT model; deliberately not used/downloaded).
+- [ ] Exact manual found — Song Pro **DM-i** owner's manual still not found (China portal P8 likely host, not retrieved).
+- [~] Alias manual found/downloaded — official **Song Pro EV** manual (P9, v201902) found = useful EV-sibling alias, **needs_review for DM-i**; link recorded, not downloaded. (Song Plus manual still excluded — different model.)
 - [ ] Exact spec sheet found — no official BYD Song Pro spec PDF; data from web databases (P2/P3/P5).
 - [ ] Alias spec sheet downloaded — none (no PDF downloaded for this vehicle).
 - [x] Manual analysis completed — `01 - Manuals/manual-analysis.md`.

@@ -30,8 +30,18 @@ Access date: 2026-06-04.
 - notes: Not sourced. Do not infer specifics from the Song Plus manual.
 
 ## Dashboard warning lights
-- value: unknown · source: pending Song Pro manual · confidence: unknown
+- value: Meanings documented in the Song Pro **EV** manual (P9) indicator chapter — powertrain-agnostic lights largely transfer; engine/hybrid-specific lights do not exist on the EV.
+- source: P9 · page: unknown · market: export EV · confidence: official (EV) → needs_review (DM-i)
+
+## EV-sibling references (Song Pro EV manual, P9 — official EV → needs_review DM-i)
+> Source file/link: `01 - Manuals/source-links.md` (P9, v201902). Page numbers unknown (PDF not downloaded
+> in this patch). All items are **powertrain-agnostic** topics that likely transfer to the DM-i but must be
+> confirmed against a DM-i manual. Do NOT use any EV-specific spec (NMC battery, 230 kPa, EV dimensions).
+- value: HV safety, charging/discharging safety workflow, battery-section precautions, emergency procedures, and towing guidance are present in the EV manual chapters.
+- source: P9 · chapters: Charging/Discharging, Battery, Service & Maintenance, Emergency · page: unknown · market: export EV · confidence: official (EV) → needs_review (DM-i)
+- notes: Use as general behaviour guidance only; the DM-i adds engine/fuel-related safety the EV manual cannot cover.
 
 ## Status
-All safety content here is **needs_review/unknown**. To make this VoltJo-ready, obtain the China
-Song Pro DM-i owner's manual (P8/cn) and extract page-cited content, as was done for vehicle 01.
+DM-i-specific safety remains **needs_review/unknown**. The Song Pro **EV** manual (P9) now provides
+useful *powertrain-agnostic* guidance, but page-cited DM-i facts still require the China **DM-i** owner's
+manual (P8/cn), as was done for vehicle 01.

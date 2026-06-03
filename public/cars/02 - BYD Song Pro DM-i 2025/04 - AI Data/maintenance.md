@@ -3,9 +3,11 @@
 Format: value / source / ref / page / market / confidence / notes. Source IDs → `03 - Jordan Market/sources.md`.
 Access date: 2026-06-04.
 
-> **No Song Pro DM-i owner's manual was obtained**, so no maintenance schedule is extracted. **No
-> intervals are invented, and the Song Plus / Seal U manual's intervals are NOT copied here** (different
-> model). Items below stay `unknown`/`needs_review` until a correct-model manual or dealer schedule is found.
+> **No Song Pro DM-i owner's manual was obtained**, so no DM-i maintenance schedule is extracted. The
+> official **Song Pro EV** manual (P9, v201902) DOES contain a service & maintenance chapter, but its
+> intervals/specs are for the **pure-electric** sibling and are **NOT** DM-i 2025 final facts (a PHEV has
+> engine oil, fuel filter, spark plugs, etc. that a BEV does not). **No intervals are invented; the EV
+> manual's and the Song Plus manual's numbers are NOT copied here.** Items stay `unknown`/`needs_review`.
 
 ## Service intervals
 - value: unknown · source: pending (BYD China manual P8 / Jordan dealer P7) · page: unknown · market: — · confidence: unknown
@@ -32,8 +34,8 @@ Access date: 2026-06-04.
 - notes: One genuinely sourced maintenance-relevant fact. Jordan unit's fitment should still be confirmed.
 
 ## Tire pressure
-- value: unknown · source: pending (door-jamb placard of a Jordan unit / Song Pro manual) · confidence: unknown
-- notes: Do NOT reuse the Song Plus manual's 250 kPa value — different model/tires.
+- value: unknown for DM-i · source: pending (door-jamb placard of a Jordan unit / Song Pro **DM-i** manual) · confidence: unknown
+- notes: The Song Pro **EV** manual states **230 kPa** (P9) — **do NOT adopt this as the DM-i value** (different model/weight; DM-i curb ~1635 kg differs from the EV). Tire *sizes* (225/60 R18; 235/50 R19) happen to match, but pressure must be confirmed on the DM-i. Do NOT reuse the Song Plus manual's 250 kPa either.
 
 ## Warranty / service notes
 - value: unknown (Jordan) · source: pending P7 · confidence: unknown

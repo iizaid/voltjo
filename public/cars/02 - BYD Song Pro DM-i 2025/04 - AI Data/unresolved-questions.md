@@ -2,9 +2,13 @@
 
 Access date: 2026-06-04. Source IDs → `03 - Jordan Market/sources.md`.
 
+## Partially addressed this patch
+- An official **Song Pro EV** manual (P9, v201902) was found → provides powertrain-agnostic safety/charging/emergency guidance. It does **not** close the DM-i gaps below (EV ≠ DM-i: NMC vs LFP, no engine/fuel, EV tire pressure 230 kPa not for DM-i).
+
 ## Missing information
-- Exact **owner's manual** (China 宋Pro DM-i via P8/cn) → blocks all safety + maintenance + tire-pressure extraction.
-- Official BYD **spec sheet/brochure** PDF.
+- Exact **Song Pro DM-i** owner's manual (China 宋Pro DM-i via P8/cn) → still blocks DM-i safety + maintenance + tire-pressure final facts.
+- **DM-i service schedule** (engine oil, fuel filter, spark plugs, intervals) — still missing (EV manual's schedule is not DM-i).
+- Official BYD **DM-i spec sheet/brochure** PDF.
 - **Combined system power** (kW/hp) — engine-only (101 hp) and motor (120 kW) known; combined not published.
 - **Combined range** (tank + charge) for the 2025 Song Pro.
 - **Maintenance schedule**, fluids, **tire pressure** values, warranty.
