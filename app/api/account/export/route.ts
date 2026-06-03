@@ -41,7 +41,24 @@ export async function GET() {
     );
   }
 
-  const { data: profile } = await supabase
+  // Safe server-side logging for optional export queries. We never expose raw
+  // Supabase errors to the user, but a silent failure hides export problems in
+  // production. Logs include only the query name, the authenticated user id, and
+  // the error code/message — never message content, email, or the export payload.
+  function logExportQueryWarning(
+    query: string,
+    userId: string,
+    error: { code?: string | null; message?: string | null },
+  ) {
+    console.warn("account-export: optional query failed", {
+      query,
+      userId,
+      code: error.code ?? null,
+      message: error.message ?? null,
+    });
+  }
+
+  const { data: profile, error: profileError } = await supabase
     .from("profiles")
     .select(
       "id,full_name,avatar_path,age_range,country,city,ownership_status,has_driven_ev_or_hybrid,main_goal,driving_pattern,home_charging_access,priorities,privacy_settings,location_preferences,onboarding_completed,onboarding_completed_at,profile_version,created_at,updated_at",
@@ -49,10 +66,14 @@ export async function GET() {
     .eq("id", user.id)
     .maybeSingle();
 
+  if (profileError) {
+    logExportQueryWarning("profiles", user.id, profileError);
+  }
+
   // Chat history. RLS already scopes these to the current user; the explicit
   // user_id filter is defense-in-depth. user.id comes from the authenticated
   // session (supabase.auth.getUser), never from the client request body.
-  const { data: conversations } = await supabase
+  const { data: conversations, error: conversationsError } = await supabase
     .from("chat_conversations")
     .select(
       "id,title,category,model_id,thinking_mode,archived,created_at,updated_at",
@@ -60,13 +81,21 @@ export async function GET() {
     .eq("user_id", user.id)
     .order("created_at", { ascending: true });
 
-  const { data: messages } = await supabase
+  if (conversationsError) {
+    logExportQueryWarning("chat_conversations", user.id, conversationsError);
+  }
+
+  const { data: messages, error: messagesError } = await supabase
     .from("chat_messages")
     .select(
       "id,conversation_id,role,content,bullets,metadata,attachment,status,created_at",
     )
     .eq("user_id", user.id)
     .order("created_at", { ascending: true });
+
+  if (messagesError) {
+    logExportQueryWarning("chat_messages", user.id, messagesError);
+  }
 
   const payload = {
     account: {
