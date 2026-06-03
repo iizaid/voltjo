@@ -21,7 +21,7 @@ export async function GET() {
     return NextResponse.json({ error: "غير مصرح." }, { status: 401 });
   }
 
-  const rateLimit = checkRateLimit({
+  const rateLimit = await checkRateLimit({
     key: user.id,
     action: "account-export",
     limit: 5,

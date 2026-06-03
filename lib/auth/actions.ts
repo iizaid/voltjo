@@ -193,7 +193,7 @@ export async function signUpAction(formData: FormData): Promise<AuthActionState>
     return { ok: false, message: "أكمل أسئلة الملف الذكي قبل المتابعة." };
   }
 
-  const rateLimit = checkAuthRateLimit("signup", emailResult.email);
+  const rateLimit = await checkAuthRateLimit("signup", emailResult.email);
   if (!rateLimit.ok) {
     return { ok: false, message: rateLimit.message };
   }
@@ -247,7 +247,7 @@ export async function signInAction(formData: FormData): Promise<AuthActionState>
   if (!passwordResult.ok) return passwordResult;
   if (!draftResult.ok) return draftResult;
 
-  const rateLimit = checkAuthRateLimit("login", emailResult.email);
+  const rateLimit = await checkAuthRateLimit("login", emailResult.email);
   if (!rateLimit.ok) {
     return { ok: false, message: rateLimit.message };
   }
@@ -266,7 +266,7 @@ export async function signInAction(formData: FormData): Promise<AuthActionState>
     return { ok: false, message: "بيانات الدخول غير صحيحة أو الحساب غير مؤكد." };
   }
 
-  clearAuthRateLimit("login", emailResult.email);
+  await clearAuthRateLimit("login", emailResult.email);
 
   if (draftResult.hasDraft) {
     const profileResult = await upsertCurrentUserProfile({
@@ -394,7 +394,7 @@ export async function sendPasswordResetLinkAction(
     return { ok: false, message: "يجب تسجيل الدخول قبل إرسال رابط التغيير." };
   }
 
-  const rateLimit = checkRateLimit({
+  const rateLimit = await checkRateLimit({
     key: user.id,
     action: "password-reset",
     limit: 3,

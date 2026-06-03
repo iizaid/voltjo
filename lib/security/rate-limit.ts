@@ -1,13 +1,16 @@
+import "server-only";
+
+import { getRedisClient } from "@/lib/server/redis";
+
+// Durable auth rate limiter backed by Upstash Redis so login/signup limits hold
+// across serverless instances and restarts. Atomic INCR + PEXPIRE fixed window.
+// Fail-closed: if the store is unconfigured or unreachable, deny the attempt
+// rather than allow unlimited auth attempts. Raw Redis errors are never exposed.
 type RateLimitAction = "login" | "signup";
 
 type RateLimitConfig = {
   maxAttempts: number;
   windowMs: number;
-};
-
-type RateLimitEntry = {
-  count: number;
-  resetAt: number;
 };
 
 const LIMITS: Record<RateLimitAction, RateLimitConfig> = {
@@ -21,45 +24,86 @@ const LIMITS: Record<RateLimitAction, RateLimitConfig> = {
   },
 };
 
-const buckets = new Map<string, RateLimitEntry>();
-
 export const RATE_LIMIT_MESSAGE = "محاولات كثيرة. حاول مرة أخرى بعد قليل.";
 
 function getRateLimitKey(action: RateLimitAction, email: string) {
-  return `${action}:${email.toLowerCase()}`;
+  return `authratelimit:${action}:${email.toLowerCase()}`;
 }
 
-export function checkAuthRateLimit(action: RateLimitAction, email: string) {
-  const now = Date.now();
+export async function checkAuthRateLimit(
+  action: RateLimitAction,
+  email: string,
+) {
   const config = LIMITS[action];
-  const key = getRateLimitKey(action, email);
-  const current = buckets.get(key);
+  const redis = getRedisClient();
+  const currentTime = Date.now();
 
-  if (!current || current.resetAt <= now) {
-    buckets.set(key, {
-      count: 1,
-      resetAt: now + config.windowMs,
+  if (!redis) {
+    // Fail closed: deny auth attempts when no shared store is configured.
+    console.warn("auth-rate-limit: store unavailable", {
+      action,
+      reason: "missing-config",
     });
-    return { ok: true as const };
-  }
-
-  if (current.count >= config.maxAttempts) {
     return {
       ok: false as const,
       message: RATE_LIMIT_MESSAGE,
-      resetAt: current.resetAt,
+      resetAt: currentTime + config.windowMs,
     };
   }
 
-  current.count += 1;
-  buckets.set(key, current);
-  return { ok: true as const };
+  const key = getRateLimitKey(action, email);
+
+  try {
+    const count = await redis.incr(key);
+
+    let pttl: number;
+    if (count === 1) {
+      await redis.pexpire(key, config.windowMs);
+      pttl = config.windowMs;
+    } else {
+      pttl = await redis.pttl(key);
+      if (pttl < 0) {
+        await redis.pexpire(key, config.windowMs);
+        pttl = config.windowMs;
+      }
+    }
+
+    if (count > config.maxAttempts) {
+      return {
+        ok: false as const,
+        message: RATE_LIMIT_MESSAGE,
+        resetAt: currentTime + pttl,
+      };
+    }
+
+    return { ok: true as const };
+  } catch (error) {
+    console.warn("auth-rate-limit: store error", {
+      action,
+      error: error instanceof Error ? error.name : "unknown",
+    });
+    return {
+      ok: false as const,
+      message: RATE_LIMIT_MESSAGE,
+      resetAt: currentTime + config.windowMs,
+    };
+  }
 }
 
-export function clearAuthRateLimit(action: RateLimitAction, email: string) {
-  buckets.delete(getRateLimitKey(action, email));
-}
+export async function clearAuthRateLimit(
+  action: RateLimitAction,
+  email: string,
+) {
+  const redis = getRedisClient();
+  if (!redis) return;
 
-// This is intentionally in-memory for Phase 1 hardening only. Multi-instance
-// production deployments must replace it with Redis/Upstash, Supabase Edge
-// rate limiting, or platform/WAF-level protection.
+  try {
+    await redis.del(getRateLimitKey(action, email));
+  } catch (error) {
+    // Best effort: failing to clear leaves the bucket to expire naturally.
+    console.warn("auth-rate-limit: clear failed", {
+      action,
+      error: error instanceof Error ? error.name : "unknown",
+    });
+  }
+}

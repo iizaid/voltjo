@@ -109,7 +109,7 @@ export async function POST(request: Request) {
   const ip = getIpFromRequest(request);
   const rateKey = user ? `user:${user.id}` : `ip:${ip}`;
 
-  const rateLimit = checkRateLimit({
+  const rateLimit = await checkRateLimit({
     key: rateKey,
     action: "chat",
     limit: user ? 30 : 10,

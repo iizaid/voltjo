@@ -122,7 +122,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const rateLimit = checkRateLimit({
+  const rateLimit = await checkRateLimit({
     key: user?.id || getIpFromRequest(request),
     action: "avatar-upload",
     limit: 5,
