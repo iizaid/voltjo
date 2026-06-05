@@ -1,33 +1,58 @@
 # Maintenance — BYD Sealion 05 DM-i 2025
 
 Format: value / source / ref / page / market / confidence / notes. Source IDs → `03 - Jordan Market/sources.md`.
-Access date: 2026-06-04.
+Corrected access date: **2026-06-05**.
 
-> **No owner's manual exists for this model yet**, so no maintenance schedule is extracted. **No intervals are
-> invented, and NO other BYD model's manual (Sealion 6 / Seal U / Song Plus / Song Pro) is copied here.** All
-> items stay `unknown`/`needs_review` until a correct-model manual or Jordan dealer schedule is obtained.
+> No model-specific owner manual or maintenance schedule was found for **Sealion 05 DM-i / 海狮05 DM-i**. Do not copy service intervals, oil grades, fluids, tire pressures, or warnings from Seal 05 sedan, Sealion 6, Song Plus, or Song Pro.
 
 ## Service intervals
-- value: unknown · source: pending (BYD China manual / Jordan dealer) · page: unknown · market: — · confidence: unknown
+- value: unknown
+- source: pending exact Sealion 05 manual / dealer maintenance sheet
+- page: unknown
+- market: unknown
+- confidence: unknown
 
-## Engine oil & filter / air filter / cabin filter / fuel filter / spark plugs
-- value: unknown · source: pending · confidence: unknown
+## Engine oil & filter
+- value: unknown
+- source: pending exact manual/dealer sheet
+- confidence: unknown
+- notes: 1.5L BYD472QC engine family identified, but oil grade/capacity must come from exact manual or dealer.
 
-## Brake fluid / coolant / gear oil (EHS) / transmission fluid
-- value: unknown · source: pending · confidence: unknown
+## Air filter / cabin filter / fuel filter / spark plugs
+- value: unknown
+- source: pending
+- confidence: unknown
 
-## Hybrid system / HV battery tray checks
-- value: unknown · source: pending · confidence: unknown
-- notes: LFP Blade platform; specifics not sourced.
+## Brake fluid / coolant / EHS fluid / transmission fluid
+- value: unknown
+- source: pending
+- confidence: unknown
+
+## Hybrid system / HV battery checks
+- value: unknown
+- source: pending exact manual/dealer maintenance plan
+- confidence: unknown
+- notes: LFP Blade / DM-i architecture identified, but inspection intervals are not sourced.
 
 ## Tire sizes
-- value: unknown (not captured for Jordan/2025款) · source: pending · confidence: unknown
-- notes: Do NOT borrow tire sizes from other BYD models. Confirm from the Jordan unit.
+- value: needs_review
+- source: pending clean China config table or vehicle placard
+- confidence: needs_review
+- notes: Do not borrow tire sizes from Seal 05 sedan, Song Pro, or other BYD models.
 
 ## Tire pressure
-- value: unknown · source: pending (door-jamb placard of a Jordan unit / Sealion 05 manual) · confidence: unknown
-- notes: Do NOT reuse any other model's tire-pressure value.
+- value: unknown
+- source: pending door-jamb placard / exact manual
+- confidence: unknown
 
-## Warranty / service notes (Jordan)
-- value: unknown · source: pending (MEE Auto / Bustami & Saheb) · market: Jordan · confidence: unknown
-- notes: Confirm whether dealer-official (warranty) or parallel import.
+## Warranty / service support in Jordan
+- value: unknown
+- source: pending selling dealer/importer confirmation
+- market: Jordan
+- confidence: unknown
+
+## Evidence needed to close maintenance
+- exact owner manual for 海狮05 DM-i / Sealion 05 DM-i
+- dealer service sheet for the actual import-market vehicle
+- photos of oil/fluid/tire placards
+- VIN/build sheet identifying source market
