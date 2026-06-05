@@ -1,35 +1,50 @@
 # Unresolved Questions — BYD Sealion 05 DM-i 2025
 
-Access date: 2026-06-04. Source IDs → `03 - Jordan Market/sources.md`.
+Corrected access date: **2026-06-05**. Source IDs → `03 - Jordan Market/sources.md`.
 
 ## Biggest open question
-- **Which generation/trim is sold in Jordan?** China 2025款 (75/115KM, CLTC) vs new-gen (55/220/305 km,
-  7.68/26.6/34.3 kWh, 65 L, 4780 mm). MEE Auto's "55 KM" matches the **new-gen** → confirm with a build sheet.
+- Is there a clean, public Jordan source for the **BYD Sealion 05 DM-i SUV / 海狮05 DM-i** specifically?
+- User reports that the SUV exists locally, but this pack still needs a clean listing, dealer page, VIN/build sheet, or photos to attach source-market specs safely.
+
+## Identity questions
+- Does a local listing say **Sealion 05 DM-i** or only **Seal 05 DM-i**?
+- Does the body shown match the SUV or the sedan?
+- Does a build sheet/window sticker show **海狮05 DM-i**?
 
 ## Missing information
-- Exact **owner's manual** (China 海狮05 DM-i / EU Sealion 5 DM-i) → blocks safety + maintenance + tire pressure.
-- Official BYD **spec sheet/brochure** PDF.
-- **Exact battery (kWh)** per Jordan trim; **fuel tank** for the 2025款; **combined system power**.
-- **Charging connector** for Jordan units; **AC/DC speeds**.
-- **Warranty / service** terms; **official importer** (MEE Auto vs Bustami & Saheb).
+- Exact owner manual for Sealion 05 / 海狮05 DM-i.
+- Official spec PDF or brochure.
+- Exact local import origin: China / GCC / Europe / other.
+- Exact Jordan trim: 75KM / 115KM / smart-driving version / export trim.
+- Exact battery kWh by local trim.
+- Charging connector and AC/DC charging speeds.
+- Fuel tank and combined range by exact trim.
+- Warranty/service terms in Jordan.
+- Tire pressure and tire size by exact trim.
 
-## Conflicting / standard-dependent
-- **Battery:** 7.68 / ~12.9 / ~18.3 / 15.87 / 26.628 / 34.275 kWh across gen+trim+market.
-- **EV range:** 55 / 75 / 115 / 220 / 305 km CLTC vs 95 km WLTP vs 81 km WLTC.
-- **Motor power:** 120 kW (L1/L4) vs 145 kW (one snippet, R3).
-- **Power type:** engine-only ~74 kW/99 hp vs motor 120 kW/163 hp vs (unpublished) combined system power.
-- **Name:** Sealion 05 / Seal 05 / Sealion 5.
-- **Generation:** 2025款 vs new-gen (~Apr 2026).
+## Conflicting / standard-dependent areas
+- China-market 75KM / 115KM CLTC trim family versus possible export-market Sealion 5 naming.
+- 2025 first-generation data versus 2026/newer long-range data.
+- China GB/T charging versus export Type 2/CCS2.
 
 ## Contamination risks to keep blocking
-- Sealion 6 (=Song Plus), Sealion 07, Seal U, Seal 06 / Seal 6 Touring, Song Plus, Song Pro — different vehicles; never merge.
+- **Seal 05 DM-i / 海豹05 DM-i** — sedan; separate future folder.
+- **Sealion 6 / Seal U / Song Plus** — larger SUV family.
+- **Sealion 07** — larger EV SUV.
+- **Seal 06 / Seal 6 Touring** — sedan/estate family.
+- **Song Pro DM-i** — sister/counterpart, not exact.
 
-## Evidence needed to close the Jordan charging-port gap
-1. Charging-port photo on a Jordan unit. 2. Dealer confirmation (MEE Auto / BSG). 3. VIN/build sheet.
-4. Official Jordan/GCC spec or manual. 5. Physical inspection.
+## Evidence needed to close Jordan data
+1. Clean Jordan Sealion 05 SUV dealer/listing page.
+2. Charging-port photo.
+3. VIN/build sheet.
+4. Window sticker showing trim/range/battery.
+5. Dealer confirmation of source market and warranty.
+6. Official China/EU/GCC manual/spec sheet.
 
-## Questions to ask owners / dealer
-- "Is your Seal 05 DM-i the 75/115KM (older 2025款) or the new 55/220/305 km generation?"
-- "Which charging connector — GB/T or Type 2/CCS2? Does it support DC fast charging?"
-- "Bought from MEE Auto, Bustami & Saheb, or a parallel importer? Warranty terms?"
-- "Exact battery kWh and EV range on the window sticker/build sheet?"
+## Questions to ask owners / dealers
+- Is the car **Sealion 05 SUV** or **Seal 05 sedan**?
+- What import market is it from?
+- What range badge is shown: 75KM / 115KM / other?
+- What charging connector does it have?
+- What warranty/service support comes with this specific unit?
