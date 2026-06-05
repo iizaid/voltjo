@@ -1,32 +1,34 @@
 # Jordan Verification Needed — BYD Sealion 05 DM-i 2025
 
-Access date: 2026-06-04. Items a human must confirm before any Jordan fact is treated as final.
+Corrected access date: **2026-06-05**. Items a human/source must confirm before any Jordan fact is treated as final.
 
-## Highest priority — generation/identity
-1. **Which generation is sold in Jordan?** China 2025款 (75KM/115KM, CLTC) vs new-generation (55/220/305 km,
-   7.68/26.6/34.3 kWh, 65 L, 4780 mm). MEE Auto's "55 KM" spec points to the **new-gen** — confirm.
-   Evidence: VIN/build sheet, dealer spec sheet, EV-range badge, dimensions on a Jordan unit.
-2. **Exact battery + EV range + standard** for the Jordan trim(s). Evidence: dealer spec sheet / build sheet.
+## Highest priority — identity and import origin
+1. Confirm the local car is **BYD Sealion 05 DM-i / 海狮05 DM-i SUV**, not **BYD Seal 05 DM-i / 海豹05 sedan**.
+2. Confirm source market/import origin: China-direct, GCC/export, Europe, or other.
+3. Confirm exact trim: 75KM / 115KM / smart-driving version / other export trim.
 
 ## High priority
-3. **Charging connector** (GB/T vs Type 2 + CCS2). Evidence: charging-port photo on a Jordan unit / build sheet.
-4. **Official importer/dealer** — MEE Auto vs Bustami & Saheb (BSG). Evidence: dealer confirmation.
-5. **Trim lineup + price by trim** currently offered in Jordan.
+4. **Charging connector**: GB/T vs Type 2 + CCS2. Evidence: charging-port photo, VIN/build sheet, or dealer confirmation.
+5. **Battery and EV range standard**: kWh, CLTC/WLTP/NEDC/other.
+6. **Fuel tank and combined range** for the exact trim.
+7. **Price and warranty** from the actual selling dealer/importer.
 
 ## Medium priority
-6. **Warranty** terms (vehicle + HV battery); whether dealer-official or parallel import.
-7. **Service intervals / authorized service** in Jordan.
-8. **Combined system power** (kW/hp) and **fuel tank** for the exact Jordan trim.
+8. Owner manual or official spec PDF for exact source-market vehicle.
+9. Maintenance schedule and service support in Jordan.
+10. Tire sizes and tire pressures from a placard/manual.
 
-## Evidence that would close gaps
-- Charging-port photo on a Jordan unit.
-- Dealer (MEE Auto / BSG) written spec confirmation.
-- VIN / build sheet.
-- Official Jordan/GCC Seal 05 DM-i spec sheet or owner's manual.
-- Physical inspection.
+## Evidence that would close the gaps
+- Clear listing page showing **Sealion 05 DM-i** SUV.
+- Photo of the vehicle and charging port.
+- VIN/build sheet.
+- Window sticker or official spec sheet.
+- Dealer confirmation of source market and warranty.
+- Official China/EU/GCC owner manual for Sealion 05 / Sealion 5 DM-i.
 
 ## Do NOT do
-- Do NOT copy specs from Sealion 6 / Sealion 07 / Seal U / Song Plus / Song Pro.
-- Do NOT mix the **2025款 (75/115KM)** numbers with the **new-gen (55/220/305 km)** numbers.
-- Do NOT treat CLTC/WLTC/WLTP ranges as interchangeable or as real-world.
-- Do NOT state a Jordan charging connector as final without per-unit evidence.
+- Do NOT use Seal 05 sedan data as Sealion 05 SUV data.
+- Do NOT use Sealion 6 / Seal U / Song Plus data.
+- Do NOT use Song Pro data as final, even though it is a sister/counterpart.
+- Do NOT assume Jordan-specific specs exist; classify by import origin instead.
+- Do NOT state connector or warranty as final without unit-level evidence.
