@@ -1,35 +1,42 @@
 # AI Context Summary — BYD Sealion 05 DM-i 2025
 
-Compact, labeled context for VoltJo AI. Source IDs → `03 - Jordan Market/sources.md`. Access date: 2026-06-04.
+Compact, labeled context for VoltJo AI. Source IDs → `03 - Jordan Market/sources.md`. Corrected access date: 2026-06-05.
 
 ## Safe facts
-- BYD Sealion 05 DM-i is a **compact PHEV SUV** (BYD DM-i), 1.5L NA petrol (BYD472QC ~74 kW) + ~120 kW motor, **LFP Blade**, FWD, E-CVT. [L1/L4]
-- Jordan name = **"Seal 05 DM-i"**; sold in Jordan (~21,900–23,900 JOD new). [L1/L2/L3]
-- China name 海狮05 DM-i = Europe "Sealion 5 DM-i" = Jordan "Seal 05 DM-i" — one vehicle, different market names. [L1/L7/L8]
+- **BYD Sealion 05 DM-i** is a compact crossover SUV / PHEV under the BYD Ocean-series SUV family.
+- Chinese name: **海狮05 DM-i**.
+- It is related to / a sister model of **BYD Song Pro DM-i**, but it is not the same folder and should keep separate data.
+- It is **not BYD Seal 05 DM-i**. Seal 05 / 海豹05 is a compact sedan and must have its own future folder if needed.
+- Broad first-generation China data: DM-i PHEV, 1.5L BYD472QC engine, LFP Blade battery, FWD, E-CVT, 75KM/115KM CLTC trim family.
 
-## Conditional facts (state the condition)
-- **Two generations** share the name: China **2025款** (75KM/115KM, CLTC) vs **new-gen** (55/220/305 km, 7.68/26.6/34.3 kWh, 65 L, ~Apr 2026). The Jordan "55 KM" matches the **new-gen**. [L1/L4/L5]
-- **Battery** depends on gen/trim: 7.68 / ~12.9 / ~18.3 / 15.87 / 26.6 / 34.3 kWh — no single value. [L1/L4/L5/L6]
-- **EV range** depends on standard: CLTC vs WLTP (95) vs WLTC (81). [L1/L4/L7]
-- **Charging connector**: China GB/T; export Type 2 + CCS2; **Jordan unknown**. [L8/needs_review]
+## Conditional facts
+- Battery/range depends on exact Sealion 05 generation and trim. First-gen 2024/2025 sources show 75KM / 115KM CLTC families; exact kWh per trim should remain sourced from China config databases.
+- Europe **Sealion 5 DM-i** may be an export alias/relative, but exact equivalence to China Sealion 05 remains `needs_review` until an official alias/spec bridge is found.
+- Jordan presence is user-reported / needs source confirmation. Do not use Seal 05 sedan listings as proof of Sealion 05 SUV availability.
 
 ## Market-specific facts
-- China: GB/T, CLTC, 2025款 75/115KM + new-gen 55/220/305. Europe/Thailand: "Sealion 5 DM-i", WLTP, Type 2 + CCS2. Jordan: "Seal 05 DM-i", importer MEE Auto (± BSG).
+- China: 海狮05 DM-i, first-gen 75KM / 115KM, 2025 smart-driving facelift entries.
+- Europe: Sealion 5 DM-i official model page exists; treat as official for EU model, needs_review for direct equivalence.
+- Jordan: exact local Sealion 05 SUV trim, price, importer, connector, and warranty are unverified in this corrected pack.
 
 ## Unknowns
-- Which generation/trim is the Jordan car; exact battery/range/standard; charging connector; fuel tank for 2025款; combined system power; warranty; maintenance/safety (no manual).
+- Clean Jordan listing/dealer page for the Sealion 05 SUV.
+- Exact Jordan trim/generation.
+- Jordan charging connector.
+- Owner manual / official spec PDF.
+- Warranty, service schedule, tire pressure.
+- Whether a local unit is China-spec GB/T or export-spec Type 2/CCS2.
 
 ## Do-not-claim
-- Do NOT import any data from **Sealion 6 / Sealion 07 / Seal U / Seal 06 / Song Plus / Song Pro** — different vehicles.
-- Do NOT blend the **2025款 (75/115KM)** with the **new-gen (55/220/305)** figures.
-- Do NOT state a single battery/range/tank as final, or treat CLTC/WLTP/WLTC as comparable or real-world.
-- Do NOT state the Jordan charging connector as final without per-unit evidence.
-- Do NOT quote maintenance/safety specifics (no model manual yet).
+- Do NOT say **Seal 05 DM-i** is the Jordan name for Sealion 05. That is the core correction.
+- Do NOT import sedan data from **Seal 05 / 海豹05**.
+- Do NOT import data from Sealion 6, Seal U, Song Plus, Sealion 07, Seal 06, or Song Pro as final Sealion 05 facts.
+- Do NOT state Jordan presence, price, charging port, warranty, or maintenance as final without a Sealion 05 SUV source.
+- Do NOT mix 2026/new-generation 220/305 km data into the 2025 pack without clear generation proof.
 
-## Suggested assistant behaviour
-- **Identity:** clarify it's the compact "Seal 05 DM-i", distinct from Sealion 6/07 and the Song models.
-- **Generation:** ask whether the user's car is the 75/115KM (2025款) or the 55/220/305 new-gen — it changes battery/range/tank.
-- **Charging port:** ask whether the unit is dealer/GCC or China-direct; don't state as final.
-- **Range/economy:** explain the test standard (CLTC/WLTP/WLTC) and that real-world is lower.
-- **Trims:** separate the Jordan "55 KM" from China/export trims.
-- **Maintenance/safety:** say a model-specific manual is needed; never borrow another model's numbers; suggest dealer confirmation.
+## Suggested assistant behavior
+- If user asks about **Sealion 05**, answer as SUV / 海狮05.
+- If user asks about **Seal 05**, answer as sedan / 海豹05, and say it should be a separate vehicle record.
+- If a source says “Seal 05” only, ask whether it is sedan or SUV and request a photo/listing/VIN/build sheet.
+- For Jordan questions, say local presence is plausible/user-reported but not source-confirmed in this pack yet.
+- For charging-port questions, ask whether the unit is China-direct or export/dealer stock and request a port photo.
