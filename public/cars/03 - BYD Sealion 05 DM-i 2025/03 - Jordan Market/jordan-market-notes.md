@@ -1,33 +1,42 @@
 # Jordan Market Notes — BYD Sealion 05 DM-i 2025
 
-Source IDs → `sources.md` (L1–L9). Access date: 2026-06-04.
+Source IDs → `sources.md`. Corrected access date: **2026-06-05**.
 
-## Local identity
-- **Jordan/common name:** BYD **Seal 05 DM-i** (note: "Seal 05", and listings also "Sealion 05"). [L1/L2]
-- China name 海狮05 DM-i = export "Sealion 5 DM-i" = Jordan "Seal 05 DM-i" — same vehicle, different market names.
-- **Not** Sealion 6 / Sealion 07 / Seal U / Seal 06 / Song Plus / Song Pro.
+## Local-market reality
+Jordan does not necessarily receive a unique Jordan-engineered trim. Local cars may be imported from China, GCC, Europe, or other export channels. For VoltJo, the correct approach is therefore:
+- identify the **exact vehicle identity** first
+- identify the **source market / import channel** second
+- then apply that market's trim/spec/manual cautiously
 
-## Is it sold in Jordan?
-- **Yes.** MEE Auto (Amman – Khalda) lists it as "**Now available in Jordan**". [L1, dealer]
-- Also on Jordan marketplaces (Dooz, OpenSooq) and BYD's official dealer store (MSTC/Bustami & Saheb). [L2/L3]
+## Correct target identity
+- **BYD Sealion 05 DM-i / 海狮05 DM-i** = compact crossover SUV.
+- It is **not** BYD Seal 05 DM-i / 海豹05, which is a compact sedan.
+- Sealion 05 is related to BYD Song Pro DM-i as an Ocean-series sister/counterpart, but it remains a separate vehicle record.
 
-## Dealer / importer (unresolved)
-- **MEE Auto** explicitly markets the "Seal 05 DM-i 55 KM" in Jordan. [L1]
-- **Bustami & Saheb (BSG/MSTC)** is BYD's official Jordan distributor; whether *they* stock the Seal 05 (vs MEE importing it) is **unconfirmed**. [L3, needs_review]
+## Jordan presence
+- User reports that **both Sealion 05 DM-i and Seal 05 DM-i exist in Jordan**.
+- The current corrected research pack does **not yet contain a clean public source** that proves the local Sealion 05 SUV listing/trim. Treat Jordan presence as plausible/user-reported until a clean dealer/listing/photo/VIN source is added.
+- Do not use Seal 05 sedan pages as proof of Sealion 05 SUV availability.
 
-## Price (Jordan)
-- New ~**21,900–23,900 JOD** (aggregated listings); Dooz from ~14,000 JOD (likely base/used). [L1/L2, dealer/owner_reported]
+## What would count as good Jordan evidence
+- Dealer/listing page explicitly saying **Sealion 05 DM-i** or showing the SUV body.
+- Chinese name **海狮05 DM-i** on a build sheet/window sticker.
+- VIN/build sheet confirming model family and source market.
+- Photos proving SUV body and charging connector.
+- Dealer confirmation of import origin: China / GCC / Europe / other.
 
-## Which generation is the Jordan car?
-- The MEE Auto spec (7.68 kWh, 65 L, 4780 mm, 55 km CLTC) matches the **new-generation** Sealion 05, **not** the
-  China 2025款 75KM/115KM. So the Jordan-sold car may be the **new-gen "55 KM" entry trim**. → **needs_review.**
+## Jordan fields that should remain needs_review
+- exact local trim/generation
+- import origin
+- price band
+- charging connector
+- AC/DC charging support
+- warranty and service support
+- exact battery/range/fuel-tank values
 
-## Charging connector (Jordan)
-- **Unknown.** Not stated on the MEE page. China = GB/T; export (EU) = Type 2 + CCS2. Jordan unit unconfirmed. → needs_review.
+## Do-not-use local data
+- Do not use **MEE Auto Seal 05 DM-i 55 KM** as Sealion 05 SUV data unless a future source proves it is actually the SUV. Current corrected classification: sedan-related / rejected for this folder.
 
-## Warranty / service
-- **Unknown.** No Jordan warranty/service terms sourced. Confirm with the selling dealer (MEE Auto / BSG).
-
-## Verification status
-- **Confirmed:** sold in Jordan as "Seal 05 DM-i"; compact PHEV SUV; 1.5L NA + ~120 kW motor; LFP Blade; price band.
-- **Needs verification:** exact generation/trim/battery, EV range + standard, fuel tank, charging connector, official importer, warranty.
+## Current status
+- **Vehicle file status:** corrected / partial / needs_review.
+- **AI use:** safe for identity and anti-contamination; not final for Jordan specs.
