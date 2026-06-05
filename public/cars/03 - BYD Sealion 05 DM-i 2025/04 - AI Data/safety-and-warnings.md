@@ -1,32 +1,57 @@
 # Safety & Warnings — BYD Sealion 05 DM-i 2025
 
 Format: value / source / ref / page / market / confidence / notes. Source IDs → `03 - Jordan Market/sources.md`.
-Access date: 2026-06-04.
+Corrected access date: **2026-06-05**.
 
-> **No model-specific owner's manual exists yet** → there are **no page-cited safety facts** for this car.
-> The items below are **generic BYD DM-i platform topics** (confidence: needs_review). **Do NOT copy page-cited
-> text from another model's manual (Sealion 6 / Seal U / Song Plus / Song Pro)** — different vehicles. A real
-> Sealion 05 DM-i manual must be sourced to fill these with model-specific, page-numbered instructions.
+> No exact owner manual was found for **BYD Sealion 05 DM-i / 海狮05 DM-i**. Therefore, this file intentionally avoids page-cited safety claims from other BYD models. Items below are platform-level reminders only and remain `needs_review` until an exact manual is found.
 
 ## High-voltage safety
-- value: Platform principle — do not touch orange HV cables/components; HV service by qualified techs only.
-- source: BYD DM-i platform (general) · page: unknown · market: — · confidence: needs_review
+- value: BYD DM-i / PHEV high-voltage system likely uses standard HV safety procedures
+- source: general platform context, not exact manual
+- page: unknown
+- market: unknown
+- confidence: needs_review
+- notes: Do not quote specific rescue, cable, shutdown, or service procedures until a Sealion 05 manual is sourced.
 
 ## Charging safety
-- value: Platform principle — certified equipment only, no wet hands, no charging in thunderstorm, don't force a frozen/locked port.
-- source: general · page: unknown · confidence: needs_review
+- value: charging safety procedures are unknown for the exact model
+- source: pending exact manual
+- page: unknown
+- confidence: unknown
+- notes: Connector and charging workflow differ by source market. Do not infer from Seal 05 sedan or Sealion 6/Song Plus.
 
-## Battery handling / thermal
-- value: Platform principle — LFP Blade; avoid charging at extreme battery temperatures.
-- source: general · page: unknown · confidence: needs_review
+## Battery safety
+- value: LFP Blade battery platform identified, but model-specific warnings unknown
+- source: L2/L3
+- confidence: database for battery family / unknown for warning details
 
-## Emergency / towing / jump-start (12 V) / post-collision / flood / storage
-- value: unknown for this model · source: pending Sealion 05 manual · page: unknown · confidence: unknown
-- notes: Not sourced. Do not infer from other models.
+## Emergency / towing / jump-start / post-collision
+- value: unknown for exact Sealion 05 DM-i
+- source: pending exact manual
+- page: unknown
+- confidence: unknown
+
+## Water/flooding guidance
+- value: unknown for exact Sealion 05 DM-i
+- source: pending exact manual
+- confidence: unknown
+- notes: Important for Jordan road/flood conditions; must be extracted from manual or dealer safety sheet.
 
 ## Dashboard warning lights
-- value: unknown · source: pending Sealion 05 manual · confidence: unknown
+- value: unknown
+- source: pending exact manual
+- confidence: unknown
 
-## Status
-All safety content here is **needs_review/unknown**. To make this VoltJo-ready, obtain the China 海狮05 DM-i
-owner's manual (BYD China portal) or an EU Sealion 5 DM-i manual and extract page-cited content.
+## Long-term parking / storage
+- value: unknown for exact model
+- source: pending exact manual
+- confidence: unknown
+
+## Do-not-use safety sources
+- Seal 05 sedan / 海豹05 manuals or data
+- Sealion 6 / Seal U / Song Plus manuals
+- Song Pro manuals as final facts
+- Generic web advice without model source
+
+## Update trigger
+When an exact China/EU/GCC owner manual is found, replace this file with page-cited, model-specific safety facts.
