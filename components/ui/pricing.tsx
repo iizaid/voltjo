@@ -19,21 +19,21 @@ const plans = [
     priceLabel: "0 د.أ",
     period: "للبداية",
     yearlyPeriod: "للبداية",
-    buttonText: "ابدأ مجانًا",
+    buttonText: "قريبًا",
     secondaryButtonText: "تعرّف على الخطة",
     buttonVariant: "outline" as const,
     includes: [
       "الخطة المجانية تشمل:",
       "أسئلة محدودة للمساعد الذكي",
       "تصفح السيارات المدعومة",
-      "مقارنة أساسية بين الموديلات",
       "معلومات عامة عن الشحن والدعم",
+      "وصول أساسي إلى بيانات الموديلات",
     ],
   },
   {
     name: "Plus",
     description:
-      "لمن يفكر بشراء سيارة ويريد إجابات ومقارنات أدق.",
+      "لمن يفكر بشراء سيارة ويريد إجابات وتقديرات أدق.",
     monthlyPrice: 4.99,
     yearlyPrice: 49.99,
     period: "شهريًا",
@@ -45,10 +45,10 @@ const plans = [
     includes: [
       "كل ما تحتاجه قبل قرار الشراء:",
       "أسئلة أكثر للمساعد الذكي",
-      "مقارنات متقدمة بين السيارات",
       "تقديرات تكلفة تشغيل تقريبية",
       "حفظ ملفك وتفضيلاتك",
       "توصيات حسب استخدامك اليومي",
+      "دعم موديلات إضافية",
     ],
   },
   {
@@ -163,7 +163,7 @@ export default function Pricing() {
     setIsYearly(Number.parseInt(value) === 1);
 
   const showPricingNotice = () => {
-    setPricingNotice("الاشتراكات ستتوفر قريبًا قبل الإطلاق الرسمي.");
+    setPricingNotice("الخطط تمهيدية — الاشتراكات والدفع غير مفعّلين حتى الإطلاق الرسمي.");
     window.setTimeout(() => setPricingNotice(null), 3600);
   };
 
@@ -199,8 +199,8 @@ export default function Pricing() {
           customVariants={revealVariants}
           className="w-[86%] text-sm leading-7 text-gray-600 md:text-base md:leading-8"
         >
-          اختر الخطة المناسبة لتجربة المساعد، المقارنات، وتقديرات التكلفة
-          داخل الأردن. الأسعار الحالية مؤقتة للتجربة فقط.
+          اختر الخطة المناسبة لتجربة المساعد والحاسبة وتقديرات التكلفة داخل
+          الأردن. الخطط تمهيدية — الاشتراكات والدفع غير مفعّلين بعد.
         </TimelineContent>
 
         <TimelineContent
@@ -316,7 +316,7 @@ export default function Pricing() {
       </div>
 
       <p className="mx-auto mt-5 max-w-2xl text-center text-sm font-semibold leading-7 text-[var(--voltjo-muted)]">
-        الأسعار والمزايا مؤقتة وقابلة للتعديل قبل الإطلاق الرسمي.
+        الخطط تمهيدية — الأسعار والمزايا قابلة للتعديل. الاشتراكات والدفع غير مفعّلين قبل الإطلاق الرسمي.
       </p>
       {pricingNotice ? (
         <p
