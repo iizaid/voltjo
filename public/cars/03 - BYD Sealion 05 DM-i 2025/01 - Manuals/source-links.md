@@ -1,22 +1,36 @@
 # Manual Source Links — BYD Sealion 05 DM-i 2025
 
-Research pass 1. Access date: 2026-06-04.
+Corrected deep pass. Access date: **2026-06-05**.
 
-> **No owner's manual was found or downloaded.** The Sealion 05 DM-i is a **very new** model
-> (China 2025款; a redesigned new-generation launched ~April 2026), so an English/Arabic owner's
-> manual is not yet publicly available. No PDF downloaded. Do NOT substitute a manual from a different
-> BYD model (Sealion 6 / Seal U / Song Plus / Song Pro) as if it were this car.
+> **Manual result:** no exact owner manual for **BYD Sealion 05 DM-i / 海狮05 DM-i** was found in open web search. No PDF was downloaded.
 
-## Official manual portals (no confirmed Sealion 05 DM-i manual located)
-- **BYD China — manual portal** (official, Chinese): https://www.byd.com/cn/user-manual — likely future host of 海狮05 DM-i manual.
-- **BYD Middle East & Africa — owner's manual** (official): https://www.byd.com/kw/service-maintenance/owners-manual
-- **BYD Europe — owner's manual** (official): https://www.byd.com/eu/service-maintenance/owners-manual — Sealion 5 DM-i is an EU model; an EU manual may appear here later.
+## Exact manual search attempts
+Searched English and Chinese variants:
+- `BYD Sealion 05 DM-i owner manual PDF`
+- `BYD Sealion 5 DM-i Owner Manual PDF`
+- `海狮05 DM-i 用户手册 PDF`
+- `海狮05 DM-i 使用手册 PDF`
+- `比亚迪 海狮05 DM-i 用户手册`
+- `site:byd.com content/dam Sealion 5 Owner Manual PDF`
+- `site:byd.com/eu/service-maintenance/owners-manual Sealion 5 manual`
 
-## Not found
-- No exact Sealion 05 / Seal 05 / Sealion 5 DM-i owner's manual (any market/language).
-- No Arabic manual.
+## Official manual portals to re-check later
+- **BYD China user manual portal:** https://www.byd.com/cn/user-manual
+- **BYD Europe owner manual portal:** https://www.byd.com/eu/service-maintenance/owners-manual
+- **BYD Middle East & Africa owner manual portal:** https://www.byd.com/kw/service-maintenance/owners-manual
 
-## Suggested filenames (if/when a correct-model manual is obtained)
+## What was NOT used
+- No **Sealion 6 / Seal U / Song Plus** manual was used.
+- No **Song Pro DM-i** manual was used as final Sealion 05 data, even though the cars are sister/counterpart models.
+- No **Seal 05 / 海豹05** sedan manual or data was used.
+
+## Suggested filename if a correct manual is found
 - `BYD-Sealion-05-DMi-2025-Owner-Manual-China.pdf`
-- `BYD-Seal-05-DMi-Owner-Manual-EU-source-alias.pdf` (export alias — label clearly)
-- Do NOT name any Sealion 6 / Seal U / Song manual as a Sealion 05 manual.
+- `BYD-Sealion-5-DMi-Owner-Manual-EU-source-alias.pdf` only if proven to be the export version of this SUV.
+
+## Current manual status
+- exact manual: `not_found`
+- alias manual: `not_found`
+- model-specific safety extraction: `not_available`
+- maintenance extraction: `not_available`
+- tire pressure extraction: `not_available`
