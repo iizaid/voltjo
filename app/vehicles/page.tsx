@@ -1,8 +1,20 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Container } from "@/components/ui/Container";
 import { PageReturnBar } from "@/components/ui/PageReturnBar";
 import { listSupportedVehicles } from "@/lib/vehicles/queries";
 import { confidenceLabels, vehicleTypeLabels } from "@/lib/vehicles/types";
+
+export const metadata: Metadata = {
+  title: "السيارات المدعومة | VoltJo",
+  description:
+    "استعرض قائمة السيارات الكهربائية والهايبرد المدعومة في منصة VoltJo داخل الأردن.",
+  openGraph: {
+    title: "السيارات المدعومة | VoltJo",
+    description:
+      "قائمة السيارات الكهربائية والهايبرد المدعومة في VoltJo داخل الأردن.",
+  },
+};
 
 export default async function VehiclesPage() {
   const vehicles = await listSupportedVehicles();

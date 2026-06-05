@@ -1,9 +1,36 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Container } from "@/components/ui/Container";
 import { PageReturnBar } from "@/components/ui/PageReturnBar";
 import { getSupportedVehicleBySlug } from "@/lib/vehicles/queries";
 import { confidenceLabels, vehicleTypeLabels } from "@/lib/vehicles/types";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const vehicle = await getSupportedVehicleBySlug(slug);
+
+  if (!vehicle) {
+    return { title: "سيارة غير موجودة | VoltJo" };
+  }
+
+  const description =
+    vehicle.summaryAr ??
+    `تفاصيل ${vehicle.nameAr} من ${vehicle.brand.nameAr} — موديل ${vehicle.modelYear}`;
+
+  return {
+    title: `${vehicle.nameAr} | VoltJo`,
+    description,
+    openGraph: {
+      title: `${vehicle.nameAr} | VoltJo`,
+      description,
+    },
+  };
+}
 
 function formatPriceRange(min: number | null, max: number | null) {
   if (typeof min === "number" && typeof max === "number") {

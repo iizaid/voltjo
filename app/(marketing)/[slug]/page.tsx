@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -8,6 +9,22 @@ const pages = {
 } as const;
 
 type PageSlug = keyof typeof pages;
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const title = pages[slug as PageSlug];
+  if (!title) {
+    return { title: "صفحة غير موجودة | VoltJo" };
+  }
+  return {
+    title: `${title} | VoltJo`,
+    description: `صفحة ${title} في منصة VoltJo — قيد التجهيز.`,
+  };
+}
 
 export function generateStaticParams() {
   return Object.keys(pages).map((slug) => ({ slug }));

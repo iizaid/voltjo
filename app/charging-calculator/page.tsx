@@ -1,7 +1,19 @@
+import type { Metadata } from "next";
 import { Container } from "@/components/ui/Container";
 import { ChargingCalculatorClient } from "@/components/vehicles/ChargingCalculatorClient";
 import { PageReturnBar } from "@/components/ui/PageReturnBar";
 import { getChargingCostInputs } from "@/lib/vehicles/queries";
+
+export const metadata: Metadata = {
+  title: "حاسبة الشحن | VoltJo",
+  description:
+    "احسب تكلفة شحن سيارتك الكهربائية أو الهايبرد داخل الأردن بناءً على حجم البطارية وسعر الكهرباء.",
+  openGraph: {
+    title: "حاسبة الشحن | VoltJo",
+    description:
+      "احسب تكلفة شحن سيارتك الكهربائية داخل الأردن.",
+  },
+};
 
 export default async function ChargingCalculatorPage() {
   const inputs = await getChargingCostInputs();

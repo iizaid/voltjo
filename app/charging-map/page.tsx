@@ -1,8 +1,20 @@
+import type { Metadata } from "next";
 import { ChargingMapClient } from "@/components/vehicles/ChargingMapClient";
 import { Container } from "@/components/ui/Container";
 import { PageReturnBar } from "@/components/ui/PageReturnBar";
 import { getCurrentUser } from "@/lib/auth/session";
 import { listChargingLocations } from "@/lib/vehicles/queries";
+
+export const metadata: Metadata = {
+  title: "خريطة الشحن | VoltJo",
+  description:
+    "اعثر على نقاط شحن السيارات الكهربائية في الأردن على خريطة تفاعلية.",
+  openGraph: {
+    title: "خريطة الشحن في الأردن | VoltJo",
+    description:
+      "اعثر على نقاط شحن السيارات الكهربائية في الأردن على خريطة تفاعلية.",
+  },
+};
 
 export default async function ChargingMapPage() {
   const locations = await listChargingLocations();

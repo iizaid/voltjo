@@ -1,7 +1,19 @@
+import type { Metadata } from "next";
 import { ChatShell } from "@/components/chat/ChatShell";
 import { resolveAccountAvatarUrl } from "@/lib/account/avatar";
 import { getCurrentUserAndProfile } from "@/lib/auth/session";
 import { MAX_CHAT_MESSAGE_LENGTH } from "@/lib/chat/constants";
+
+export const metadata: Metadata = {
+  title: "المساعد الإرشادي التجريبي | VoltJo",
+  description:
+    "اطرح أسئلتك عن السيارات الكهربائية والهايبرد في الأردن على المساعد الإرشادي التجريبي لـ VoltJo.",
+  openGraph: {
+    title: "المساعد الإرشادي التجريبي | VoltJo",
+    description:
+      "مساعد إرشادي تجريبي للإجابة عن أسئلتك حول السيارات الكهربائية والهايبرد في الأردن.",
+  },
+};
 
 type Props = {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
