@@ -23,6 +23,10 @@ export async function generateMetadata({
   return {
     title: `${title} | VoltJo`,
     description: `صفحة ${title} في منصة VoltJo — قيد التجهيز.`,
+    openGraph: {
+      title: `${title} | VoltJo`,
+      description: `صفحة ${title} في منصة VoltJo — قيد التجهيز.`,
+    },
   };
 }
 
@@ -52,8 +56,7 @@ export default async function PlaceholderPage({
             {title}
           </h1>
           <p className="mt-5 max-w-2xl text-lg leading-9 text-[var(--voltjo-muted)]">
-            هذه الصفحة قيد التجهيز ضمن النسخة الأولى من واجهة VoltJo. المحتوى
-            الحالي ثابت فقط ولا يحتوي على أي منطق خلفي أو اتصال بخدمات خارجية.
+            هذه الصفحة قيد التجهيز ضمن النسخة الأولى من VoltJo، وسيتم تحديثها بمحتوى أوضح قبل الإطلاق الرسمي.
           </p>
           <div className="mt-9">
             <Button href="/">العودة للرئيسية</Button>
