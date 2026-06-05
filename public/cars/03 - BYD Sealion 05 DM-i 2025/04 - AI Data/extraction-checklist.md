@@ -1,24 +1,45 @@
 # Extraction Checklist — BYD Sealion 05 DM-i 2025
 
-Status as of 2026-06-04. [x] = done · [~] = partial/needs_review · [ ] = not done.
+Status as of **2026-06-05**. [x] = done · [~] = partial/needs_review · [ ] = not done.
 
-- [ ] Exact manual found — no Sealion 05 / Seal 05 / Sealion 5 DM-i owner's manual located (new model).
-- [ ] Alias manual found/downloaded — none appropriate (other BYD models are different vehicles; deliberately not used).
-- [ ] Exact spec sheet found — no official BYD spec PDF; data from web databases + 1 Jordan dealer page.
-- [ ] Alias spec sheet downloaded — none (no PDF downloaded for this vehicle).
+## Identity / contamination control
+- [x] Correct target identity fixed — **Sealion 05 DM-i / 海狮05 DM-i = SUV**.
+- [x] Seal 05 sedan contamination removed/rejected — **Seal 05 DM-i / 海豹05 DM-i = sedan**, future separate folder only.
+- [x] Sealion 6 / Seal U / Song Plus / Sealion 07 / Seal 06 / Song Pro contamination blocked.
+
+## Sources and specs
+- [x] Source registry corrected — `03 - Jordan Market/sources.md`.
+- [x] Spec source links corrected — `02 - Specs/source-links.md`.
+- [x] Spec analysis corrected — `02 - Specs/spec-analysis.md`.
+- [~] China 2025 75KM / 115KM trim families recorded — exact per-trim details still need deeper extraction from clean config tables.
+- [~] Europe Sealion 5 relation recorded — official EU model exists, but exact equivalence to China Sealion 05 remains needs_review.
+
+## Manuals
+- [ ] Exact manual found — no Sealion 05 / 海狮05 DM-i owner manual located.
+- [ ] Alias manual found/downloaded — none adopted; no wrong-model manual used.
 - [x] Manual analysis completed — `01 - Manuals/manual-analysis.md`.
-- [x] Spec analysis completed — `02 - Specs/spec-analysis.md`.
-- [ ] Safety extracted — none (no model manual); platform pointers only, needs_review.
-- [ ] Maintenance extracted — none (no manual).
-- [ ] Tire pressure extracted — unknown (and not borrowed from other models).
-- [ ] Warranty extracted — unknown (Jordan).
-- [~] Charging port verified — China GB/T / export Type 2+CCS2 known; Jordan unknown → needs_review.
-- [~] Jordan trims verified — "Seal 05 DM-i 55 KM" name dealer-listed (L1); specs/generation need build-sheet confirmation.
-- [x] Trim matrix created — `05 - Trims/trim-matrix.md`.
-- [x] Trim equivalence created — `05 - Trims/trim-equivalence.md` (incl. contamination blocklist).
-- [x] Conflicts documented — `sources.md` + `unresolved-questions.md` (generation, battery, range standard, motor, importer, name).
-- [x] Unresolved items listed — `unresolved-questions.md`.
+- [ ] Safety extracted — no model manual; only platform-level caution.
+- [ ] Maintenance extracted — no model manual or dealer schedule.
+- [ ] Tire pressure extracted — unknown; not borrowed from other models.
+- [ ] Warranty extracted — unknown.
+
+## Jordan
+- [~] Jordan presence — user-reported/plausible, but clean Sealion 05 SUV source still needed.
+- [ ] Jordan exact trim/generation verified — not yet.
+- [ ] Jordan charging port verified — not yet.
+- [ ] Jordan warranty/service verified — not yet.
+
+## AI readiness
+- [x] AI context updated with corrected identity and do-not-claim rules.
+- [x] Unresolved items listed.
+- [x] README corrected.
 
 ## Summary
-- **Strong:** identity + aliases + contamination control, compact PHEV SUV, engine family (1.5L NA ~74 kW), ~120 kW motor, LFP Blade, DM-i, FWD/E-CVT, **Jordan presence + name + price band**.
-- **Weak/missing:** owner's manual → safety + maintenance + tire pressure unknown; **generation/trim/battery/range/tank/connector/warranty all needs_review** due to the two-generation, multi-standard ambiguity.
+- **Strong:** corrected identity, model family, anti-contamination rules, China first-gen 75KM/115KM track, broad DM-i compact SUV profile.
+- **Partial:** exact per-trim specs, Europe/export equivalence, Jordan presence/source-market classification.
+- **Missing:** owner manual, maintenance schedule, tire pressure, Jordan connector, warranty.
+
+## Recommended status
+- **AI knowledge base:** ready as corrected partial / needs_review.
+- **Limited DB seed:** only safe identity/platform fields.
+- **Public final specs page:** not ready.
