@@ -1,28 +1,8 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { getSafeRedirectPath } from "@/lib/auth/redirect";
 
-const DEFAULT_REDIRECT_PATH = "/assistant";
 const AUTH_ERROR_REDIRECT_PATH = "/start?auth_error=callback";
-const UNSAFE_PROTOCOL_RE = /(?:^|[^\w])(https?:|javascript:|data:)/i;
-const ENCODED_BACKSLASH_RE = /%5c/i;
-
-function getSafeRedirectPath(nextParam: string | null): string {
-  if (!nextParam) return DEFAULT_REDIRECT_PATH;
-
-  const value = nextParam.trim();
-
-  if (
-    !value.startsWith("/") ||
-    value.startsWith("//") ||
-    value.includes("\\") ||
-    ENCODED_BACKSLASH_RE.test(value) ||
-    UNSAFE_PROTOCOL_RE.test(value)
-  ) {
-    return DEFAULT_REDIRECT_PATH;
-  }
-
-  return value;
-}
 
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url);

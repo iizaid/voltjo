@@ -2,16 +2,13 @@
 
 import { useEffect, useMemo, useState } from "react";
 import type { ChargingCalculatorVehicleOption } from "@/lib/vehicles/types";
+import { calculateChargingCost } from "@/lib/vehicles/charging-calculations";
 
 type Props = {
   vehicles: ChargingCalculatorVehicleOption[];
   defaultElectricityPriceJodPerKwh: number;
   defaultEfficiencyPercent: number;
 };
-
-function round(value: number, digits = 2) {
-  return Number.isFinite(value) ? Number(value.toFixed(digits)) : 0;
-}
 
 export function ChargingCalculatorClient({
   vehicles,
@@ -42,49 +39,13 @@ export function ChargingCalculatorClient({
   }, [selectedVehicleData]);
 
   const calculation = useMemo(() => {
-    const battery = Number(batteryKwh);
-    const from = Number(fromPercent);
-    const to = Number(toPercent);
-    const price = Number(pricePerKwh);
-    const efficiency = Number(efficiencyPercent);
-
-    if (
-      !Number.isFinite(battery) ||
-      !Number.isFinite(from) ||
-      !Number.isFinite(to) ||
-      !Number.isFinite(price) ||
-      !Number.isFinite(efficiency)
-    ) {
-      return { ok: false as const, message: "أدخل قيمًا رقمية صحيحة." };
-    }
-
-    if (battery <= 0) {
-      return { ok: false as const, message: "حجم البطارية يجب أن يكون أكبر من صفر." };
-    }
-
-    if (from < 0 || from > 100 || to < 0 || to > 100 || to <= from) {
-      return { ok: false as const, message: "نطاق الشحن غير صالح. يجب أن تكون نسبة الشحن النهائية أكبر من البداية." };
-    }
-
-    if (price < 0) {
-      return { ok: false as const, message: "سعر الكهرباء يجب أن يكون صفرًا أو أعلى." };
-    }
-
-    if (efficiency <= 0 || efficiency > 100) {
-      return { ok: false as const, message: "كفاءة الشحن يجب أن تكون بين 1 و100." };
-    }
-
-    const delta = (to - from) / 100;
-    const efficiencyFactor = efficiency / 100;
-    const energyNeeded = battery * delta / efficiencyFactor;
-    const estimatedCost = energyNeeded * price;
-
-    return {
-      ok: true as const,
-      energyNeeded: round(energyNeeded, 2),
-      estimatedCost: round(estimatedCost, 2),
-      effectiveChargeWindow: `${from}% → ${to}%`,
-    };
+    return calculateChargingCost({
+      batteryKwh: Number(batteryKwh),
+      fromPercent: Number(fromPercent),
+      toPercent: Number(toPercent),
+      pricePerKwh: Number(pricePerKwh),
+      efficiencyPercent: Number(efficiencyPercent),
+    });
   }, [batteryKwh, efficiencyPercent, fromPercent, pricePerKwh, toPercent]);
 
   return (
