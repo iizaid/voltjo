@@ -2,29 +2,33 @@
 
 AI research pack for VoltJo. **Not final public specs** — an internal, source-tracked knowledge base.
 
-## Research status (pass 1, access date 2026-06-04)
-- **Recommended status: `needs_review` / partial.** The vehicle IS sold in Jordan (as **"Seal 05 DM-i"**),
-  but there is a genuine **generation/trim/battery ambiguity** across sources that must be resolved by a human.
+## Research status (corrected pass, access date: 2026-06-05)
+- **Recommended status: `needs_review` / partial.** The previous pass incorrectly mixed **BYD Sealion 05 DM-i** with **BYD Seal 05 DM-i**. This pass corrects that contamination.
+- Target vehicle is **BYD Sealion 05 DM-i / 海狮05 DM-i**, a compact PHEV SUV and Ocean-series sister/counterpart of BYD Song Pro DM-i.
+- Jordan presence is **not source-confirmed inside this folder yet**. If local dealers have it, it still needs a source with the exact SUV name/photo/VIN/build sheet.
 
 ## Identity (read first)
-- **Jordan/common name:** BYD **Seal 05 DM-i**. China name: **海狮05 / Sealion 05 DM-i**. Europe: **Sealion 5 DM-i**. Same vehicle, different market names.
-- **It is NOT:** Sealion 6 (= Song Plus, vehicle 01), Sealion 07, Seal U, Seal 06 / Seal 6 Touring, Song Plus, or Song Pro. See `05 - Trims/trim-equivalence.md`.
-- **Compact PHEV SUV**, BYD DM-i, 1.5L NA petrol + electric, LFP Blade battery, FWD, E-CVT.
+- **Correct target:** BYD **Sealion 05 DM-i** / Chinese: **海狮05 DM-i** / body: **compact crossover SUV**.
+- **NOT the same as:** BYD **Seal 05 DM-i** / Chinese: **海豹05 DM-i** / body: **compact sedan**.
+- **NOT the same as:** Sealion 6 / Seal U / Song Plus, Sealion 07, Seal 06 / Seal 6 Touring, or the Seal 05 sedan.
+- **Related but still separate:** BYD Song Pro DM-i. Sealion 05 DM-i is the Ocean-series sister/counterpart of Song Pro, but it should keep its own file.
 
-## Strongest (well-sourced) facts
-- Sold in Jordan as "Seal 05 DM-i", ~21,900–23,900 JOD new (dealer/listing). [L1/L2/L3]
-- Engine: 1.5L NA BYD472QC, ~74 kW. Motor ~120 kW. LFP Blade. DM-i PHEV. [L1/L4]
+## Strongest currently usable facts
+- Compact PHEV SUV, BYD DM-i 5.0 platform, FWD, E-CVT.
+- First-generation Sealion 05 DM-i: 1.5L BYD472QC engine, 12.9 kWh / 18.3 kWh LFP Blade battery options, 75 km / 115 km CLTC EV range, approx. 4710 × 1880 × 1720 mm, wheelbase 2712 mm.
+- 2025 facelift / smart-driving version exists in China.
 
 ## Biggest unresolved items
-- **Which generation/trim is the Jordan car?** China 2025款 = 75KM/115KM (CLTC); Jordan dealer lists a "55 KM" (7.68 kWh, 65 L, 4780 mm) that matches the **new-generation** Sealion 05. → battery, range, tank = `needs_review`.
-- **Charging connector** (GB/T vs Type 2/CCS2) for Jordan units. → `needs_review`.
-- **No owner's manual** found (very new model) → safety/maintenance unknown.
+- **Jordan presence and exact local trim:** not confirmed by clean Sealion 05 SUV source.
+- **Jordan charging connector:** unknown.
+- **Owner manual / official spec PDF:** not found.
+- **Warranty, service schedule, tire pressure:** unknown.
+- **Second generation 2026 data:** keep separate from 2025/first-generation data.
 
 ## Key files
-- Conflicts + sources: `03 - Jordan Market/sources.md`, `04 - AI Data/unresolved-questions.md`
+- Sources and rejected contaminated sources: `03 - Jordan Market/sources.md`
 - Identity/aliases: `05 - Trims/trim-equivalence.md`
 - AI guardrails: `04 - AI Data/ai-context-summary.md`
-- Jordan: `03 - Jordan Market/jordan-market-notes.md`, `jordan-verification-needed.md`
+- Unresolved Jordan items: `03 - Jordan Market/jordan-verification-needed.md`, `04 - AI Data/unresolved-questions.md`
 
-> ⚠️ This is an AI research pack. Do not publish these numbers as final Jordan specs until the
-> generation/trim, battery, range standard, and charging connector are human-verified.
+> ⚠️ This folder is now corrected to represent **Sealion 05 DM-i SUV only**. Create a separate future folder for **BYD Seal 05 DM-i sedan** if needed.
