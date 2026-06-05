@@ -1,33 +1,64 @@
 # Spec Analysis — BYD Sealion 05 DM-i 2025
 
-Research pass 1. Access date: 2026-06-04. Source IDs → `03 - Jordan Market/sources.md`.
+Corrected deep pass. Access date: **2026-06-05**. Source IDs → `03 - Jordan Market/sources.md`.
 
-## The core problem: which car is "Sealion 05 DM-i 2025"?
-Sources describe **two generations** under near-identical names:
-- **A) China 2025款 海狮05 DM-i** — trims **75KM / 115KM** (CLTC), 1.5L NA, smaller batteries. [L4]
-- **B) New-generation Sealion 05 DM-i** (launched ~Apr 2026) — trims **55 / 220 / 305 km** (CLTC), batteries
-  **7.68 / 26.628 / 34.275 kWh**, **65 L** tank, dims **4780×1837×1515**, WB 2718. [L5/L1]
-- The **Jordan-sold "Seal 05 DM-i 55 KM"** (MEE Auto, L1) matches **(B)** — 7.68 kWh, 65 L, 4780 mm.
-- The **export "Sealion 5 DM-i"** (Europe/Thailand) is quoted at **18.3 kWh / 81–95 km (WLTC/WLTP)** [L7], which
-  resembles the **115KM** tier of (A) on a different standard.
+## Correct target
+This file is for **BYD Sealion 05 DM-i / 海狮05 DM-i**, a compact crossover SUV. It is **not** BYD Seal 05 DM-i / 海豹05, which is a compact sedan.
 
-→ **The generation/trim identity is unresolved.** Treat battery, EV range, and tank as `needs_review`, and
-record each variant with its market + standard rather than picking one "final" number.
+## What is strongly established
+- **Vehicle class:** compact crossover SUV / PHEV.
+- **Family:** Ocean-series SUV, sister/counterpart to BYD Song Pro DM-i.
+- **Powertrain:** BYD DM-i plug-in hybrid, 1.5L BYD472QC naturally aspirated engine, electric motor, FWD, E-CVT.
+- **China 2025 trim families:** 75KM and 115KM versions, with standard and smart-driving/facelift variants.
+- **Battery family:** LFP Blade battery; commonly tracked around 12.9 kWh for 75KM and 18.3 kWh for 115KM family, but exact per-trim extraction remains `needs_review` until confirmed from a clean config table.
 
-## What is consistent across sources (higher confidence)
-- **Body:** compact PHEV SUV, 5-seat, FWD. [L1/L4]
-- **Engine:** 1.5 L naturally-aspirated, BYD472QC, ~74 kW (~99–101 hp). [L1/L4]
-- **Drive motor:** ~120 kW. [L1/L4] (One Jordan search snippet said 145 kW/300 Nm → needs_review; not used as final.)
-- **Battery chemistry:** LFP Blade. [L1/L7]
-- **Hybrid:** BYD DM-i (5th-gen DM). [search/L4]
-- **Sold in Jordan** as "Seal 05 DM-i". [L1/L2/L3]
+## What was corrected
+The previous pass mixed in data from **BYD Seal 05 DM-i sedan**. The following values are now rejected for this SUV folder unless a future source explicitly proves a Sealion 05 SUV trim with those values:
+- 7.68 kWh battery
+- 55 km CLTC range
+- 65 L fuel tank
+- 4780 × 1837 × 1515 mm sedan-like dimensions
+- MEE Auto “Seal 05 DM-i 55 KM” page
 
-## Conflicts to carry forward
-- **EV range standard:** CLTC (China) vs WLTC (Jordan listing, 81 km) vs WLTP (Europe, 95 km) — not comparable.
-- **Battery:** 7.68 (55KM new-gen) / ~12.9–18.3 (China 2025款 75/115KM) / 18.3 (export) / 26.6 / 34.3 (new-gen long range).
-- **Tank:** 65 L (new-gen / MEE Jordan) vs unknown for China 2025款.
-- **Motor power:** 120 kW (most) vs 145 kW (one snippet).
-- **Power type:** engine-only ~74 kW/99 hp vs motor 120 kW/163 hp vs **combined system power not cleanly published** → needs_review.
+## First-generation / China 2025 Sealion 05 DM-i SUV
+Use as the main data track for this folder:
+- China name: 海狮05 DM-i
+- trims: 75KM / 115KM families
+- model year: 2025款, including 智驾版 / smart-driving facelift entries
+- confidence: database
+- source: S1/L2 China configuration databases
 
-## Usable now (with labels)
-Body, engine (1.5L NA ~74 kW), LFP Blade, DM-i, FWD/E-CVT, Jordan presence + name. Battery/range/tank/connector/power-combined = `needs_review`.
+## Possible export track
+- BYD Europe **Sealion 5 DM-i** exists as an official EU compact SUV model.
+- Treat it as **official for Europe** but only `needs_review` as exact equivalence to China Sealion 05 until a spec bridge is found.
+- Do not overwrite China/Jordan data with EU WLTP specs unless the vehicle is proven to be EU/export stock.
+
+## Jordan handling rule
+Jordan likely receives China/GCC/EU import stock, not a Jordan-specific engineering version. Therefore, do not search for “Jordan-only specs” as if they must exist. Instead, classify each Jordan unit by origin:
+- China-direct: likely China trim/connector/specs
+- EU/GCC/export: likely export trim/connector/specs
+- unknown import: keep battery/range/connector `needs_review`
+
+## Current usable facts for database seed
+- brand: BYD
+- model: Sealion 05 DM-i
+- chinese_name: 海狮05 DM-i
+- body: compact SUV
+- powertrain: PHEV / DM-i
+- engine: 1.5L BYD472QC NA
+- drivetrain: FWD
+- transmission: E-CVT
+- confidence: partial / needs_review
+
+## Must remain needs_review/null
+- exact Jordan trim
+- battery_kwh
+- electric_range_km and standard
+- fuel_tank_l
+- charging_port
+- ac_charging_kw
+- dc_fast_charging
+- tire pressure
+- warranty
+- maintenance intervals
+- official owner manual
