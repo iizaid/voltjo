@@ -91,5 +91,5 @@ Account deletion is **request-only** in this phase.
 - No `service_role` key is used
 - Public avatar bucket is acceptable for MVP
 - Before production hardening, consider moving avatar delivery to signed URLs if private storage is required
-- Avatar upload and account export now include basic in-memory rate limiting
-- Password reset link sending now includes basic in-memory rate limiting
+- Avatar upload and account export now use the shared Upstash Redis-backed rate limiter
+- Password reset link sending should be verified against the current shared rate-limit behavior before public launch

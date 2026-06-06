@@ -2,6 +2,8 @@
 
 > Read-only audit. No code was changed. Based on actual repository state at branch `main` (commit `8e098ad`).
 
+> This document is historical. It records the audit state at the time it was written. Check `plans/00-current-project-handoff.md` and the current repository before assuming any item is still open.
+
 ## Context
 
 VoltJo is an Arabic-first, Jordan-focused EV/PHEV/hybrid vehicle intelligence platform (Next.js 16, React 19, Supabase, MapLibre). The foundations are unusually disciplined for this stage: auth, RLS, account settings, avatar upload, a charging map, a charging calculator, a mock assistant, and a security/perf hardening pass already exist and are documented in `docs/`. The goal of this plan is **not** to rebuild anything — it is to identify the precise, concrete gaps between "demo that runs" and "credible public MVP," and sequence the work to close them.
@@ -81,7 +83,7 @@ The single most important theme: **most of the plumbing is real; the launch risk
 - **Severity:** Critical (auth correctness)
 - **Files:** Supabase Auth dashboard; `lib/auth/actions.ts` already branches on `data.session` for both modes.
 - **Why:** Without a production SMTP provider, confirmation/reset emails silently fail to send → users cannot complete signup or reset passwords. Default Supabase SMTP is rate-limited and not for production.
-- **Fix:** Choose confirmation on/off; configure production SMTP; brand templates per `docs/auth-email-branding.md`; test signup + reset end-to-end.
+- **Fix:** Choose confirmation on/off; configure production SMTP; brand templates per `docs/auth-email-branding.md` and `plans/08-auth-email-resend-smtp-readiness.md`; test signup + reset end-to-end.
 - **Effort:** Small–Medium · **AI-safe:** No (dashboard + DNS) · **Manual dashboard:** Yes.
 
 ### C4 — Empty charging map presented as a finished feature
@@ -169,7 +171,7 @@ The single most important theme: **most of the plumbing is real; the launch risk
 
 ## 8. Performance Review
 
-**Likely fine; perceived slowness is dev-mode** (confirmed in `docs/security-performance-audit.md`: prod cold start ~146ms, routes immediate).
+**Likely fine; perceived slowness is dev-mode** (confirmed in `plans/13-security-performance-audit-historical.md`: prod cold start ~146ms, routes immediate).
 
 - **Real bottleneck to watch:** MapLibre on `/charging-map` is the only heavy client bundle. It's already isolated to a client component on one route → acceptable. Verify it's not pulled into shared chunks.
 - **Already optimized:** memoized sidebar filtering + active-conversation lookup in chat; avatar URL resolution no longer spins up an SSR Supabase client.

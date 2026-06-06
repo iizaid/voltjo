@@ -127,7 +127,7 @@ Login from `/start`:
 - monitoring/audit logs
 - CAPTCHA/bot protection
 
-The current in-memory rate limiter is a Phase 1 safety guard only. Replace it with Redis/Upstash, Supabase Edge rate limiting, or platform/WAF protection before public launch.
+The original Phase 1 in-memory limiter has since been replaced for API protection by the shared Upstash Redis-backed limiter. Before public launch, verify the current auth and API rate-limit behavior in staging with `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` configured.
 
 ## Production Security Checklist
 

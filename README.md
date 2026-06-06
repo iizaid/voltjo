@@ -191,6 +191,8 @@ More details are in `docs/supabase-auth-foundation.md`.
 
 See the [Staging Deployment & Smoke-Test Checklist](docs/staging-smoke-tests.md) for the ordered environment setup, Supabase manual steps, route smoke tests, curl examples, and rollback notes.
 
+For future planning and handoff context, start with `plans/00-current-project-handoff.md`.
+
 ## Cloudflare Workers Deployment
 
 Use the Workers/OpenNext setup already in this repo:

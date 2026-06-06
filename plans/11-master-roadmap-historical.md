@@ -1,5 +1,7 @@
 # خطة العمل الشاملة لمشروع VoltJo (Master Roadmap)
 
+> This document is historical. It records the audit state at the time it was written. Check `plans/00-current-project-handoff.md` and the current repository before assuming any item is still open.
+
 هذا الملف يحتوي على الخطة المحكمة والدقيقة لجميع الميزات المتبقية (Missing Features) التي يجب إنجازها للوصول بمشروع **VoltJo** إلى مرحلة الإطلاق النهائي (Production). تم تقسيم الخطة إلى مراحل منطقية لضمان التسلسل الصحيح في التطوير.
 
 ---

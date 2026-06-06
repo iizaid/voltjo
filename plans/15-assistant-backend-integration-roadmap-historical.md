@@ -1,5 +1,7 @@
 # VoltJo AI Assistant Backend Integration Roadmap
 
+> This document is historical. It records the audit state at the time it was written. Check `plans/00-current-project-handoff.md` and the current repository before assuming any item is still open.
+
 This document outlines the technical design, architectural plan, and step-by-step implementation phases for connecting the **VoltJo AI Assistant** frontend to a production-grade, secure, and streaming AI backend.
 
 ---

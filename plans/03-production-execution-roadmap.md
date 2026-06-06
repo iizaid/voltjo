@@ -1,6 +1,8 @@
 # VoltJo Production Execution Roadmap
 
-> Companion to `plans/voltjo-production-readiness-plan.md`. This document turns the audit into ordered, safe, independently-reviewable execution phases. No code was written or changed to produce it.
+> Companion to `plans/01-production-readiness-audit-2026-06-06.md`. This document turns the audit into ordered, safe, independently-reviewable execution phases. No code was written or changed to produce it.
+
+> This document is historical. It records the audit state at the time it was written. Check `plans/00-current-project-handoff.md` and the current repository before assuming any item is still open.
 
 ## Executive Summary
 

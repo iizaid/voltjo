@@ -2,6 +2,8 @@
 
 > خطة تفصيلية مبنية على التدقيق الحالي للريبو. هذه الوثيقة لا تنفذ أي تعديل برمجي، بل تجمع ما تم العثور عليه، درجة الخطورة، الأدلة من الملفات، وخطة التصحيح المقترحة للمرحلة القادمة.
 
+> This document is historical. It records the audit state at the time it was written. Check `plans/00-current-project-handoff.md` and the current repository before assuming any item is still open.
+
 ## Current Status Note - 2026-06-06
 
 - هذه الوثيقة تاريخية وتحفظ نتائج التدقيق الأصلي؛ لا تعني أن كل البنود أدناه ما زالت بنفس الحالة.
@@ -461,7 +463,7 @@ supabase/migrations/008_verified_charging_locations_seed.sql
      - pricing clearly preliminary.
      - legal links exist before public launch.
 
-3. `plans/voltjo-production-readiness-plan.md`
+3. `plans/01-production-readiness-audit-2026-06-06.md`
    - لا تعدله فورًا إذا كان historical.
    - لاحقًا يمكن إضافة note في أعلى الملف يشير إلى هذه الوثيقة الأحدث.
 

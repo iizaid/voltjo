@@ -1,5 +1,7 @@
 # MVP Launch Scope
 
+> This document is historical. It records the audit state at the time it was written. Check `plans/00-current-project-handoff.md` and the current repository before assuming any item is still open.
+
 ## Public launch pages
 
 - `/vehicles`

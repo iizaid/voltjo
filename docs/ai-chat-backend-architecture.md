@@ -20,7 +20,7 @@ The API route:
 2. applies a content-length guard before JSON parsing when the header is present
 3. validates the payload server-side
 4. resolves the current Supabase user when available
-5. applies in-memory rate limiting
+5. applies Upstash Redis-backed rate limiting
 6. wraps provider calls with a timeout
 7. returns a structured JSON response
 
@@ -67,7 +67,7 @@ Current default:
 - Client components must never import server env helpers.
 - Provider errors should be sanitized before returning to the UI.
 - `/api/chat` rejects oversized request bodies when `Content-Length` exceeds the configured limit.
-- `/api/chat` includes in-memory rate limiting in this phase.
+- `/api/chat` includes Upstash Redis-backed rate limiting in this phase.
 - `/api/chat` returns rate limit headers:
   - `X-RateLimit-Limit`
   - `X-RateLimit-Remaining`
@@ -75,7 +75,7 @@ Current default:
   - `Retry-After` when blocked
 - Client requests use a timeout.
 - Provider execution uses a server-side timeout.
-- Production should replace in-memory rate limiting with shared storage or edge/network protection.
+- Production requires the Upstash Redis REST env vars. The limiter fails closed if the shared store is missing or unreachable.
 
 ## Current limitations
 
@@ -84,5 +84,5 @@ Current default:
 - Real API keys will be added later server-side only.
 - Chat persistence is still localStorage only.
 - Attachments are still metadata/demo only.
-- `/api/chat` rate limiting is temporary and in-memory.
+- `/api/chat` rate limiting is backed by Upstash Redis and should be smoke-tested with real staging Worker secrets.
 - No streaming yet.

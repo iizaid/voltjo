@@ -1,5 +1,7 @@
 # VoltJo Assistant: Pre-Backend Final Audit Checklist
 
+> This document is historical. It records the audit state at the time it was written. Check `plans/00-current-project-handoff.md` and the current repository before assuming any item is still open.
+
 This audit checklist outlines the verification criteria, user interface (UI) acceptance benchmarks, client-side conversation logic constraints, and manual QA scenarios required to validate that the `/assistant` page is fully optimized and stable before initiating backend API integration.
 
 ---
