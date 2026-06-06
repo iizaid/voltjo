@@ -10,6 +10,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/charging-calculator", priority: 0.8 },
     { path: "/assistant", priority: 0.8 },
     { path: "/start", priority: 0.7 },
+    { path: "/privacy", priority: 0.5 },
+    { path: "/terms", priority: 0.5 },
+    { path: "/data-deletion", priority: 0.5 },
   ];
 
   return routes.map(({ path, priority }) => ({

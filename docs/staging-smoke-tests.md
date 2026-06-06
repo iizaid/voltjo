@@ -102,6 +102,9 @@ Replace `STAGING_URL` with your actual staging origin before running.
 | `/charging-map` location button | Browser geolocation permission prompt appears; denying permission keeps the consent/error UX stable | |
 | `GET /charging-calculator` | 200 — calculator renders; vehicle dropdown populated from seeded rows | |
 | `GET /assistant` | 200 — assistant chat page renders | |
+| `GET /privacy` | 200 — Arabic privacy page renders | |
+| `GET /terms` | 200 — Arabic terms page renders | |
+| `GET /data-deletion` | 200 — Arabic data deletion request page renders | |
 | `GET /robots.txt` | 200 — `Sitemap:` line references staging origin, not `voltjo.com` | |
 | `GET /sitemap.xml` | 200 — XML with staging origin URLs, not `voltjo.com` | |
 | `GET /nonexistent-path-xyz` | 404 — custom not-found page | |
@@ -199,6 +202,9 @@ After 10 signed-in saves within 10 minutes, the next request returns `429` with 
 - [ ] AI assistant returns mock responses only — no real AI provider is launched
 - [ ] Assistant public copy says experimental guidance and does not imply final AI advice
 - [ ] Assistant model menu labels alternate modes as experimental; Gemini/Kimi must not appear as live provider integrations unless implemented
+- [ ] Footer contains Arabic legal links: سياسة الخصوصية، الشروط، حذف البيانات
+- [ ] `sitemap.xml` includes `/privacy`, `/terms`, and `/data-deletion`
+- [ ] `robots.txt` does not block `/privacy`, `/terms`, or `/data-deletion`
 - [ ] No provider names leak into UI (Supabase, OpenAI, Stripe, database, backend)
 - [ ] Arabic text renders correctly — RTL layout, font loaded
 

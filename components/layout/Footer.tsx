@@ -2,6 +2,8 @@ import Link from "next/link";
 import { Mail } from "lucide-react";
 import { VoltJoLogo } from "@/components/brand/VoltJoLogo";
 
+const SUPPORT_EMAIL = "support@voltjo.com";
+
 const navLinks = [
   { label: "الرئيسية", href: "/" },
   { label: "السيارات المدعومة", href: "/vehicles" },
@@ -9,6 +11,12 @@ const navLinks = [
   { label: "حاسبة الشحن", href: "/charging-calculator" },
   { label: "المساعد الذكي", href: "/assistant" },
   { label: "الأسعار", href: "/#pricing" },
+];
+
+const legalLinks = [
+  { label: "سياسة الخصوصية", href: "/privacy" },
+  { label: "الشروط", href: "/terms" },
+  { label: "حذف البيانات", href: "/data-deletion" },
 ];
 
 export function Footer() {
@@ -44,7 +52,7 @@ export function Footer() {
             ))}
             <li>
               <a
-                href="mailto:zaid.tarawneh.505@gmail.com"
+                href={`mailto:${SUPPORT_EMAIL}`}
                 className="text-[15px] font-semibold text-white/80 transition-colors hover:text-[var(--voltjo-orange)]"
               >
                 تواصل معنا
@@ -53,15 +61,30 @@ export function Footer() {
           </ul>
         </nav>
 
+        <nav className="mb-8 w-full" dir="rtl" aria-label="روابط قانونية">
+          <ul className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3">
+            {legalLinks.map((link) => (
+              <li key={link.href}>
+                <Link
+                  href={link.href}
+                  className="text-[13px] font-semibold text-white/55 transition-colors hover:text-[var(--voltjo-orange)]"
+                >
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
         {/* Contact Button */}
         <div>
           <a
-            href="mailto:zaid.tarawneh.505@gmail.com"
+            href={`mailto:${SUPPORT_EMAIL}`}
             className="group flex items-center gap-2.5 rounded-full border border-[var(--voltjo-orange)]/40 bg-[var(--voltjo-orange)]/10 px-7 py-3 transition-all hover:bg-[var(--voltjo-orange)]/20"
           >
             <Mail className="size-[18px] text-[var(--voltjo-orange)]" />
             <span className="text-[15px] font-bold tracking-wide text-[var(--voltjo-orange)]" dir="ltr">
-              zaid.tarawneh.505@gmail.com
+              {SUPPORT_EMAIL}
             </span>
           </a>
         </div>
