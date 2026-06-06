@@ -183,6 +183,8 @@ Not implemented yet:
 
 More details are in `docs/supabase-auth-foundation.md`.
 
+See the [Staging Deployment & Smoke-Test Checklist](docs/staging-smoke-tests.md) for the ordered environment setup, Supabase manual steps, route smoke tests, curl examples, and rollback notes.
+
 ## Account vs Dashboard
 
 - `/account` is the main Smart Profile page: identity, onboarding preferences, completion status, and account/security information.
