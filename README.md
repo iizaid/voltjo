@@ -219,5 +219,5 @@ shared store is missing or unreachable.
 
 - `/account` is the main Smart Profile page: identity, onboarding preferences, completion status, and account/security information.
 - `/dashboard` is intentionally lightweight until product databases exist. Future modules can include saved cars, comparisons, reports, and chat history.
-- Login rate-limit buckets reset after successful login, but the in-memory limiter is still temporary and must be replaced before public launch.
+- API rate limiting is backed by Upstash Redis and fails closed when the shared store is missing or unreachable. Review auth and API rate-limit behavior during staging before public launch.
 - Vehicle data in the MVP seed is sample launch data and still requires business verification before making public claims.

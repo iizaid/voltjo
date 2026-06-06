@@ -3,21 +3,28 @@
 ## Current State
 
 Monitoring is not wired to a vendor yet. There is no Sentry setup, no Vercel
-Observability setup, and no monitoring-specific environment variable should be
-added until that integration is intentionally installed.
+Observability setup, no dedicated Cloudflare Observability integration, and no
+monitoring-specific environment variable should be added until that integration
+is intentionally installed.
 
-For staging, use Vercel deployment logs and runtime function logs as the first
-line of visibility. The app should continue returning safe Arabic UI/API
-messages while operational details stay in logs.
+For staging, use the active hosting platform logs as the first line of
+visibility: Cloudflare Workers build/deploy logs and runtime logs for the
+current OpenNext deployment path, or Vercel deployment/function logs if the app
+is deployed there. The app should continue returning safe Arabic UI/API messages
+while operational details stay in logs.
 
 ## Recommended Monitoring Path
 
-### 1. Staging baseline: Vercel logs
+### 1. Staging baseline: platform logs
 
 - Review build logs for TypeScript, lint, route generation, and environment
   warnings after every staging deploy.
-- Review runtime function logs for API errors, auth callback failures, avatar
-  upload failures, rate-limit denials, and location-save failures.
+- On Cloudflare Workers, review build/deploy logs and Worker runtime logs after
+  every OpenNext deploy.
+- On Vercel, review deployment logs and runtime function logs if that platform
+  is used for the environment.
+- Review runtime logs for API errors, auth callback failures, avatar upload
+  failures, rate-limit denials, and location-save failures.
 - Confirm server logs never include secrets, tokens, service-role keys, full
   export payloads, chat content, or raw uploaded files.
 
@@ -59,9 +66,10 @@ safe.
 
 Before promoting a staging build, verify:
 
-- [ ] Vercel build logs show no unexpected build, lint, or TypeScript failures.
-- [ ] Runtime function logs are checked after exercising auth, chat, avatar,
-  account export, and location-save flows.
+- [ ] Cloudflare Workers build/deploy logs, or Vercel build logs if hosted
+  there, show no unexpected build, lint, or TypeScript failures.
+- [ ] Runtime logs are checked after exercising auth, chat, avatar, account
+  export, and location-save flows.
 - [ ] No raw stack traces are visible in UI pages or API responses.
 - [ ] Rate-limit failures are visible enough to diagnose abuse patterns, but do
   not log secrets, message contents, full payloads, or private files.
@@ -76,7 +84,8 @@ location-preference routes should keep their server-side limits in place.
 
 Do not add CAPTCHA widgets in this phase. Future layers, if abuse requires them:
 
-- Vercel WAF / firewall rules for obvious automated traffic patterns.
+- Cloudflare WAF / firewall rules, or Vercel WAF if hosted there, for obvious
+  automated traffic patterns.
 - Turnstile or hCaptcha on signup/login only after product review.
 - Continued API rate limits for chat, avatar upload, account export, and
   location saving.

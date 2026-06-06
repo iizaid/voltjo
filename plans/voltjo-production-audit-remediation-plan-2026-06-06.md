@@ -2,6 +2,13 @@
 
 > خطة تفصيلية مبنية على التدقيق الحالي للريبو. هذه الوثيقة لا تنفذ أي تعديل برمجي، بل تجمع ما تم العثور عليه، درجة الخطورة، الأدلة من الملفات، وخطة التصحيح المقترحة للمرحلة القادمة.
 
+## Current Status Note - 2026-06-06
+
+- هذه الوثيقة تاريخية وتحفظ نتائج التدقيق الأصلي؛ لا تعني أن كل البنود أدناه ما زالت بنفس الحالة.
+- Phase 5 verified vehicle/station data remains pending, and no fake verified data should be added.
+- Cloudflare/OpenNext deployment support was added after Phase 6A.
+- Public production remains blocked by verified data, real production operations, and the final launch checklist.
+
 ## الخلاصة التنفيذية
 
 VoltJo قريب من بيئة staging من ناحية البنية العامة، لكنه ليس جاهزًا بعد. السبب ليس أن المشروع غير مكتمل بالكامل، بل أن هناك عدة نقاط صغيرة لكنها مؤثرة تجعل اختبار staging غير موثوق إذا تم تجاهلها.

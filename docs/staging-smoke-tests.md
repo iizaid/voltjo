@@ -7,7 +7,9 @@
 
 ## 1. Environment Variables
 
-Set all of the following in your staging host (Vercel → Project → Settings → Environment Variables).
+Set all of the following in your staging host (Cloudflare Workers dashboard for
+the current OpenNext deployment path, or Vercel → Project → Settings →
+Environment Variables if using Vercel).
 Do **not** commit real values.
 
 | Variable | Required | Staging value |
@@ -27,6 +29,10 @@ Do not add `SENTRY_DSN` or `SENTRY_AUTH_TOKEN` until Sentry is installed.
 
 > `NEXT_PUBLIC_SITE_URL` is required for `robots.txt` and `sitemap.xml` to reference the
 > correct staging origin. Without it both files fall back to `https://voltjo.com`.
+
+For Cloudflare Workers staging, use the repository deployment runbook in
+`README.md`: build command `npm run cf:build`, deploy command
+`npx wrangler deploy`, and Node.js `22` or newer.
 
 ---
 
@@ -216,8 +222,8 @@ After 10 signed-in saves within 10 minutes, the next request returns `429` with 
 
 ### 3e. Production-Ops Verification
 
-- [ ] Review Vercel build logs after deployment; no unexpected build, lint, or TypeScript failures
-- [ ] Review runtime function logs after exercising auth, chat, avatar, export, and location flows
+- [ ] Review Cloudflare Workers build/deploy logs after deployment, or Vercel build logs if hosted there; no unexpected build, lint, or TypeScript failures
+- [ ] Review runtime logs after exercising auth, chat, avatar, export, and location flows
 - [ ] Confirm rate-limit denials are diagnosable in logs without leaking message contents, tokens, or private payloads
 - [ ] Bot protection is not integrated yet; current protection is server-side rate limiting
 - [ ] Future bot protection plan reviewed in `docs/monitoring.md` and must not break Arabic onboarding
@@ -264,6 +270,13 @@ curl -s -o /dev/null -w "location: %{http_code}\n" -X POST "$STAGING_URL/api/acc
 ---
 
 ## 5. Rollback Notes
+
+### Cloudflare Workers Deployment Rollback
+
+1. Cloudflare Dashboard -> Workers & Pages -> select the VoltJo Worker
+2. Open **Deployments**
+3. Select the last known-good deployment
+4. Use rollback/promote controls available for the Worker deployment, then re-run the smoke tests above
 
 ### Vercel Deployment Rollback
 
