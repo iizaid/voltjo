@@ -152,6 +152,11 @@ Expected: `413` with an Arabic payload-size error and no raw stack trace.
 Note: current rate limiting is fail-closed. If Upstash Redis env vars are missing or invalid,
 rate-limited endpoints may return 429/deny instead of working normally.
 
+If `/assistant` immediately shows `محاولات كثيرة. حاول بعد قليل.` on staging,
+verify the Cloudflare Worker has both `UPSTASH_REDIS_REST_URL` and
+`UPSTASH_REDIS_REST_TOKEN` configured. This is expected fail-closed behavior
+when the shared rate-limit store is unavailable, not necessarily a chat bug.
+
 **GET /api/account/export — signed-out (expect 401):**
 
 ```bash

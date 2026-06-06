@@ -11,7 +11,7 @@ type ButtonProps = {
 
 const variants = {
   primary:
-    "bg-[var(--voltjo-black)] text-white shadow-[0_1px_0_rgba(13,13,13,0.05)] hover:bg-[#1a1a1a]",
+    "bg-[var(--voltjo-black)] text-white on-dark-fg shadow-[0_1px_0_rgba(13,13,13,0.05)] hover:bg-[#1a1a1a]",
   secondary:
     "border border-[var(--voltjo-border)] bg-white text-[var(--voltjo-black)] shadow-[0_1px_0_rgba(13,13,13,0.02)] hover:bg-[var(--voltjo-bg-soft)]",
   ghost:

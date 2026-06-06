@@ -191,6 +191,30 @@ More details are in `docs/supabase-auth-foundation.md`.
 
 See the [Staging Deployment & Smoke-Test Checklist](docs/staging-smoke-tests.md) for the ordered environment setup, Supabase manual steps, route smoke tests, curl examples, and rollback notes.
 
+## Cloudflare Workers Deployment
+
+Use the Workers/OpenNext setup already in this repo:
+
+- Build command: `npm run cf:build`
+- Deploy command: `npx wrangler deploy`
+- Node.js version: `22` or newer
+- Wrangler config: `wrangler.jsonc`
+
+Required Worker variables/secrets:
+
+| Variable | Value |
+| --- | --- |
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon key |
+| `NEXT_PUBLIC_SITE_URL` | Cloudflare staging/production origin, no trailing slash |
+| `AI_PROVIDER` | `mock` |
+| `UPSTASH_REDIS_REST_URL` | Upstash Redis REST URL |
+| `UPSTASH_REDIS_REST_TOKEN` | Upstash Redis REST token |
+
+If `/assistant` immediately shows `محاولات كثيرة. حاول بعد قليل.`, first verify
+the two Upstash Worker secrets above. The rate limiter fails closed when the
+shared store is missing or unreachable.
+
 ## Account vs Dashboard
 
 - `/account` is the main Smart Profile page: identity, onboarding preferences, completion status, and account/security information.
