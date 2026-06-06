@@ -21,7 +21,7 @@ export function FinalCtaSection() {
                 <ArrowUpLeft size={18} />
               </span>
             </Button>
-            <Button href="/charging-calculator" variant="secondary">
+            <Button href="/charging-calculator">
               جرّب الحاسبة
             </Button>
           </div>

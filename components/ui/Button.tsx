@@ -25,10 +25,23 @@ export function Button({
   className = "",
   disabled = false,
 }: ButtonProps) {
+  const isAnimatedPrimary = variant === "primary" && !disabled;
   const disabledClasses = disabled
     ? "cursor-not-allowed bg-[var(--voltjo-surface-soft)] text-[var(--voltjo-muted)] shadow-none opacity-100 hover:bg-[var(--voltjo-surface-soft)]"
     : variants[variant];
-  const classes = `inline-flex min-h-[44px] items-center justify-center rounded-full px-6 text-sm font-bold transition-all duration-200 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-0.5 active:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(255,77,0,0.28)] focus-visible:ring-offset-2 ${disabledClasses} ${className}`;
+  const motionClasses = isAnimatedPrimary
+    ? "voltjo-action-button transition-transform duration-200 ease-[cubic-bezier(0,0,0.2,1)]"
+    : "transition-all duration-200 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-0.5 active:translate-y-0";
+  const classes = `inline-flex min-h-[44px] items-center justify-center rounded-full px-6 text-sm font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(255,77,0,0.28)] focus-visible:ring-offset-2 ${motionClasses} ${disabledClasses} ${className}`;
+  const content = isAnimatedPrimary ? (
+    <>
+      <span className="voltjo-action-transition" aria-hidden="true" />
+      <span className="voltjo-action-gradient" aria-hidden="true" />
+      <span className="voltjo-action-label">{children}</span>
+    </>
+  ) : (
+    children
+  );
 
   if (href) {
     return (
@@ -38,14 +51,14 @@ export function Button({
         href={disabled ? "#" : href}
         onClick={disabled ? (event) => event.preventDefault() : undefined}
       >
-        {children}
+        {content}
       </Link>
     );
   }
 
   return (
     <button className={classes} disabled={disabled}>
-      {children}
+      {content}
     </button>
   );
 }

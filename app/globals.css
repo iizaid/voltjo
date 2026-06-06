@@ -364,6 +364,63 @@ input {
   color: #fff !important;
 }
 
+.voltjo-action-button {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  border: 0;
+  cursor: pointer;
+  color: #fff !important;
+}
+
+.voltjo-action-gradient {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  margin-top: -0.25em;
+  border-radius: inherit;
+  pointer-events: none;
+  background-image: linear-gradient(
+    rgba(0, 0, 0, 0),
+    rgba(0, 0, 0, 0),
+    rgba(0, 0, 0, 0.24)
+  );
+}
+
+.voltjo-action-transition {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 0;
+  width: 0;
+  height: 0;
+  border-radius: 9999px;
+  background-color: rgba(255, 255, 255, 0.24);
+  transform: translate(-50%, -50%);
+  transition-duration: 500ms;
+  transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
+}
+
+.voltjo-action-button:hover .voltjo-action-transition {
+  width: 14em;
+  height: 14em;
+}
+
+.voltjo-action-button:active {
+  transform: scale(0.97);
+}
+
+.voltjo-action-label {
+  position: relative;
+  top: -1px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  color: #fff !important;
+}
+
 .soft-shadow {
   box-shadow: var(--voltjo-shadow-soft);
 }

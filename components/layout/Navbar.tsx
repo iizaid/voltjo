@@ -80,9 +80,11 @@ export function Navbar({ auth }: { auth?: NavbarAuthState | null }) {
             ) : (
               <Link
                 href="/start"
-                className="flex h-10 items-center justify-center rounded-full bg-[var(--voltjo-orange)] px-5 text-sm font-bold text-white shadow-[0_0_0_6px_var(--voltjo-orange-glow)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[var(--voltjo-orange-dark)]"
+                className="voltjo-action-button on-dark-fg flex h-10 items-center justify-center rounded-full bg-[var(--voltjo-orange)] px-5 text-sm font-bold text-white shadow-[0_0_0_6px_var(--voltjo-orange-glow)] transition-transform duration-200"
               >
-                ابدأ الآن
+                <span className="voltjo-action-transition" aria-hidden="true" />
+                <span className="voltjo-action-gradient" aria-hidden="true" />
+                <span className="voltjo-action-label">ابدأ الآن</span>
               </Link>
             )}
           </div>
@@ -145,9 +147,11 @@ export function Navbar({ auth }: { auth?: NavbarAuthState | null }) {
                 <Link
                   href="/start"
                   onClick={() => setMobileOpen(false)}
-                  className="flex w-full items-center justify-center rounded-full bg-[var(--voltjo-orange)] px-4 py-2.5 text-sm font-bold text-white transition hover:bg-[var(--voltjo-orange-dark)]"
+                  className="voltjo-action-button on-dark-fg flex w-full items-center justify-center rounded-full bg-[var(--voltjo-orange)] px-4 py-2.5 text-sm font-bold text-white transition-transform duration-200"
                 >
-                  ابدأ الآن
+                  <span className="voltjo-action-transition" aria-hidden="true" />
+                  <span className="voltjo-action-gradient" aria-hidden="true" />
+                  <span className="voltjo-action-label">ابدأ الآن</span>
                 </Link>
               )}
             </div>

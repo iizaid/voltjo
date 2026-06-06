@@ -91,12 +91,12 @@ const PricingSwitch = ({
 
   return (
     <div className={cn("flex justify-center", className)}>
-      <div className="relative z-10 mx-auto flex w-fit rounded-full border border-[var(--voltjo-border)] bg-[var(--voltjo-surface-soft)] p-1 shadow-[var(--voltjo-shadow-ring)]">
+      <div className="relative z-10 mx-auto flex w-fit rounded-xl border border-gray-200 bg-neutral-50 p-1 shadow-[var(--voltjo-shadow-ring)]">
         <button
           type="button"
           onClick={() => handleSwitch("0")}
           className={cn(
-            "relative z-10 h-12 w-fit cursor-pointer rounded-full px-3 py-1 text-sm font-medium transition-colors sm:px-6 sm:py-2 sm:text-base",
+            "relative z-10 h-12 w-fit cursor-pointer rounded-xl px-3 py-1 text-sm font-medium transition-colors sm:px-6 sm:py-2 sm:text-base",
             selected === "0"
               ? "text-white"
               : "text-muted-foreground hover:text-black",
@@ -105,7 +105,7 @@ const PricingSwitch = ({
           {selected === "0" && (
             <motion.span
               layoutId="switch"
-              className="absolute left-0 top-0 h-12 w-full rounded-full bg-[var(--voltjo-orange)] shadow-[0_0_0_5px_var(--voltjo-orange-glow)]"
+              className="absolute left-0 top-0 h-12 w-full rounded-xl border-4 border-orange-600 bg-gradient-to-t from-orange-500 via-orange-400 to-orange-600 shadow-sm shadow-orange-600"
               transition={{ type: "spring", stiffness: 500, damping: 30 }}
             />
           )}
@@ -116,7 +116,7 @@ const PricingSwitch = ({
           type="button"
           onClick={() => handleSwitch("1")}
           className={cn(
-            "relative z-10 h-12 w-fit flex-shrink-0 cursor-pointer rounded-full px-3 py-1 text-sm font-medium transition-colors sm:px-6 sm:py-2 sm:text-base",
+            "relative z-10 h-12 w-fit flex-shrink-0 cursor-pointer rounded-xl px-3 py-1 text-sm font-medium transition-colors sm:px-6 sm:py-2 sm:text-base",
             selected === "1"
               ? "text-white"
               : "text-muted-foreground hover:text-black",
@@ -125,13 +125,13 @@ const PricingSwitch = ({
           {selected === "1" && (
             <motion.span
               layoutId="switch"
-              className="absolute left-0 top-0 h-12 w-full rounded-full bg-[var(--voltjo-orange)] shadow-[0_0_0_5px_var(--voltjo-orange-glow)]"
+              className="absolute left-0 top-0 h-12 w-full rounded-xl border-4 border-orange-600 bg-gradient-to-t from-orange-500 via-orange-400 to-orange-600 shadow-sm shadow-orange-600"
               transition={{ type: "spring", stiffness: 500, damping: 30 }}
             />
           )}
           <span className="relative flex items-center gap-2">
             سنوي
-            <span className="rounded-full border border-[rgba(255,77,0,0.16)] bg-[rgba(255,77,0,0.06)] px-2 py-0.5 text-xs font-medium text-[var(--voltjo-black)]">
+            <span className="rounded-full border border-orange-200 bg-orange-50 px-2 py-0.5 text-xs font-medium text-black">
               قيد التحضير
             </span>
           </span>
@@ -176,13 +176,14 @@ export default function Pricing() {
       dir="rtl"
     >
       <article className="mb-6 max-w-2xl space-y-4 text-right">
-        <h2 className="display-heading mb-4 pb-1 text-4xl font-medium leading-[1.35] text-gray-900 md:text-6xl">
+        <h2 className="display-heading mb-4 overflow-visible pb-3 text-4xl font-medium leading-[1.46] text-gray-900 md:text-6xl">
           <VerticalCutReveal
             splitBy="words"
             staggerDuration={0.15}
             staggerFrom="first"
             reverse
-            containerClassName="justify-start"
+            containerClassName="justify-start overflow-visible pb-1"
+            wordLevelClassName="overflow-visible py-2 -my-2"
             transition={{
               type: "spring",
               stiffness: 250,
