@@ -46,7 +46,7 @@ export function HeroPromptBox() {
 
   return (
     <div className="mx-auto mt-10 max-w-3xl" dir="rtl">
-      <div className="rounded-[28px] border border-[var(--voltjo-border)] bg-white p-3 shadow-[var(--voltjo-shadow-ring)] transition-shadow focus-within:border-[rgba(255,77,0,0.32)] focus-within:shadow-[0_0_0_6px_var(--voltjo-orange-glow)]">
+      <div className="rounded-[28px] border border-[var(--voltjo-border)] bg-white p-3 shadow-[var(--voltjo-shadow-ring)] transition-shadow focus-within:border-[rgba(255,77,0,0.32)] focus-within:shadow-[0_0_0_4px_rgba(255,77,0,0.12)]">
         {/* Textarea */}
         <textarea
           aria-label="سؤال VoltJo"
@@ -80,7 +80,7 @@ export function HeroPromptBox() {
             type="button"
             onClick={() => handleSubmit()}
             aria-label="ابدأ"
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--voltjo-orange)] text-white shadow-[0_0_0_5px_var(--voltjo-orange-glow)] transition hover:-translate-y-0.5 hover:bg-[var(--voltjo-orange-dark)]"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--voltjo-orange)] text-white shadow-[0_8px_18px_rgba(255,77,0,0.16)] transition hover:-translate-y-0.5 hover:bg-[var(--voltjo-orange-dark)]"
           >
             <ArrowUp size={17} />
           </button>

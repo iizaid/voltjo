@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { AnimatePresence } from "motion/react";
 import { OnboardingAuthPanel } from "@/components/onboarding/OnboardingAuthPanel";
 import { OnboardingIntro } from "@/components/onboarding/OnboardingIntro";
+import { OnboardingPrivacyConsent } from "@/components/onboarding/OnboardingPrivacyConsent";
 import { OnboardingQuestion } from "@/components/onboarding/OnboardingQuestion";
 import { onboardingQuestions } from "@/lib/onboarding/questions";
 import { saveOnboardingProfileAction } from "@/lib/auth/actions";
@@ -14,13 +15,15 @@ import {
   loadOnboardingProgress,
   saveOnboardingProgress,
   clearOnboardingDraft,
+  loadOnboardingPrivacyConsent,
+  saveOnboardingPrivacyConsent,
 } from "@/lib/onboarding/storage";
 import type {
   CustomerProfileDraft,
   OnboardingQuestion as OnboardingQuestionData,
 } from "@/lib/onboarding/types";
 
-type FlowState = "intro" | "questions" | "auth";
+type FlowState = "intro" | "consent" | "questions" | "auth";
 
 function getMotionDelay(duration: number) {
   if (typeof window === "undefined") return duration;
@@ -113,6 +116,12 @@ export function OnboardingFlow({ isAuthenticated }: { isAuthenticated?: boolean 
     setCurrentQuestionIndex((index) => Math.max(0, index - 1));
   };
 
+  const handlePrivacyConsentAccepted = () => {
+    saveOnboardingPrivacyConsent();
+    setFlowState("questions");
+    setCurrentQuestionIndex((index) => Math.max(0, index));
+  };
+
   const handleSelect = (value: string) => {
     if (!currentQuestion) return;
     clearNextTimeout();
@@ -156,26 +165,33 @@ export function OnboardingFlow({ isAuthenticated }: { isAuthenticated?: boolean 
   useEffect(() => {
     const storedDraft = loadOnboardingDraft();
     const storedProgress = loadOnboardingProgress();
+    const hasPrivacyConsent = loadOnboardingPrivacyConsent();
+    const nextAfterIntro: FlowState = hasPrivacyConsent ? "questions" : "consent";
 
     if (storedDraft) {
       setAnswers(storedDraft);
     }
 
     if (storedProgress) {
-      setFlowState(storedProgress.flowState);
       setCurrentQuestionIndex(storedProgress.currentQuestionIndex);
       
       if (storedProgress.flowState === "intro") {
         const introTimeout = setTimeout(
-          () => setFlowState("questions"),
+          () => setFlowState(nextAfterIntro),
           getMotionDelay(1050),
         );
         setHasHydrated(true);
         return () => { clearTimeout(introTimeout); clearNextTimeout(); };
       }
+
+      if (storedProgress.flowState === "questions" && !hasPrivacyConsent) {
+        setFlowState("consent");
+      } else {
+        setFlowState(storedProgress.flowState);
+      }
     } else {
       const introTimeout = setTimeout(
-        () => setFlowState("questions"),
+        () => setFlowState(nextAfterIntro),
         getMotionDelay(1050),
       );
       setHasHydrated(true);
@@ -224,6 +240,13 @@ export function OnboardingFlow({ isAuthenticated }: { isAuthenticated?: boolean 
   return (
     <AnimatePresence mode="wait">
       {flowState === "intro" ? <OnboardingIntro key="intro" /> : null}
+
+      {flowState === "consent" ? (
+        <OnboardingPrivacyConsent
+          key="consent"
+          onAccept={handlePrivacyConsentAccepted}
+        />
+      ) : null}
 
       {flowState === "questions" && currentQuestion ? (
         <OnboardingQuestion

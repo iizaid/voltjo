@@ -47,7 +47,7 @@ export function OnboardingQuestion({
       transition={{ duration: 0.22, ease: "easeOut" }}
       dir="rtl"
     >
-      <div className="w-full max-w-[820px]">
+      <div className="w-full max-w-[980px] rounded-[28px] border border-[var(--voltjo-border)] bg-white px-6 py-7 shadow-[0_28px_80px_rgba(13,13,13,0.06)] sm:px-10 sm:py-9">
         <div className="flex items-center justify-between gap-4 border-b border-[rgba(13,13,13,0.08)] pb-5">
           <span className="text-sm font-bold text-[#6F6673]">
             سؤال {questionIndex + 1} من {totalQuestions}
@@ -66,7 +66,7 @@ export function OnboardingQuestion({
           />
         </div>
 
-        <div className="mt-14">
+        <div className="mt-12">
           <h1 className="max-w-3xl text-4xl font-bold leading-tight text-[var(--voltjo-black)] sm:text-5xl">
             {question.title}
           </h1>
@@ -82,7 +82,7 @@ export function OnboardingQuestion({
           ) : null}
         </div>
 
-        <div className="mt-10 border-y border-[rgba(13,13,13,0.08)] bg-white/50 backdrop-blur-sm">
+        <div className="mt-10 overflow-hidden rounded-[22px] border border-[var(--voltjo-border)] bg-[#fbfbfb]">
           {question.options.map((option) => {
             const selected = isOptionSelected(option, answer);
 
@@ -92,10 +92,10 @@ export function OnboardingQuestion({
                 type="button"
                 aria-pressed={selected}
                 onClick={() => onSelect(option.value)}
-                className={`group flex min-h-[68px] w-full items-center justify-between gap-5 border-b border-[rgba(13,13,13,0.065)] px-1 py-4 text-right text-base font-bold leading-7 transition last:border-b-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(255,106,0,0.28)] sm:px-2 ${
+                className={`group flex min-h-[72px] w-full items-center justify-between gap-5 border-b border-[rgba(13,13,13,0.065)] px-5 py-4 text-right text-base font-bold leading-7 transition last:border-b-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[rgba(255,106,0,0.28)] sm:px-6 ${
                   selected
-                    ? "bg-[rgba(255,106,0,0.055)] text-[var(--voltjo-black)]"
-                    : "text-[var(--voltjo-black)] hover:bg-white/80"
+                    ? "bg-white text-[var(--voltjo-black)]"
+                    : "text-[var(--voltjo-black)] hover:bg-white"
                 }`}
               >
                 <span className="flex items-center gap-4">

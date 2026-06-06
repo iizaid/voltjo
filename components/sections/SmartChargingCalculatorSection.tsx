@@ -124,9 +124,9 @@ export function SmartChargingCalculatorSection() {
                 splitBy="words"
                 rotationInterval={2400}
                 staggerDuration={0.025}
-                mainClassName="inline-flex min-w-[7.25em] items-center justify-center overflow-visible rounded-[16px] bg-[var(--voltjo-orange)] px-4 py-2 text-[0.78em] leading-none text-white shadow-[0_16px_36px_rgba(255,106,0,0.22)] sm:text-[0.74em]"
-                splitLevelClassName="overflow-visible py-1"
-                elementLevelClassName="pb-0.5 leading-[1.16]"
+                mainClassName="inline-flex min-w-[7.1em] items-center justify-center overflow-visible rounded-[16px] bg-[var(--voltjo-orange)] px-5 py-3 text-[0.72em] leading-none text-white shadow-[0_12px_28px_rgba(255,106,0,0.16)] sm:text-[0.68em]"
+                splitLevelClassName="overflow-visible py-2 -my-1"
+                elementLevelClassName="pb-1 leading-[1.34]"
               />
             </h2>
             <p className="mx-auto mt-4 max-w-2xl text-base font-semibold leading-8 text-[var(--voltjo-muted)] sm:text-lg">

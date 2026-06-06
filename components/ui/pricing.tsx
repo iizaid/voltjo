@@ -238,7 +238,7 @@ export default function Pricing() {
                       {plan.name}
                     </h3>
                     {plan.popular ? (
-                      <span className="rounded-full bg-[var(--voltjo-orange)] px-3 py-1 text-sm font-medium text-white shadow-[0_0_0_5px_var(--voltjo-orange-glow)]">
+                      <span className="rounded-full bg-[var(--voltjo-orange)] px-3 py-1 text-sm font-medium text-white shadow-[0_8px_18px_rgba(255,77,0,0.14)]">
                         تمهيدية
                       </span>
                     ) : null}
@@ -274,7 +274,7 @@ export default function Pricing() {
                   onClick={showPricingNotice}
                   className={`mb-3 w-full rounded-xl px-4 py-3 text-base font-bold transition-all ${
                     plan.popular
-                      ? "border border-transparent bg-[var(--voltjo-orange)] text-white shadow-[0_0_0_5px_var(--voltjo-orange-glow)] hover:-translate-y-0.5 hover:bg-[var(--voltjo-orange-dark)]"
+                      ? "border border-transparent bg-[var(--voltjo-orange)] text-white shadow-[0_10px_22px_rgba(255,77,0,0.18)] hover:-translate-y-0.5 hover:bg-[var(--voltjo-orange-dark)]"
                       : plan.buttonVariant === "outline"
                         ? "border border-[var(--voltjo-border)] bg-[var(--voltjo-black)] text-white shadow-sm hover:-translate-y-0.5"
                         : "border border-[var(--voltjo-border)] bg-white text-[var(--voltjo-black)] shadow-sm hover:-translate-y-0.5 hover:bg-[var(--voltjo-surface-soft)]"

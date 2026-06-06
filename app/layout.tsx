@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Readex_Pro, Changa } from "next/font/google";
+import { CookieConsentBanner } from "@/components/layout/CookieConsentBanner";
 import { InitialSiteLoader } from "@/components/layout/InitialSiteLoader";
 import "./globals.css";
 
@@ -37,6 +38,7 @@ export default function RootLayout({
     >
       <body>
         {children}
+        <CookieConsentBanner />
         <InitialSiteLoader />
       </body>
     </html>

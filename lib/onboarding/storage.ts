@@ -2,9 +2,10 @@ import type { CustomerProfileDraft } from "@/lib/onboarding/types";
 
 export const ONBOARDING_STORAGE_KEY = "voltjo:onboarding:draft";
 export const ONBOARDING_PROGRESS_KEY = "voltjo:onboarding:progress";
+export const ONBOARDING_PRIVACY_CONSENT_KEY = "voltjo_privacy_onboarding_consent";
 
 export interface OnboardingProgress {
-  flowState: "intro" | "questions" | "auth";
+  flowState: "intro" | "consent" | "questions" | "auth";
   currentQuestionIndex: number;
 }
 
@@ -78,7 +79,7 @@ export function loadOnboardingProgress(): OnboardingProgress | null {
     if (
       !parsed ||
       typeof parsed !== "object" ||
-      !["intro", "questions", "auth"].includes(parsed.flowState) ||
+      !["intro", "consent", "questions", "auth"].includes(parsed.flowState) ||
       typeof parsed.currentQuestionIndex !== "number"
     ) {
       return null;
@@ -98,5 +99,27 @@ export function clearOnboardingDraft() {
     storage.removeItem(ONBOARDING_PROGRESS_KEY);
   } catch {
     // Onboarding persistence is best-effort until backend storage is added.
+  }
+}
+
+export function loadOnboardingPrivacyConsent() {
+  const storage = getLocalStorage();
+  if (!storage) return false;
+
+  try {
+    return storage.getItem(ONBOARDING_PRIVACY_CONSENT_KEY) === "accepted";
+  } catch {
+    return false;
+  }
+}
+
+export function saveOnboardingPrivacyConsent() {
+  const storage = getLocalStorage();
+  if (!storage) return;
+
+  try {
+    storage.setItem(ONBOARDING_PRIVACY_CONSENT_KEY, "accepted");
+  } catch {
+    // Onboarding consent persistence is best-effort on the current browser.
   }
 }

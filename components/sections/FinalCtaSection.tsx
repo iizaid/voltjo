@@ -21,9 +21,6 @@ export function FinalCtaSection() {
                 <ArrowUpLeft size={18} />
               </span>
             </Button>
-            <Button href="/charging-calculator">
-              جرّب الحاسبة
-            </Button>
           </div>
           <p className="mt-7 text-sm font-black text-[var(--voltjo-muted)]">
             معلومات محلية أولية • بيانات قيد المراجعة • خصوصيتك محمية

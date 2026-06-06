@@ -80,7 +80,7 @@ export function Navbar({ auth }: { auth?: NavbarAuthState | null }) {
             ) : (
               <Link
                 href="/start"
-                className="voltjo-action-button on-dark-fg flex h-10 items-center justify-center rounded-full bg-[var(--voltjo-orange)] px-5 text-sm font-bold text-white shadow-[0_0_0_6px_var(--voltjo-orange-glow)] transition-transform duration-200"
+                className="voltjo-action-button on-dark-fg flex h-10 items-center justify-center rounded-full bg-[var(--voltjo-orange)] px-5 text-sm font-bold text-white shadow-[0_8px_18px_rgba(255,77,0,0.16)] transition-transform duration-200"
               >
                 <span className="voltjo-action-transition" aria-hidden="true" />
                 <span className="voltjo-action-gradient" aria-hidden="true" />
