@@ -5,6 +5,9 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "cf:build": "opennextjs-cloudflare build",
+    "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
+    "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
     "start": "next start",
     "lint": "eslint . --max-warnings=0",
     "test": "vitest run"
@@ -27,6 +30,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@opennextjs/cloudflare": "^1.19.11",
     "@tailwindcss/postcss": "^4.1.17",
     "@types/node": "^20.17.9",
     "@types/react": "^19.2.6",
@@ -36,6 +40,7 @@
     "tailwindcss": "^4.1.17",
     "typescript": "^5.7.2",
     "typescript-eslint": "^8.60.0",
-    "vitest": "^3.2.6"
+    "vitest": "^3.2.6",
+    "wrangler": "^4.98.0"
   }
 }

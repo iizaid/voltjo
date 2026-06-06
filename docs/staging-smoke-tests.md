@@ -205,8 +205,17 @@ After 10 signed-in saves within 10 minutes, the next request returns `429` with 
 - [ ] Footer contains Arabic legal links: سياسة الخصوصية، الشروط، حذف البيانات
 - [ ] `sitemap.xml` includes `/privacy`, `/terms`, and `/data-deletion`
 - [ ] `robots.txt` does not block `/privacy`, `/terms`, or `/data-deletion`
+- [ ] Public pages include `Content-Security-Policy-Report-Only` header; no enforcing CSP is enabled yet
 - [ ] No provider names leak into UI (Supabase, OpenAI, Stripe, database, backend)
 - [ ] Arabic text renders correctly — RTL layout, font loaded
+
+### 3e. Production-Ops Verification
+
+- [ ] Review Vercel build logs after deployment; no unexpected build, lint, or TypeScript failures
+- [ ] Review runtime function logs after exercising auth, chat, avatar, export, and location flows
+- [ ] Confirm rate-limit denials are diagnosable in logs without leaking message contents, tokens, or private payloads
+- [ ] Bot protection is not integrated yet; current protection is server-side rate limiting
+- [ ] Future bot protection plan reviewed in `docs/monitoring.md` and must not break Arabic onboarding
 
 ---
 
@@ -222,10 +231,16 @@ curl -I "$STAGING_URL/vehicles"
 curl -I "$STAGING_URL/charging-map"
 curl -I "$STAGING_URL/charging-calculator"
 curl -I "$STAGING_URL/assistant"
+curl -I "$STAGING_URL/privacy"
+curl -I "$STAGING_URL/terms"
+curl -I "$STAGING_URL/data-deletion"
 
 # SEO files
 curl -s "$STAGING_URL/robots.txt"
 curl -s "$STAGING_URL/sitemap.xml"
+
+# Security headers
+curl -I "$STAGING_URL/" | grep -i "content-security-policy-report-only"
 
 # 404
 curl -I "$STAGING_URL/nonexistent-path-xyz"
@@ -277,6 +292,7 @@ If a migration seeded wrong vehicle or location data:
 Do not promote to production until all boxes are checked:
 
 - [ ] All route smoke tests pass (sections 3a–3d)
+- [ ] Production-ops checks pass (section 3e)
 - [ ] No raw stack traces visible in UI or API responses
 - [ ] `robots.txt` references staging/production origin — not `localhost`
 - [ ] `sitemap.xml` references correct origin
@@ -287,4 +303,5 @@ Do not promote to production until all boxes are checked:
 - [ ] Charging station data added and verified before public map claims
 - [ ] `AI_PROVIDER=mock` confirmed — no live AI costs
 - [ ] Monitoring plan reviewed (`docs/monitoring.md`)
+- [ ] Bot protection plan reviewed; no CAPTCHA/WAF integration is assumed until configured and tested
 - [ ] HTTPS confirmed — no HTTP-only deployment

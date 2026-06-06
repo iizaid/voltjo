@@ -14,7 +14,7 @@ function isProtectedPath(pathname: string) {
   );
 }
 
-export async function proxy(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { url, anonKey } = getSupabaseEnv();
 
   if (!url || !anonKey) {

@@ -123,6 +123,7 @@ Set these in `.env.local` for development and in your hosting provider for produ
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Public anon key |
 | `NEXT_PUBLIC_SITE_URL` | Yes (prod) | Public origin, no trailing slash. Used by `lib/auth/actions.ts` (`getRequestOrigin`) to build the password-reset redirect. Safe to expose. |
 | `AI_PROVIDER` | Yes | Keep `mock` for launch |
+| `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` | Yes | Required for server-side API rate limiting. Keep token server-only. |
 | `OPENAI_API_KEY` / `GEMINI_API_KEY` / `KIMI_API_KEY` | No | Leave empty for launch (assistant is mock-only). Server-only — never `NEXT_PUBLIC_*` |
 
 Never place a Supabase `service_role` key in client code or any `NEXT_PUBLIC_*` variable;
@@ -147,23 +148,24 @@ Implemented:
 - RLS schema for `public.profiles`
 - protected account/security page
 - auth callback redirect hardening
-- basic in-memory auth rate limiting
+- API rate limiting backed by Upstash Redis
+- authenticated chat database persistence
 - supported vehicles MVP foundation
 - charging calculator MVP page
 - interactive charging map MVP with browser-only geolocation and no map API key
+- legal pages for privacy, terms, and manual data deletion requests
+- security headers including CSP report-only for staging observation
 
 Not implemented yet:
 
 - AI provider integration
-- chat database persistence
 - saved cars
 - comparison persistence
 - reports
 - payments
-- distributed production rate limiting
 - CAPTCHA/bot protection
-- monitoring/audit logs
-- final Content-Security-Policy
+- monitoring vendor integration
+- enforced final Content-Security-Policy
 
 ## Production Security Checklist
 
@@ -172,15 +174,16 @@ Not implemented yet:
 - Verify vehicle data and add verified `charging_locations` rows before public claims (the `005` seed is sample/estimate data only).
 - Configure Supabase Site URL and Redirect URLs, including `/auth/callback` (email and OAuth) and `/auth/update-password` (password reset).
 - Set `NEXT_PUBLIC_SITE_URL` to the production origin so password-reset links resolve correctly.
+- Set Upstash Redis REST env vars before staging or production smoke tests; rate-limited APIs fail closed when the shared store is missing.
 - Enable Google and GitHub providers in Supabase Auth dashboard with their respective credentials.
 - Decide whether email confirmation is enabled.
 - Use a production SMTP provider for auth email.
 - Verify RLS with two separate users.
 - Keep service role keys out of frontend code and `NEXT_PUBLIC_*`.
-- Replace the in-memory rate limiter before public launch.
-- Add monitoring/logging and bot protection before public launch.
+- Review auth and API rate-limit behavior before public launch.
+- Review `docs/monitoring.md`; add monitoring vendor integration and bot protection only when the team is ready to configure them properly.
 - Review Next.js `middleware.ts` to `proxy.ts` migration before deployment.
-- Add and test CSP once production domains are final.
+- Observe CSP report-only in staging, then tighten and enforce CSP once production domains are final.
 - Deploy over HTTPS only.
 - Before production, search runtime UI for provider names such as Supabase, OpenAI, Stripe, database, backend.
 
