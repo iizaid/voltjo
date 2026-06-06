@@ -106,8 +106,11 @@ The avatar migrations set RLS policies but do **not** create the bucket. Create 
 - Decide whether email confirmation is enabled (the signup flow supports both modes).
 - Configure a production SMTP provider for auth email; the default Supabase SMTP is
   rate-limited and not intended for production.
-- Enable Google / GitHub providers only if you actually launch them, using credentials
-  set inside the Supabase Auth dashboard (never in the repo).
+- Enable Google / GitHub providers when the visible OAuth buttons should work:
+  - Supabase Dashboard → Authentication → Providers → enable Google and GitHub.
+  - Add provider client IDs/secrets inside Supabase only (never in `.env*` files).
+  - Copy the provider callback URL shown by Supabase into the Google/GitHub OAuth app settings.
+  - Confirm both providers redirect back to `https://<your-domain>/auth/callback`.
 
 ### 4. Environment variables
 

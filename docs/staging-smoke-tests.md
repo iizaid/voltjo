@@ -78,7 +78,10 @@ All migrations are additive and idempotent — safe to re-run.
   - `http://localhost:3000/auth/callback` (for local dev parity)
   - `http://localhost:3000/auth/update-password` (for local dev parity)
 - [ ] Decide whether email confirmation is enabled (staging can disable for speed)
-- [ ] Do **not** enable Google/GitHub OAuth unless credentials are staged
+- [ ] If Google/GitHub buttons are visible in staging, enable both providers in **Authentication → Providers**
+- [ ] Add Google and GitHub client credentials in the Supabase Dashboard only — never in repo env files
+- [ ] Copy the provider callback URL shown by Supabase into the Google/GitHub OAuth app settings
+- [ ] Confirm OAuth sign-in redirects back to `https://<staging-domain>/auth/callback`
 
 ---
 
@@ -96,6 +99,7 @@ Replace `STAGING_URL` with your actual staging origin before running.
 | `GET /vehicles/<existing-slug>` | 200 — vehicle detail page renders | |
 | `GET /vehicles/bad-slug-that-does-not-exist` | 404 — not-found page renders | |
 | `GET /charging-map` | 200 — map renders; empty charging stations state handled gracefully (005 seeds no stations) | |
+| `/charging-map` location button | Browser geolocation permission prompt appears; denying permission keeps the consent/error UX stable | |
 | `GET /charging-calculator` | 200 — calculator renders; vehicle dropdown populated from seeded rows | |
 | `GET /assistant` | 200 — assistant chat page renders | |
 | `GET /robots.txt` | 200 — `Sitemap:` line references staging origin, not `voltjo.com` | |
@@ -111,6 +115,9 @@ Replace `STAGING_URL` with your actual staging origin before running.
 | Signup flow (email confirmation off) | Account created, redirected to `/account` | |
 | Login with valid credentials | Session established, redirected to intended page | |
 | Login with wrong password | Arabic error message shown, no 500 | |
+| Google OAuth button | With Supabase Google provider configured, redirects through Google and returns to `/auth/callback` without a fake UI-only action | |
+| GitHub OAuth button | With Supabase GitHub provider configured, redirects through GitHub and returns to `/auth/callback` without a fake UI-only action | |
+| OAuth provider not configured | Document as external setup missing; do not treat a provider-dashboard error as an app-code pass | |
 | `GET /auth/callback` (no params) | Safe redirect — no crash, redirects to `/assistant` (the configured safe-redirect default) | |
 | `GET /auth/update-password` | 200 — password update form renders | |
 | `GET /account` (signed-in) | 200 — Smart Profile page loads with user data | |
@@ -170,8 +177,10 @@ Expected: `200` — location saved to profile.
 - [ ] `/vehicles` renders current seeded rows from migration 005 (all marked sample / preliminary)
 - [ ] `/charging-calculator` vehicle dropdown lists vehicles that have `battery_kwh` populated
 - [ ] `/charging-map` shows graceful empty state — migration 005 seeds no charging stations
+- [ ] `/charging-map` can ask for browser location after the app-level `Permissions-Policy` header is applied
 - [ ] Pricing labels say preliminary / coming soon / تقريبي — no confirmed JOD figures
-- [ ] AI assistant returns mock responses only — no real AI provider
+- [ ] AI assistant returns mock responses only — no real AI provider is launched
+- [ ] Assistant model menu labels alternate modes as experimental; Gemini/Kimi must not appear as live provider integrations unless implemented
 - [ ] No provider names leak into UI (Supabase, OpenAI, Stripe, database, backend)
 - [ ] Arabic text renders correctly — RTL layout, font loaded
 
@@ -249,6 +258,7 @@ Do not promote to production until all boxes are checked:
 - [ ] `sitemap.xml` references correct origin
 - [ ] Avatar upload works end-to-end (avatars bucket created, migration 004 ran)
 - [ ] Auth callback does not crash on malformed or missing state parameter
+- [ ] Google/GitHub OAuth buttons are tested with configured Supabase providers or explicitly documented as not configured for the environment
 - [ ] Vehicle data verified by human review before any public claims
 - [ ] Charging station data added and verified before public map claims
 - [ ] `AI_PROVIDER=mock` confirmed — no live AI costs

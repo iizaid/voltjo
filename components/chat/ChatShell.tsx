@@ -46,13 +46,13 @@ export const CHAT_MODELS = [
   },
   {
     id: "gemini",
-    name: "Gemini",
-    description: "مناسب للأسئلة العامة والسريعة",
+    name: "نمط سريع",
+    description: "تجريبي - يستخدم ردود VoltJo التجريبية الآن",
   },
   {
     id: "kimi",
-    name: "Kimi AI",
-    description: "مناسب للنصوص الطويلة والتحليل",
+    name: "نمط موسع",
+    description: "تجريبي - يستخدم ردود VoltJo التجريبية الآن",
   },
 ];
 
