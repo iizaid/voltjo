@@ -8,6 +8,7 @@ import {
 import { getCurrentUser } from "@/lib/server/auth";
 import { apiError, apiSuccess } from "@/lib/server/api-response";
 import { checkRateLimit } from "@/lib/server/rate-limit";
+import { readJsonWithByteLimit } from "@/lib/server/request-body";
 import { withTimeout } from "@/lib/server/timeout";
 
 const MAX_CHAT_API_BODY_BYTES = 12 * 1024;
@@ -63,6 +64,7 @@ async function tryFindOwnedConversation(conversationId: string) {
 }
 
 export async function POST(request: Request) {
+  const ip = getIpFromRequest(request);
   const contentLength = request.headers.get("content-length");
   if (contentLength) {
     const parsedLength = Number.parseInt(contentLength, 10);
@@ -78,11 +80,46 @@ export async function POST(request: Request) {
     }
   }
 
-  let body: unknown;
+  const preParseRateLimit = await checkRateLimit({
+    key: `ip:${ip}`,
+    action: "chat-preparse",
+    limit: 60,
+    windowMs: 10 * 60 * 1000,
+  });
 
-  try {
-    body = await request.json();
-  } catch {
+  if (!preParseRateLimit.ok) {
+    const retryAfter = Math.max(
+      1,
+      Math.ceil((preParseRateLimit.resetAt - Date.now()) / 1000),
+    );
+    return apiError({
+      code: "RATE_LIMITED",
+      message: preParseRateLimit.message,
+      status: 429,
+      headers: {
+        ...buildRateLimitHeaders(
+          preParseRateLimit.limit,
+          preParseRateLimit.remaining,
+          preParseRateLimit.resetAt,
+        ),
+        "Retry-After": String(retryAfter),
+      },
+    });
+  }
+
+  const bodyResult = await readJsonWithByteLimit(request, MAX_CHAT_API_BODY_BYTES);
+  if (!bodyResult.ok) {
+    if (bodyResult.reason === "too_large") {
+      return apiError({
+        code: "PAYLOAD_TOO_LARGE",
+        message: "حجم الطلب كبير جدًا.",
+        status: 413,
+        headers: {
+          "Cache-Control": "no-store, max-age=0",
+        },
+      });
+    }
+
     return apiError({
       code: "INVALID_JSON",
       message: "تعذر قراءة الطلب.",
@@ -92,6 +129,7 @@ export async function POST(request: Request) {
       },
     });
   }
+  const body = bodyResult.data;
 
   const validation = validateAiChatRequest(body);
   if (!validation.ok) {
@@ -106,7 +144,6 @@ export async function POST(request: Request) {
   }
 
   const { user } = await getCurrentUser();
-  const ip = getIpFromRequest(request);
   const rateKey = user ? `user:${user.id}` : `ip:${ip}`;
 
   const rateLimit = await checkRateLimit({

@@ -36,6 +36,19 @@ export const ALLOWED_AVATAR_IMAGE_TYPES = [
   "image/webp",
 ] as const;
 
+export function getAvatarUploadFormat(mimeType: string) {
+  switch (mimeType) {
+    case "image/jpeg":
+      return { extension: "jpg", contentType: "image/jpeg" as const };
+    case "image/png":
+      return { extension: "png", contentType: "image/png" as const };
+    case "image/webp":
+      return { extension: "webp", contentType: "image/webp" as const };
+    default:
+      return null;
+  }
+}
+
 export const MAX_AVATAR_IMAGE_SIZE_BYTES = 3 * 1024 * 1024;
 
 function isRecord(input: unknown): input is Record<string, unknown> {

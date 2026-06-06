@@ -141,6 +141,11 @@ Rate-limit response headers present: `X-RateLimit-Limit`, `X-RateLimit-Remaining
 Send 11 identical requests in quick succession (anonymous, no session cookie).
 Expected: `429` with `Retry-After` header and Arabic error message body.
 
+**POST /api/chat — oversized JSON body (expect 413):**
+
+Send a JSON request larger than 12KB, including when `Content-Length` is missing or chunked.
+Expected: `413` with an Arabic payload-size error and no raw stack trace.
+
 Note: current rate limiting is fail-closed. If Upstash Redis env vars are missing or invalid,
 rate-limited endpoints may return 429/deny instead of working normally.
 
@@ -161,6 +166,12 @@ Body is valid JSON containing account data (no raw stack traces).
 curl -s -o /dev/null -w "%{http_code}" -X POST "$STAGING_URL/api/account/avatar"
 ```
 
+**POST /api/account/avatar — upload hardening:**
+
+- Missing or invalid `Content-Length`: `400` with Arabic error before multipart parsing
+- Request larger than the avatar upload cap: `413`
+- JPG, PNG, and WEBP uploads keep matching storage extensions and content types
+
 **POST /api/account/location-preferences — signed-out (expect 401):**
 
 ```bash
@@ -171,6 +182,10 @@ curl -s -o /dev/null -w "%{http_code}" -X POST "$STAGING_URL/api/account/locatio
 
 Send with a valid session cookie and body `{ "latitude": 31.9, "longitude": 35.9, "consent": true }`.
 Expected: `200` — location saved to profile.
+
+**POST /api/account/location-preferences — repeated saves (expect 429):**
+
+After 10 signed-in saves within 10 minutes, the next request returns `429` with `Retry-After`.
 
 ### 3d. Data / UI Verification
 

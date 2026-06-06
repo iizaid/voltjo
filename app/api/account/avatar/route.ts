@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import {
   ALLOWED_AVATAR_IMAGE_TYPES,
+  getAvatarUploadFormat,
   MAX_AVATAR_IMAGE_SIZE_BYTES,
 } from "@/lib/account/settings";
 import { checkRateLimit } from "@/lib/server/rate-limit";
@@ -13,8 +14,8 @@ const MAX_AVATAR_REQUEST_BYTES = MAX_AVATAR_IMAGE_SIZE_BYTES + 256 * 1024;
 // RLS policy ((storage.foldername(name))[1] = auth.uid()::text) still applies,
 // but uses a random filename so public avatar URLs are not guessable/enumerable.
 // crypto.randomUUID() is a Node global in this (Node runtime) route — no new dependency.
-function getAvatarPath(userId: string) {
-  return `${userId}/${crypto.randomUUID()}.webp`;
+function getAvatarPath(userId: string, extension: string) {
+  return `${userId}/${crypto.randomUUID()}.${extension}`;
 }
 
 function getIpFromRequest(request: Request) {
@@ -92,14 +93,26 @@ function hasValidImageSignature(buffer: Buffer, mimeType: string) {
 
 export async function POST(request: Request) {
   const contentLength = request.headers.get("content-length");
-  if (contentLength) {
-    const parsedLength = Number.parseInt(contentLength, 10);
-    if (Number.isFinite(parsedLength) && parsedLength > MAX_AVATAR_REQUEST_BYTES) {
-      return NextResponse.json(
-        { ok: false, message: "حجم الصورة أكبر من 3MB." },
-        { status: 413 },
-      );
-    }
+  if (!contentLength || !/^\d+$/.test(contentLength.trim())) {
+    return NextResponse.json(
+      { ok: false, message: "تعذر التحقق من حجم الرفع. أعد اختيار الصورة وحاول مرة أخرى." },
+      { status: 400 },
+    );
+  }
+
+  const parsedLength = Number.parseInt(contentLength, 10);
+  if (!Number.isFinite(parsedLength) || parsedLength <= 0) {
+    return NextResponse.json(
+      { ok: false, message: "تعذر التحقق من حجم الرفع. أعد اختيار الصورة وحاول مرة أخرى." },
+      { status: 400 },
+    );
+  }
+
+  if (parsedLength > MAX_AVATAR_REQUEST_BYTES) {
+    return NextResponse.json(
+      { ok: false, message: "حجم الصورة أكبر من 3MB." },
+      { status: 413 },
+    );
   }
 
   const supabase = await createClient();
@@ -161,6 +174,17 @@ export async function POST(request: Request) {
     );
   }
 
+  const uploadFormat = getAvatarUploadFormat(file.type);
+  if (!uploadFormat) {
+    return NextResponse.json(
+      {
+        ok: false,
+        message: "الملف غير مدعوم. استخدم JPG أو PNG أو WEBP فقط.",
+      },
+      { status: 400 },
+    );
+  }
+
   if (file.size > MAX_AVATAR_IMAGE_SIZE_BYTES) {
     return NextResponse.json(
       { ok: false, message: "حجم الصورة أكبر من 3MB." },
@@ -211,7 +235,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const nextPath = getAvatarPath(user.id);
+  const nextPath = getAvatarPath(user.id, uploadFormat.extension);
   const buffer = Buffer.from(await file.arrayBuffer());
 
   if (!hasValidImageSignature(buffer, file.type)) {
@@ -227,7 +251,7 @@ export async function POST(request: Request) {
   const { error: uploadError } = await supabase.storage
     .from(AVATAR_BUCKET)
     .upload(nextPath, buffer, {
-      contentType: "image/webp",
+      contentType: uploadFormat.contentType,
       cacheControl: "3600",
       upsert: true,
     });

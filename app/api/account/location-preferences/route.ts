@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { checkRateLimit } from "@/lib/server/rate-limit";
 import { createClient } from "@/lib/supabase/server";
 
 type LocationPayload = {
@@ -8,13 +9,14 @@ type LocationPayload = {
   consent?: boolean;
 };
 
-function invalid(message: string, status = 400) {
+function invalid(message: string, status = 400, headers?: HeadersInit) {
   return NextResponse.json(
     { error: message },
     {
       status,
       headers: {
         "Cache-Control": "no-store, max-age=0",
+        ...headers,
       },
     },
   );
@@ -34,6 +36,24 @@ export async function POST(request: Request) {
 
   if (userError || !user) {
     return invalid("سجّل الدخول أولًا لحفظ موقعك.", 401);
+  }
+
+  const rateLimit = await checkRateLimit({
+    key: `user:${user.id}`,
+    action: "location-preferences",
+    limit: 10,
+    windowMs: 10 * 60 * 1000,
+  });
+
+  if (!rateLimit.ok) {
+    const retryAfter = Math.max(1, Math.ceil((rateLimit.resetAt - Date.now()) / 1000));
+    return invalid(
+      rateLimit.message,
+      429,
+      {
+        "Retry-After": String(retryAfter),
+      },
+    );
   }
 
   let body: LocationPayload;
