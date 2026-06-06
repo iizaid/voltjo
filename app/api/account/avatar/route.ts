@@ -92,29 +92,6 @@ function hasValidImageSignature(buffer: Buffer, mimeType: string) {
 }
 
 export async function POST(request: Request) {
-  const contentLength = request.headers.get("content-length");
-  if (!contentLength || !/^\d+$/.test(contentLength.trim())) {
-    return NextResponse.json(
-      { ok: false, message: "تعذر التحقق من حجم الرفع. أعد اختيار الصورة وحاول مرة أخرى." },
-      { status: 400 },
-    );
-  }
-
-  const parsedLength = Number.parseInt(contentLength, 10);
-  if (!Number.isFinite(parsedLength) || parsedLength <= 0) {
-    return NextResponse.json(
-      { ok: false, message: "تعذر التحقق من حجم الرفع. أعد اختيار الصورة وحاول مرة أخرى." },
-      { status: 400 },
-    );
-  }
-
-  if (parsedLength > MAX_AVATAR_REQUEST_BYTES) {
-    return NextResponse.json(
-      { ok: false, message: "حجم الصورة أكبر من 3MB." },
-      { status: 413 },
-    );
-  }
-
   const supabase = await createClient();
   if (!supabase) {
     return NextResponse.json(
@@ -151,6 +128,29 @@ export async function POST(request: Request) {
           "Retry-After": String(Math.max(1, Math.ceil((rateLimit.resetAt - Date.now()) / 1000))),
         },
       },
+    );
+  }
+
+  const contentLength = request.headers.get("content-length");
+  if (!contentLength || !/^\d+$/.test(contentLength.trim())) {
+    return NextResponse.json(
+      { ok: false, message: "تعذر التحقق من حجم الرفع. أعد اختيار الصورة وحاول مرة أخرى." },
+      { status: 400 },
+    );
+  }
+
+  const parsedLength = Number.parseInt(contentLength, 10);
+  if (!Number.isFinite(parsedLength) || parsedLength <= 0) {
+    return NextResponse.json(
+      { ok: false, message: "تعذر التحقق من حجم الرفع. أعد اختيار الصورة وحاول مرة أخرى." },
+      { status: 400 },
+    );
+  }
+
+  if (parsedLength > MAX_AVATAR_REQUEST_BYTES) {
+    return NextResponse.json(
+      { ok: false, message: "حجم الصورة أكبر من 3MB." },
+      { status: 413 },
     );
   }
 
