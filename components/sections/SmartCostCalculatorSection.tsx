@@ -144,7 +144,7 @@ export function SmartCostCalculatorSection() {
   const results = [
     { label: "تكلفة 100 كم", value: activeMode.cost100 },
     { label: "التكلفة الشهرية", value: activeMode.monthly },
-    { label: "أفضل خيار للشحن", value: activeMode.best },
+    { label: "خيار أوفر في المثال", value: activeMode.best },
   ];
 
   return (
@@ -157,7 +157,7 @@ export function SmartCostCalculatorSection() {
                 حاسبة التكلفة الذكية
               </span>
               <h2 className="mt-5 max-w-2xl text-balance text-4xl font-black leading-[1.25] text-[var(--voltjo-black)] sm:text-5xl">
-                احسب تكلفة سيارتك قبل القرار
+                قدّر تكلفة سيارتك قبل القرار
               </h2>
               <p className="mt-5 max-w-2xl text-base font-semibold leading-8 text-[var(--voltjo-muted)] sm:text-lg">
                 اختر السيارة، طريقة الشحن، وعدد الكيلومترات اليومية — وشاهد
@@ -186,11 +186,11 @@ export function SmartCostCalculatorSection() {
               </div>
 
               <div className="mt-8 flex flex-wrap gap-3">
-                <Button href="/calculators?tool=charging-cost">
+                <Button href="/charging-calculator">
                   جرّب الحاسبة
                 </Button>
-                <Button href="/compare" variant="secondary">
-                  قارن بين سيارتين
+                <Button href="/vehicles" variant="secondary">
+                  استعرض السيارات
                 </Button>
               </div>
 

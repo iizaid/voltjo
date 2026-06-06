@@ -5,15 +5,15 @@ import { Brain, HelpCircle, Car, MapPin, BarChart3, BellRing, CheckCircle2, Luci
 import TrueFocus from "@/components/TrueFocus";
 
 const leftCards = [
-  { id: "01", title: "يفهم نوع السؤال", desc: "سيارة، شحن، مقارنة، أو مشكلة شائعة.", icon: HelpCircle },
-  { id: "02", title: "يربطها بالسيارة", desc: "الموديل، البطارية، النظام، وطريقة الاستخدام.", icon: Car },
-  { id: "03", title: "يفهم سياق الأردن", desc: "الشحن، الدعم، الضمان، والطرق داخل الأردن.", icon: MapPin }
+  { id: "01", title: "يرتّب نوع السؤال", desc: "سيارة، شحن، مقارنة، أو مشكلة شائعة.", icon: HelpCircle },
+  { id: "02", title: "يربطها بالمعلومات المتاحة", desc: "الموديل، البطارية، النظام، وطريقة الاستخدام.", icon: Car },
+  { id: "03", title: "يراعي سياق الأردن", desc: "الشحن، الدعم، الضمان، والطرق داخل الأردن عند توفر البيانات.", icon: MapPin }
 ];
 
 const rightCards = [
-  { id: "04", title: "يحسب ويقارن", desc: "تكلفة 100 كم، الشهرية، والفرق بين الخيارات.", icon: BarChart3 },
+  { id: "04", title: "يعرض تقديرات أولية", desc: "تكلفة 100 كم، الشهرية، والفرق بين الخيارات عند توفر المعطيات.", icon: BarChart3 },
   { id: "05", title: "ينبّه عند نقص البيانات", desc: "يوضح متى تكون الأرقام تقريبية أو بحاجة تأكيد.", icon: BellRing },
-  { id: "06", title: "يعطي خلاصة عملية", desc: "توصية أو مقارنة واضحة تساعدك على القرار.", icon: CheckCircle2 }
+  { id: "06", title: "يقترح خطوات تحقق", desc: "يلخّص الأسئلة المهمة قبل مراجعة الوكيل أو المصدر الرسمي.", icon: CheckCircle2 }
 ];
 
 const DesktopLinesSVG = () => (
@@ -83,7 +83,7 @@ export function AiAssistantSection() {
         {/* Header Area */}
         <div className="mb-16 text-center lg:mb-24 flex flex-col items-center">
           <h2 className="display-heading text-balance text-4xl font-bold leading-tight text-[var(--voltjo-black)] sm:text-[44px]">
-            مساعد متخصص في
+            مساعد إرشادي تجريبي في
             <div className="mt-5 flex flex-wrap items-center justify-center gap-[0.3em]" dir="rtl">
               <span>السيارات</span>
               <TrueFocus 
@@ -97,7 +97,7 @@ export function AiAssistantSection() {
             </div>
           </h2>
           <p className="mx-auto mt-8 max-w-3xl text-base font-medium leading-8 text-[var(--voltjo-muted)] sm:text-lg">
-            بعكس المساعدات العامة، صُمم VoltJo ليفهم أسئلة السيارات داخل السوق الأردني: الموديلات، البطاريات، تكلفة الشحن، المقارنة، الدعم، والضمان — ليحوّل التفاصيل المتفرقة إلى إجابة عملية تساعدك قبل الشراء.
+            يساعدك VoltJo على ترتيب أسئلة السيارات داخل السوق الأردني: الموديلات، البطاريات، تكلفة الشحن، المقارنة، الدعم، والضمان. يعرض تقديرات أولية وينبّهك عند نقص البيانات قبل الرجوع للوكيل أو المصدر الرسمي.
           </p>
         </div>
 

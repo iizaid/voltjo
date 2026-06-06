@@ -8,11 +8,11 @@ import { confidenceLabels, vehicleTypeLabels } from "@/lib/vehicles/types";
 export const metadata: Metadata = {
   title: "السيارات المدعومة | VoltJo",
   description:
-    "استعرض قائمة السيارات الكهربائية والهايبرد المدعومة في منصة VoltJo داخل الأردن.",
+    "استعرض قائمة أولية للسيارات الكهربائية والهايبرد في VoltJo داخل الأردن.",
   openGraph: {
     title: "السيارات المدعومة | VoltJo",
     description:
-      "قائمة السيارات الكهربائية والهايبرد المدعومة في VoltJo داخل الأردن.",
+      "قائمة أولية للسيارات الكهربائية والهايبرد في VoltJo داخل الأردن.",
   },
 };
 
@@ -29,7 +29,10 @@ export default async function VehiclesPage() {
               السيارات المدعومة
             </h1>
             <p className="mt-4 max-w-3xl text-base font-semibold leading-8 text-[var(--voltjo-muted)] sm:text-lg">
-              قاعدة سيارات VoltJo التي يعتمد عليها المساعد والحاسبات.
+              قائمة أولية تساعدك على الاستكشاف قبل الرجوع للوكيل أو المصدر الرسمي.
+            </p>
+            <p className="mt-4 max-w-4xl rounded-[16px] border border-[rgba(255,106,0,0.18)] bg-[rgba(255,106,0,0.06)] px-4 py-3 text-sm font-bold leading-7 text-[var(--voltjo-black)]">
+              البيانات قد تختلف حسب بلد الاستيراد، الفئة، الوكيل، وتوفر السيارة في السوق الأردني. تحقّق من المصدر الرسمي قبل أي قرار شراء.
             </p>
           </div>
 

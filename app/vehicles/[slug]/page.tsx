@@ -20,7 +20,7 @@ export async function generateMetadata({
 
   const description =
     vehicle.summaryAr ??
-    `تفاصيل ${vehicle.nameAr} من ${vehicle.brand.nameAr} — موديل ${vehicle.modelYear}`;
+    `تفاصيل أولية عن ${vehicle.nameAr} من ${vehicle.brand.nameAr} — موديل ${vehicle.modelYear}`;
 
   return {
     title: `${vehicle.nameAr} | VoltJo`,
@@ -116,6 +116,16 @@ export default async function VehicleDetailPage({
               </p>
             ) : null}
 
+            {currentVehicle.dataConfidence === "estimate" ? (
+              <p className="mt-5 max-w-3xl rounded-[16px] border border-[rgba(255,106,0,0.18)] bg-[rgba(255,106,0,0.06)] px-4 py-3 text-sm font-bold leading-7 text-[var(--voltjo-black)]">
+                هذه بيانات تقديرية أولية. قد تختلف المواصفات والأسعار حسب بلد الاستيراد، الفئة، الوكيل، وتوفر السيارة في الأردن. تحقّق من الوكيل أو المصدر الرسمي قبل الشراء.
+              </p>
+            ) : (
+              <p className="mt-5 max-w-3xl rounded-[16px] border border-[var(--voltjo-border)] bg-[#FBFBF9] px-4 py-3 text-sm font-bold leading-7 text-[var(--voltjo-black)]">
+                قد تختلف التفاصيل حسب بلد الاستيراد، الفئة، الوكيل، وتوفر السيارة في الأردن. تحقّق من المصدر الرسمي قبل الشراء.
+              </p>
+            )}
+
             <div className="mt-8 grid gap-4 md:grid-cols-2">
               {facts.map((fact) => (
                 <div
@@ -179,7 +189,7 @@ export default async function VehicleDetailPage({
             ) : null}
 
             <p className="mt-8 text-sm font-semibold leading-7 text-[var(--voltjo-muted)]">
-              هذه البيانات قيد المراجعة وقد تختلف حسب النسخة والسوق.
+              هذه البيانات قيد المراجعة وقد تختلف حسب بلد الاستيراد، الفئة، الوكيل، وتوفر السيارة في السوق الأردني.
             </p>
             <div className="mt-6 flex flex-wrap items-center gap-4 text-sm font-bold">
               <Link

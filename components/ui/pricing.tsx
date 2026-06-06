@@ -16,7 +16,7 @@ const plans = [
       "جرّب VoltJo وافهم أساسيات السيارات الكهربائية والهايبرد.",
     monthlyPrice: 0,
     yearlyPrice: 0,
-    priceLabel: "0 د.أ",
+    priceLabel: "مجاني",
     period: "للبداية",
     yearlyPeriod: "للبداية",
     buttonText: "قريبًا",
@@ -24,49 +24,51 @@ const plans = [
     buttonVariant: "outline" as const,
     includes: [
       "الخطة المجانية تشمل:",
-      "أسئلة محدودة للمساعد الذكي",
-      "تصفح السيارات المدعومة",
+      "أسئلة محدودة للمساعد الإرشادي التجريبي",
+      "تصفح بيانات السيارات الأولية",
       "معلومات عامة عن الشحن والدعم",
-      "وصول أساسي إلى بيانات الموديلات",
+      "وصول أساسي إلى بيانات موديلات قيد المراجعة",
     ],
   },
   {
     name: "Plus",
     description:
-      "لمن يفكر بشراء سيارة ويريد إجابات وتقديرات أدق.",
-    monthlyPrice: 4.99,
-    yearlyPrice: 49.99,
-    period: "شهريًا",
-    yearlyPeriod: "سنويًا",
-    buttonText: "اشترك لاحقًا",
-    secondaryButtonText: "عرض التفاصيل",
+      "لمن يفكر بشراء سيارة ويريد مزايا أوسع عند اكتمال الإطلاق.",
+    monthlyPrice: 0,
+    yearlyPrice: 0,
+    priceLabel: "قريبًا",
+    period: "قيد التحضير",
+    yearlyPeriod: "قيد التحضير",
+    buttonText: "سجّل اهتمامك لاحقًا",
+    secondaryButtonText: "الخطط قيد التحضير",
     buttonVariant: "default" as const,
     popular: true,
     includes: [
       "كل ما تحتاجه قبل قرار الشراء:",
-      "أسئلة أكثر للمساعد الذكي",
-      "تقديرات تكلفة تشغيل تقريبية",
+      "أسئلة أكثر للمساعد الإرشادي",
+      "تقديرات تكلفة تشغيل أولية",
       "حفظ ملفك وتفضيلاتك",
-      "توصيات حسب استخدامك اليومي",
-      "دعم موديلات إضافية",
+      "اقتراحات مبدئية حسب استخدامك اليومي",
+      "دعم موديلات إضافية بعد المراجعة",
     ],
   },
   {
     name: "Pro",
     description:
       "لمن يريد متابعة أعمق قبل الشراء وبعد امتلاك السيارة.",
-    monthlyPrice: 9.99,
-    yearlyPrice: 99.99,
-    period: "شهريًا",
-    yearlyPeriod: "سنويًا",
+    monthlyPrice: 0,
+    yearlyPrice: 0,
+    priceLabel: "قريبًا",
+    period: "قيد التحضير",
+    yearlyPeriod: "قيد التحضير",
     buttonText: "قريبًا",
     secondaryButtonText: "سجّل اهتمامك",
     buttonVariant: "outline" as const,
     includes: [
       "للمتابعة المتقدمة:",
       "كل مزايا Plus",
-      "تقارير أوضح عن التكلفة والملكية",
-      "دعم أوسع للسيارات والموديلات",
+      "تقارير تمهيدية أوضح عن التكلفة والملكية",
+      "دعم أوسع للسيارات والموديلات بعد التحقق",
       "تنبيهات وتحديثات مستقبلية",
       "مميزات قادمة لأصحاب السيارات",
     ],
@@ -130,7 +132,7 @@ const PricingSwitch = ({
           <span className="relative flex items-center gap-2">
             سنوي
             <span className="rounded-full bg-orange-50 px-2 py-0.5 text-xs font-medium text-black">
-              وفر 20%
+              قيد التحضير
             </span>
           </span>
         </button>
@@ -199,8 +201,8 @@ export default function Pricing() {
           customVariants={revealVariants}
           className="w-[86%] text-sm leading-7 text-gray-600 md:text-base md:leading-8"
         >
-          اختر الخطة المناسبة لتجربة المساعد والحاسبة وتقديرات التكلفة داخل
-          الأردن. الخطط تمهيدية — الاشتراكات والدفع غير مفعّلين بعد.
+          تعرّف على الاتجاه المتوقع للخطط قبل الإطلاق. الاشتراكات والدفع غير
+          مفعّلين بعد، والأسعار والمزايا قد تتغير قبل الاعتماد النهائي.
         </TimelineContent>
 
         <TimelineContent
@@ -236,7 +238,7 @@ export default function Pricing() {
                     </h3>
                     {plan.popular ? (
                       <span className="rounded-full bg-orange-500 px-3 py-1 text-sm font-medium text-white shadow-sm">
-                        أفضل عرض
+                        تمهيدية
                       </span>
                     ) : null}
                   </div>
@@ -316,7 +318,7 @@ export default function Pricing() {
       </div>
 
       <p className="mx-auto mt-5 max-w-2xl text-center text-sm font-semibold leading-7 text-[var(--voltjo-muted)]">
-        الخطط تمهيدية — الأسعار والمزايا قابلة للتعديل. الاشتراكات والدفع غير مفعّلين قبل الإطلاق الرسمي.
+        الخطط تمهيدية — لا توجد اشتراكات أو مدفوعات مفعّلة الآن، والأسعار والمزايا قابلة للتعديل قبل الإطلاق الرسمي.
       </p>
       {pricingNotice ? (
         <p

@@ -10,7 +10,7 @@ export function HeroSection() {
           <div className="fade-up">
             <HeroHeadlineTextType />
             <p className="mx-auto mt-5 max-w-2xl text-lg font-medium leading-9 text-[var(--voltjo-muted)] sm:text-xl">
-              قارن بين السيارات الكهربائية والهايبرد، احسب تكلفة الشحن الحقيقية، وافهم الدعم والضمان في السوق الأردني — قبل أي قرار شراء.
+              قارن بين السيارات الكهربائية والهايبرد، واستعرض تقديرات تكلفة الشحن، وافهم نقاط الدعم والضمان في السوق الأردني — قبل أي قرار شراء.
             </p>
           </div>
 

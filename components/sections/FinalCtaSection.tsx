@@ -11,8 +11,8 @@ export function FinalCtaSection() {
             خلّي قرارك أوضح قبل الشراء
           </h2>
           <p className="mx-auto mt-5 max-w-3xl text-lg font-semibold leading-9 text-[var(--voltjo-muted)]">
-            اسأل، قارن، واحسب تكلفة الشحن في الأردن من مكان واحد مصمم
-            ليساعدك تختار بثقة وهدوء.
+            اسأل، قارن، واستعرض تقديرات الشحن في الأردن من مكان واحد مصمم
+            ليساعدك ترتّب أسئلتك قبل التحقق من المصادر الرسمية.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Button href="/assistant">
@@ -26,7 +26,7 @@ export function FinalCtaSection() {
             </Button>
           </div>
           <p className="mt-7 text-sm font-black text-[var(--voltjo-muted)]">
-            معلومات محلية موثوقة • بيانات محدثة باستمرار • خصوصيتك محمية
+            معلومات محلية أولية • بيانات قيد المراجعة • خصوصيتك محمية
           </p>
         </div>
       </Container>

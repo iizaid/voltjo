@@ -190,11 +190,14 @@ After 10 signed-in saves within 10 minutes, the next request returns `429` with 
 ### 3d. Data / UI Verification
 
 - [ ] `/vehicles` renders current seeded rows from migration 005 (all marked sample / preliminary)
+- [ ] Announcement bar says vehicle data is experimental / under review, not launch-ready
+- [ ] Vehicle list/detail pages show a visible note that data may differ by import origin, trim, dealer, and Jordan market availability
 - [ ] `/charging-calculator` vehicle dropdown lists vehicles that have `battery_kwh` populated
 - [ ] `/charging-map` shows graceful empty state — migration 005 seeds no charging stations
 - [ ] `/charging-map` can ask for browser location after the app-level `Permissions-Policy` header is applied
-- [ ] Pricing labels say preliminary / coming soon / تقريبي — no confirmed JOD figures
+- [ ] Pricing labels say preliminary / coming soon / قيد التحضير — no confirmed paid-plan JOD figures and no active payment/subscription claim
 - [ ] AI assistant returns mock responses only — no real AI provider is launched
+- [ ] Assistant public copy says experimental guidance and does not imply final AI advice
 - [ ] Assistant model menu labels alternate modes as experimental; Gemini/Kimi must not appear as live provider integrations unless implemented
 - [ ] No provider names leak into UI (Supabase, OpenAI, Stripe, database, backend)
 - [ ] Arabic text renders correctly — RTL layout, font loaded
