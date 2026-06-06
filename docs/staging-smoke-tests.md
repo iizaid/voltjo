@@ -16,8 +16,8 @@ Do **not** commit real values.
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Your Supabase anon key |
 | `NEXT_PUBLIC_SITE_URL` | Yes | Your staging origin, no trailing slash (e.g. `https://voltjo-staging.vercel.app`) |
 | `AI_PROVIDER` | Yes | **`mock`** — keep mock for all staging and public MVP |
-| `UPSTASH_REDIS_REST_URL` | Optional | Leave empty to fall back to in-memory rate limiting |
-| `UPSTASH_REDIS_REST_TOKEN` | Optional | Leave empty to fall back to in-memory rate limiting |
+| `UPSTASH_REDIS_REST_URL` | Yes | Upstash Redis REST URL — required for rate limiting |
+| `UPSTASH_REDIS_REST_TOKEN` | Yes | Upstash Redis REST token — required for rate limiting |
 | `OPENAI_API_KEY` | No | Leave empty |
 | `GEMINI_API_KEY` | No | Leave empty |
 | `KIMI_API_KEY` | No | Leave empty |
@@ -111,7 +111,7 @@ Replace `STAGING_URL` with your actual staging origin before running.
 | Signup flow (email confirmation off) | Account created, redirected to `/account` | |
 | Login with valid credentials | Session established, redirected to intended page | |
 | Login with wrong password | Arabic error message shown, no 500 | |
-| `GET /auth/callback` (no params) | Safe redirect — no crash, redirects to `/start` or `/` | |
+| `GET /auth/callback` (no params) | Safe redirect — no crash, redirects to `/assistant` (the configured safe-redirect default) | |
 | `GET /auth/update-password` | 200 — password update form renders | |
 | `GET /account` (signed-in) | 200 — Smart Profile page loads with user data | |
 | Sign out | Session cleared, redirected to `/` or `/start` | |
@@ -123,7 +123,7 @@ Replace `STAGING_URL` with your actual staging origin before running.
 ```bash
 curl -s -X POST "$STAGING_URL/api/chat" \
   -H "Content-Type: application/json" \
-  -d '{"message":"ما هي أفضل سيارة كهربائية؟","modelId":"mock","thinkingMode":false}'
+  -d '{"message":"ما هي أفضل سيارة كهربائية؟","modelId":"voltjo","thinkingMode":false}'
 ```
 
 Expected: `200` with JSON body `{ message: { content: "...", ... }, conversationId: ... }`
@@ -134,8 +134,8 @@ Rate-limit response headers present: `X-RateLimit-Limit`, `X-RateLimit-Remaining
 Send 11 identical requests in quick succession (anonymous, no session cookie).
 Expected: `429` with `Retry-After` header and Arabic error message body.
 
-Note: the MVP rate limiter is in-memory and resets on serverless cold-start.
-This test is approximate unless Upstash Redis is wired.
+Note: current rate limiting is fail-closed. If Upstash Redis env vars are missing or invalid,
+rate-limited endpoints may return 429/deny instead of working normally.
 
 **GET /api/account/export — signed-out (expect 401):**
 
@@ -145,7 +145,7 @@ curl -s -o /dev/null -w "%{http_code}" "$STAGING_URL/api/account/export"
 
 **GET /api/account/export — signed-in (expect 200 JSON attachment):**
 
-Expected: `200` with `Content-Disposition: attachment; filename="voltjo-account-export.json"`
+Expected: `200` with `Content-Disposition: attachment; filename="voltjo-account-data.json"`
 Body is valid JSON containing account data (no raw stack traces).
 
 **POST /api/account/avatar — signed-out (expect 401):**
@@ -200,7 +200,7 @@ curl -I "$STAGING_URL/nonexistent-path-xyz"
 # Mock chat (expect 200)
 curl -s -X POST "$STAGING_URL/api/chat" \
   -H "Content-Type: application/json" \
-  -d '{"message":"ما هي أفضل سيارة كهربائية؟","modelId":"mock","thinkingMode":false}' | head -c 300
+  -d '{"message":"ما هي أفضل سيارة كهربائية؟","modelId":"voltjo","thinkingMode":false}' | head -c 300
 
 # Auth-protected endpoints (all expect 401 without session)
 curl -s -o /dev/null -w "export: %{http_code}\n" "$STAGING_URL/api/account/export"
@@ -234,8 +234,8 @@ If a migration seeded wrong vehicle or location data:
 
 ### Rate Limiting
 
-- In-memory rate limiting resets on each serverless cold-start — this is expected for MVP staging
-- Wire Upstash Redis (`UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN`) before expecting consistent distributed rate-limit behavior across deployments
+- Current rate limiting is fail-closed. If Upstash Redis env vars are missing or invalid, rate-limited endpoints may return 429/deny instead of working normally.
+- Set `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` before running any staging smoke tests.
 
 ---
 
