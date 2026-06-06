@@ -2,9 +2,17 @@
 
 import { FormEvent, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { motion } from "motion/react";
-import { CheckCircle2 } from "lucide-react";
-import Folder from "@/components/Folder";
+import {
+  CheckCircle2,
+  ChevronRight,
+  MapPin,
+  PlugZap,
+  Route,
+  ShieldCheck,
+  Target,
+} from "lucide-react";
 import { VoltJoLogo } from "@/components/brand/VoltJoLogo";
 import { signInAction, signUpAction } from "@/lib/auth/actions";
 import { signInWithOAuth, type OAuthProvider } from "@/lib/auth/oauth-client";
@@ -19,18 +27,50 @@ function getAnswerLabel(questionId: keyof CustomerProfileDraft, value: string) {
   return question?.options.find((option) => option.value === value)?.label ?? value;
 }
 
-function getProfileHighlights(answers: CustomerProfileDraft) {
-  const highlights = [
-    answers.mainGoal ? getAnswerLabel("mainGoal", answers.mainGoal) : undefined,
+function getProfileSummaryItems(answers: CustomerProfileDraft) {
+  const items = [
+    answers.mainGoal
+      ? {
+          label: "الهدف",
+          value: getAnswerLabel("mainGoal", answers.mainGoal),
+          icon: Target,
+        }
+      : null,
     answers.drivingPattern
-      ? getAnswerLabel("drivingPattern", answers.drivingPattern)
-      : undefined,
+      ? {
+          label: "نمط القيادة",
+          value: getAnswerLabel("drivingPattern", answers.drivingPattern),
+          icon: Route,
+        }
+      : null,
+    answers.homeChargingAccess
+      ? {
+          label: "الشحن المنزلي",
+          value: getAnswerLabel("homeChargingAccess", answers.homeChargingAccess),
+          icon: PlugZap,
+        }
+      : null,
     Array.isArray(answers.priorities) && answers.priorities[0]
-      ? getAnswerLabel("priorities", answers.priorities[0])
-      : undefined,
+      ? {
+          label: "أولوية القرار",
+          value: getAnswerLabel("priorities", answers.priorities[0]),
+          icon: ShieldCheck,
+        }
+      : null,
+    answers.city
+      ? {
+          label: "المدينة",
+          value: getAnswerLabel("city", answers.city),
+          icon: MapPin,
+        }
+      : null,
   ];
 
-  return highlights.filter(Boolean) as string[];
+  return items.filter(Boolean).slice(0, 5) as Array<{
+    label: string;
+    value: string;
+    icon: typeof Target;
+  }>;
 }
 
 export function OnboardingAuthPanel({
@@ -49,8 +89,12 @@ export function OnboardingAuthPanel({
   const [authError, setAuthError] = useState<string | null>(notice || null);
   const [emailConfirmationRequired, setEmailConfirmationRequired] =
     useState(false);
-  const highlights = useMemo(() => getProfileHighlights(answers), [answers]);
+  const profileSummaryItems = useMemo(
+    () => getProfileSummaryItems(answers),
+    [answers],
+  );
   const serializedAnswers = useMemo(() => JSON.stringify(answers), [answers]);
+  const isSignup = mode === "signup";
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -116,64 +160,46 @@ export function OnboardingAuthPanel({
 
   return (
     <motion.section
-      className="flex min-h-dvh items-center justify-center px-4 py-8 sm:px-6"
+      className="min-h-dvh bg-white px-4 py-5 text-[var(--voltjo-black)] sm:px-6 lg:px-8"
       initial={{ opacity: 0, y: 18 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -18 }}
       transition={{ duration: 0.26, ease: "easeOut" }}
       dir="rtl"
     >
-      <div className="grid w-full max-w-5xl overflow-hidden rounded-[30px] border border-[rgba(13,13,13,0.08)] bg-white/88 shadow-[0_28px_90px_rgba(13,13,13,0.09)] backdrop-blur-md lg:grid-cols-[0.95fr_1.05fr]">
-        <div className="flex flex-col items-center border-b border-[rgba(13,13,13,0.07)] p-6 text-center sm:p-8 lg:border-b-0 lg:border-l">
-          <div className="flex justify-center">
-            <VoltJoLogo />
+      <div className="mx-auto grid min-h-[calc(100dvh-2.5rem)] w-full max-w-7xl items-stretch gap-5 lg:grid-cols-[minmax(0,1.02fr)_minmax(0,0.98fr)]">
+        <div className="flex min-h-full flex-col rounded-[28px] border border-[var(--voltjo-border)] bg-white px-5 py-6 shadow-[0_24px_70px_rgba(13,13,13,0.055)] sm:px-8 sm:py-8 lg:px-10">
+          <div className="flex items-center justify-between gap-4">
+            <VoltJoLogo className="shrink-0" />
+            <button
+              type="button"
+              onClick={onBack}
+              className="inline-flex h-10 items-center gap-2 rounded-full border border-[var(--voltjo-border)] bg-white px-4 text-sm font-bold text-[var(--voltjo-muted)] transition hover:bg-[var(--voltjo-surface-soft)] hover:text-[var(--voltjo-black)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(13,13,13,0.16)]"
+            >
+              <ChevronRight size={16} />
+              رجوع للأسئلة
+            </button>
           </div>
-          <h1 className="mt-12 text-3xl font-bold leading-tight text-[var(--voltjo-black)] sm:text-5xl">
-            أنشئ حسابك واحفظ ملفك الذكي
-          </h1>
-          <p className="mt-5 max-w-lg text-base font-medium leading-8 text-[var(--voltjo-muted)]">
-            سنستخدم إجاباتك لتخصيص تجربة المساعد، المقارنات، وتقديرات التكلفة
-            داخل VoltJo.
-          </p>
 
-          <motion.div
-            className="mt-8 flex w-full max-w-[360px] flex-col items-center rounded-3xl border border-[rgba(13,13,13,0.06)] bg-white p-8 shadow-sm"
-            whileHover={{ y: -3 }}
-            transition={{ duration: 0.18, ease: "easeOut" }}
-          >
-            <Folder color="#ff6a00" size={0.8} className="mb-8 mt-2" />
-            
-            <h3 className="text-[22px] font-bold text-[var(--voltjo-black)]">
-              ملفك الشخصي جاهز
-            </h3>
-            
-            <p className="mt-3 text-center text-[15px] font-medium leading-[1.6] text-[#6F6673]">
-              تم تجهيز تفضيلاتك لتخصيص تجربة المساعد والمقارنات.
+          <div className="mt-10 max-w-xl">
+            <p className="text-sm font-black text-[var(--voltjo-orange-dark)]">
+              الخطوة الأخيرة
             </p>
-            
-            <div className="mt-6 flex flex-wrap justify-center gap-2.5">
-              {(highlights.length ? highlights : ["تجربة مخصصة"]).map(
-                (highlight) => (
-                  <span
-                    key={highlight}
-                    className="rounded-full border border-[#FFD5C0] bg-white px-4 py-1.5 text-[14px] font-bold text-[var(--voltjo-black)] transition-colors hover:bg-[#FFF5EF]"
-                  >
-                    {highlight}
-                  </span>
-                ),
-              )}
-            </div>
-          </motion.div>
-        </div>
+            <h1 className="mt-3 text-3xl font-black leading-tight text-[var(--voltjo-black)] sm:text-4xl">
+              {isSignup ? "إنشاء حسابك في VoltJo" : "تسجيل الدخول إلى VoltJo"}
+            </h1>
+            <p className="mt-4 text-base font-semibold leading-8 text-[var(--voltjo-muted)]">
+              احفظ ملفك الذكي وتفضيلاتك لتجربة مخصصة يمكنك تعديلها لاحقًا.
+            </p>
+          </div>
 
-        <div className="p-6 sm:p-8">
-          <div className="grid grid-cols-2 rounded-full bg-[#F3F3F1] p-1">
+          <div className="mt-8 grid grid-cols-2 rounded-full border border-[var(--voltjo-border)] bg-[var(--voltjo-surface-soft)] p-1">
             <button
               type="button"
               onClick={() => setMode("signup")}
-              className={`h-10 rounded-full text-sm font-bold transition ${
+              className={`h-11 rounded-full text-sm font-bold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(255,77,0,0.24)] ${
                 mode === "signup"
-                  ? "bg-white text-[var(--voltjo-black)] shadow-sm"
+                  ? "bg-white text-[var(--voltjo-black)] shadow-[0_2px_10px_rgba(13,13,13,0.06)]"
                   : "text-[var(--voltjo-muted)]"
               }`}
             >
@@ -182,9 +208,9 @@ export function OnboardingAuthPanel({
             <button
               type="button"
               onClick={() => setMode("login")}
-              className={`h-10 rounded-full text-sm font-bold transition ${
+              className={`h-11 rounded-full text-sm font-bold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(255,77,0,0.24)] ${
                 mode === "login"
-                  ? "bg-white text-[var(--voltjo-black)] shadow-sm"
+                  ? "bg-white text-[var(--voltjo-black)] shadow-[0_2px_10px_rgba(13,13,13,0.06)]"
                   : "text-[var(--voltjo-muted)]"
               }`}
             >
@@ -192,12 +218,12 @@ export function OnboardingAuthPanel({
             </button>
           </div>
 
-          <div className="mt-7 grid gap-4">
+          <div className="mt-7 grid gap-3 sm:grid-cols-2">
             <button
               type="button"
               onClick={() => handleOAuth("google")}
               disabled={isSubmitting}
-              className="flex h-12 w-full items-center justify-center gap-3 rounded-[14px] border border-[var(--voltjo-border)] bg-white text-sm font-bold text-[var(--voltjo-black)] shadow-sm transition hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[var(--voltjo-orange)] focus:ring-offset-2 disabled:opacity-50"
+              className="flex h-12 w-full items-center justify-center gap-3 rounded-[16px] border border-[var(--voltjo-border)] bg-white text-sm font-bold text-[var(--voltjo-black)] transition hover:bg-[var(--voltjo-surface-soft)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(255,77,0,0.26)] focus-visible:ring-offset-2 disabled:cursor-wait disabled:opacity-50"
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -211,31 +237,29 @@ export function OnboardingAuthPanel({
               type="button"
               onClick={() => handleOAuth("github")}
               disabled={isSubmitting}
-              className="flex h-12 w-full items-center justify-center gap-3 rounded-[14px] border border-[var(--voltjo-border)] bg-white text-sm font-bold text-[var(--voltjo-black)] shadow-sm transition hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[var(--voltjo-orange)] focus:ring-offset-2 disabled:opacity-50"
+              className="flex h-12 w-full items-center justify-center gap-3 rounded-[16px] border border-[var(--voltjo-border)] bg-white text-sm font-bold text-[var(--voltjo-black)] transition hover:bg-[var(--voltjo-surface-soft)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(255,77,0,0.26)] focus-visible:ring-offset-2 disabled:cursor-wait disabled:opacity-50"
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                 <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
               </svg>
               المتابعة باستخدام GitHub
             </button>
-            <div className="relative flex items-center py-2">
-              <div className="flex-grow border-t border-[rgba(13,13,13,0.08)]"></div>
-              <span className="flex-shrink-0 px-4 text-xs font-semibold text-[var(--voltjo-muted)]">
-                أو استخدم البريد الإلكتروني
-              </span>
-              <div className="flex-grow border-t border-[rgba(13,13,13,0.08)]"></div>
-            </div>
           </div>
 
-          <form className="mt-2 grid gap-4" onSubmit={handleSubmit}>
+          <div className="my-7 flex items-center gap-4">
+            <div className="h-px flex-1 bg-[var(--voltjo-border)]" />
+            <span className="text-xs font-bold text-[var(--voltjo-muted)]">
+              أو استخدم البريد الإلكتروني
+            </span>
+            <div className="h-px flex-1 bg-[var(--voltjo-border)]" />
+          </div>
+
+          <form className="grid gap-4" onSubmit={handleSubmit}>
             <input
               type="hidden"
               name="onboardingAnswers"
               value={serializedAnswers}
             />
-            <p className="rounded-[16px] border border-[rgba(255,106,0,0.18)] bg-[rgba(255,106,0,0.055)] px-4 py-3 text-sm font-semibold leading-7 text-[var(--voltjo-muted)]">
-              سيتم إنشاء حساب VoltJo وحفظ تفضيلاتك في ملفك الذكي. لا يتم حفظ كلمة المرور داخل VoltJo.
-            </p>
             {authError ? (
               <p
                 role="alert"
@@ -249,7 +273,7 @@ export function OnboardingAuthPanel({
                 <div
                   role="status"
                   aria-live="polite"
-                  className="rounded-[18px] border border-emerald-200 bg-[linear-gradient(180deg,rgba(236,253,245,0.96),rgba(240,253,250,0.92))] px-4 py-4 text-right shadow-sm"
+                  className="rounded-[20px] border border-emerald-200 bg-emerald-50 px-4 py-4 text-right"
                 >
                   <div className="flex items-start gap-3">
                     <span className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">
@@ -285,7 +309,7 @@ export function OnboardingAuthPanel({
                   required
                   name="name"
                   autoComplete="name"
-                  className="h-12 rounded-[14px] border border-[rgba(13,13,13,0.1)] bg-white px-4 text-base font-medium outline-none transition focus:border-[rgba(255,106,0,0.46)]"
+                  className="h-12 rounded-[16px] border border-[var(--voltjo-border)] bg-white px-4 text-base font-medium outline-none transition focus:border-[rgba(255,77,0,0.42)] focus:ring-4 focus:ring-[rgba(255,77,0,0.08)]"
                 />
               </label>
             ) : null}
@@ -296,7 +320,7 @@ export function OnboardingAuthPanel({
                 name="email"
                 type="email"
                 autoComplete="email"
-                className="h-12 rounded-[14px] border border-[rgba(13,13,13,0.1)] bg-white px-4 text-base font-medium outline-none transition focus:border-[rgba(255,106,0,0.46)]"
+                className="h-12 rounded-[16px] border border-[var(--voltjo-border)] bg-white px-4 text-base font-medium outline-none transition focus:border-[rgba(255,77,0,0.42)] focus:ring-4 focus:ring-[rgba(255,77,0,0.08)]"
               />
             </label>
             <label className="grid gap-2 text-sm font-bold text-[var(--voltjo-black)]">
@@ -306,14 +330,14 @@ export function OnboardingAuthPanel({
                 name="password"
                 type="password"
                 autoComplete={mode === "signup" ? "new-password" : "current-password"}
-                className="h-12 rounded-[14px] border border-[rgba(13,13,13,0.1)] bg-white px-4 text-base font-medium outline-none transition focus:border-[rgba(255,106,0,0.46)]"
+                className="h-12 rounded-[16px] border border-[var(--voltjo-border)] bg-white px-4 text-base font-medium outline-none transition focus:border-[rgba(255,77,0,0.42)] focus:ring-4 focus:ring-[rgba(255,77,0,0.08)]"
               />
             </label>
 
             <button
               type="submit"
               disabled={isSubmitting}
-              className="mt-2 h-12 rounded-full bg-[var(--voltjo-black)] px-6 text-sm font-bold text-white transition hover:-translate-y-0.5 disabled:cursor-wait disabled:bg-[#C9C4BA]"
+              className="mt-2 h-12 rounded-full bg-[var(--voltjo-black)] px-6 text-sm font-bold text-white transition hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(13,13,13,0.2)] focus-visible:ring-offset-2 disabled:cursor-wait disabled:bg-[#C9C4BA] disabled:hover:translate-y-0"
             >
               {isSubmitting
                 ? "جاري التجهيز..."
@@ -323,20 +347,92 @@ export function OnboardingAuthPanel({
             </button>
             <button
               type="button"
-              onClick={onBack}
-              className="h-11 rounded-full text-sm font-bold text-[var(--voltjo-muted)] transition hover:bg-[#F6F6F4] hover:text-[var(--voltjo-black)]"
-            >
-              رجوع للأسئلة
-            </button>
-            <button
-              type="button"
               onClick={handleCancel}
-              className="h-11 rounded-full border border-[rgba(13,13,13,0.1)] bg-white text-sm font-bold text-[var(--voltjo-black)] transition hover:border-[rgba(13,13,13,0.18)] hover:bg-[#FAFAFA]"
+              className="h-10 rounded-full text-sm font-bold text-[var(--voltjo-muted)] transition hover:bg-[var(--voltjo-surface-soft)] hover:text-[var(--voltjo-black)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(13,13,13,0.16)]"
             >
               إلغاء والعودة للرئيسية
             </button>
           </form>
         </div>
+
+        <aside className="relative overflow-hidden rounded-[28px] border border-[var(--voltjo-border)] bg-[var(--voltjo-surface-soft)] p-5 shadow-[0_24px_70px_rgba(13,13,13,0.045)] sm:p-7 lg:p-9">
+          <div className="absolute left-8 top-8 opacity-[0.035]" aria-hidden="true">
+            <Image
+              src="/logo/VoltJo%20logo%20shape.svg"
+              alt=""
+              width={150}
+              height={220}
+              className="h-44 w-auto"
+              unoptimized
+            />
+          </div>
+
+          <div className="relative z-10 flex min-h-full flex-col">
+            <div className="inline-flex w-fit items-center gap-2 rounded-full border border-[rgba(255,77,0,0.16)] bg-white px-4 py-2 text-sm font-bold text-[var(--voltjo-orange-dark)]">
+              <span className="h-2 w-2 rounded-full bg-[var(--voltjo-orange)]" />
+              ملفك الذكي جاهز
+            </div>
+
+            <div className="mt-10 max-w-xl">
+              <h2 className="text-4xl font-black leading-tight text-[var(--voltjo-black)] sm:text-5xl">
+                سنحفظ تفضيلاتك لتجربة أكثر ملاءمة داخل VoltJo
+              </h2>
+              <p className="mt-5 text-base font-semibold leading-8 text-[var(--voltjo-muted)]">
+                هذه الإجابات تساعد في ترتيب الإرشاد، المقارنات، وتقديرات التكلفة
+                بشكل يناسب استخدامك. يمكنك تعديلها لاحقًا من ملفك.
+              </p>
+            </div>
+
+            <div className="mt-8 grid gap-3">
+              {(profileSummaryItems.length
+                ? profileSummaryItems
+                : [
+                    {
+                      label: "التخصيص",
+                      value: "تجربة مخصصة حسب إجاباتك",
+                      icon: Target,
+                    },
+                  ]
+              ).map(({ label, value, icon: Icon }) => (
+                <div
+                  key={`${label}-${value}`}
+                  className="flex items-center gap-4 rounded-[20px] border border-[var(--voltjo-border)] bg-white px-4 py-4 shadow-[0_8px_24px_rgba(13,13,13,0.025)]"
+                >
+                  <span className="grid h-11 w-11 shrink-0 place-items-center rounded-[14px] border border-[rgba(255,77,0,0.14)] bg-[rgba(255,77,0,0.055)] text-[var(--voltjo-orange-dark)]">
+                    <Icon size={19} />
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block text-xs font-bold leading-6 text-[var(--voltjo-muted)]">
+                      {label}
+                    </span>
+                    <span className="block text-sm font-black leading-7 text-[var(--voltjo-black)]">
+                      {value}
+                    </span>
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-auto pt-8">
+              <div className="rounded-[22px] border border-[var(--voltjo-border)] bg-white/86 p-4">
+                <div className="flex items-center gap-3">
+                  <Image
+                    src="/logo/VoltJo%20logo%20shape.svg"
+                    alt=""
+                    width={28}
+                    height={42}
+                    className="h-9 w-auto"
+                    unoptimized
+                  />
+                  <p className="text-sm font-bold leading-7 text-[var(--voltjo-muted)]">
+                    لا ندّعي أن البيانات نهائية؛ التجربة الحالية مخصصة للإرشاد
+                    المبدئي ومساعدتك على تنظيم قرارك.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </aside>
       </div>
     </motion.section>
   );

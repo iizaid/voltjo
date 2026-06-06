@@ -4,8 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
-const MARK_SRC = "/brands/logo%201.png";
-const WORDMARK_SRC = "/brands/typo%201.png";
+const MARK_SRC = "/logo/VoltJo%20logo%20shape.svg";
+const WORDMARK_SRC = "/logo/VoltJo%20logo.svg";
 
 type VoltJoLogoProps = {
   compact?: boolean;
@@ -20,26 +20,27 @@ export function VoltJoLogo({
 }: VoltJoLogoProps) {
   const content: ReactNode = (
     <>
-      <span className="relative flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden">
+      {compact ? (
         <Image
           src={MARK_SRC}
-          alt="VoltJo mark"
-          width={44}
-          height={44}
-          className="h-11 w-11 object-contain"
+          alt="VoltJo"
+          width={34}
+          height={50}
+          className="h-10 w-auto object-contain"
           priority
+          unoptimized
         />
-      </span>
-      {!compact ? (
+      ) : (
         <Image
           src={WORDMARK_SRC}
           alt="VoltJo"
-          width={160}
-          height={44}
-          className="h-9 w-auto object-contain"
+          width={184}
+          height={45}
+          className="h-10 w-auto object-contain"
           priority
+          unoptimized
         />
-      ) : null}
+      )}
     </>
   );
 
