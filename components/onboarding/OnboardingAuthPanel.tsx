@@ -3,7 +3,7 @@
 import { FormEvent, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "motion/react";
-import { CheckCircle2, ChevronRight } from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
 import { VoltJoLogo } from "@/components/brand/VoltJoLogo";
 import { signInAction, signUpAction } from "@/lib/auth/actions";
 import { signInWithOAuth, type OAuthProvider } from "@/lib/auth/oauth-client";
@@ -108,16 +108,8 @@ export function OnboardingAuthPanel({
       >
         <div className="w-full max-w-[480px]">
           {/* Header */}
-          <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center justify-start gap-4">
             <VoltJoLogo className="shrink-0" />
-            <button
-              type="button"
-              onClick={onBack}
-              className="inline-flex h-10 items-center gap-2 rounded-full border border-[var(--voltjo-border)] bg-white px-4 text-sm font-bold text-[var(--voltjo-muted)] transition hover:bg-[var(--voltjo-surface-soft)] hover:text-[var(--voltjo-black)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(13,13,13,0.16)]"
-            >
-              <ChevronRight size={16} />
-              رجوع
-            </button>
           </div>
 
           {/* Step label + title + subtitle */}
