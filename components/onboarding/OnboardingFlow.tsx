@@ -264,7 +264,7 @@ export function OnboardingFlow({ isAuthenticated }: { isAuthenticated?: boolean 
       ) : null}
 
       {flowState === "auth" ? (
-        <OnboardingAuthPanel key="auth" answers={answers} notice={flowNotice} onBack={goBack} />
+        <OnboardingAuthPanel key="auth" answers={answers} notice={flowNotice} />
       ) : null}
     </AnimatePresence>
   );

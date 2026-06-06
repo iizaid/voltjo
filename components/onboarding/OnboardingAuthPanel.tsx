@@ -15,11 +15,9 @@ type AuthMode = "signup" | "login";
 export function OnboardingAuthPanel({
   answers,
   notice,
-  onBack,
 }: {
   answers: CustomerProfileDraft;
   notice?: string | null;
-  onBack: () => void;
 }) {
   const router = useRouter();
   const [mode, setMode] = useState<AuthMode>("signup");
