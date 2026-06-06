@@ -31,14 +31,14 @@ export default async function VehiclesPage() {
             <p className="mt-4 max-w-3xl text-base font-semibold leading-8 text-[var(--voltjo-muted)] sm:text-lg">
               قائمة أولية تساعدك على الاستكشاف قبل الرجوع للوكيل أو المصدر الرسمي.
             </p>
-            <p className="mt-4 max-w-4xl rounded-[16px] border border-[rgba(255,106,0,0.18)] bg-[rgba(255,106,0,0.06)] px-4 py-3 text-sm font-bold leading-7 text-[var(--voltjo-black)]">
+            <p className="mt-4 max-w-4xl rounded-[16px] border border-[rgba(255,77,0,0.18)] bg-[rgba(255,77,0,0.055)] px-4 py-3 text-sm font-bold leading-7 text-[var(--voltjo-black)] shadow-[var(--voltjo-shadow-ring)]">
               البيانات قد تختلف حسب بلد الاستيراد، الفئة، الوكيل، وتوفر السيارة في السوق الأردني. تحقّق من المصدر الرسمي قبل أي قرار شراء.
             </p>
           </div>
 
           {vehicles.length === 0 ? (
             <div className="space-y-6">
-              <div className="rounded-[24px] border border-[var(--voltjo-border)] bg-white px-6 py-12 text-center shadow-[0_18px_50px_rgba(13,13,13,0.05)]">
+              <div className="rounded-[24px] border border-[var(--voltjo-border)] bg-white px-6 py-12 text-center shadow-[var(--voltjo-shadow-soft)]">
                 <p className="text-2xl font-black text-[var(--voltjo-black)]">
                   قائمة السيارات قيد التجهيز
                 </p>
@@ -47,7 +47,7 @@ export default async function VehiclesPage() {
                 </p>
               </div>
 
-              <div className="rounded-[24px] border border-[var(--voltjo-border)] bg-white p-6 shadow-[0_18px_50px_rgba(13,13,13,0.05)]">
+              <div className="rounded-[24px] border border-[var(--voltjo-border)] bg-white p-6 shadow-[var(--voltjo-shadow-soft)]">
                 <h2 className="text-2xl font-black text-[var(--voltjo-black)]">
                   ماذا سيظهر هنا؟
                 </h2>
@@ -61,7 +61,7 @@ export default async function VehiclesPage() {
                   ].map((item) => (
                     <div
                       key={item}
-                      className="rounded-[16px] border border-[var(--voltjo-border)] bg-[#FBFBF9] px-4 py-4 text-sm font-black text-[var(--voltjo-black)]"
+                      className="rounded-[16px] border border-[var(--voltjo-border)] bg-[var(--voltjo-surface-soft)] px-4 py-4 text-sm font-black text-[var(--voltjo-black)]"
                     >
                       {item}
                     </div>
@@ -75,7 +75,7 @@ export default async function VehiclesPage() {
                 <Link
                   key={vehicle.id}
                   href={`/vehicles/${vehicle.slug}`}
-                  className="rounded-[20px] border border-[var(--voltjo-border)] bg-white p-5 shadow-[0_18px_50px_rgba(13,13,13,0.05)] transition hover:border-[rgba(255,106,0,0.25)]"
+                  className="rounded-[20px] border border-[var(--voltjo-border)] bg-white p-5 shadow-[var(--voltjo-shadow-ring)] transition-all duration-200 hover:-translate-y-1 hover:border-[rgba(255,77,0,0.24)] hover:shadow-[var(--voltjo-shadow-soft)]"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="text-right">
@@ -86,7 +86,7 @@ export default async function VehiclesPage() {
                         {vehicle.nameAr}
                       </h2>
                     </div>
-                    <span className="rounded-full border border-[rgba(255,106,0,0.18)] bg-[rgba(255,106,0,0.06)] px-3 py-1 text-xs font-black text-[var(--voltjo-orange)]">
+                    <span className="rounded-full border border-[rgba(255,77,0,0.18)] bg-[rgba(255,77,0,0.055)] px-3 py-1 text-xs font-black text-[var(--voltjo-orange)]">
                       {vehicleTypeLabels[vehicle.vehicleType]}
                     </span>
                   </div>

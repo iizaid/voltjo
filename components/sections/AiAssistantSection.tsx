@@ -44,30 +44,30 @@ interface BranchCardProps {
 
 const BranchCard = ({ num, title, desc, icon: Icon, side }: BranchCardProps) => {
   return (
-    <div className={`flex w-full items-center gap-4 rounded-[14px] border border-[var(--voltjo-border-soft)] bg-white/90 p-4 shadow-sm hover:shadow-md transition-shadow ai-feature-card ai-feature-card-${num}`}>
+    <div className={`flex w-full items-center gap-4 rounded-[var(--voltjo-radius-card)] border border-[var(--voltjo-border)] bg-white p-4 shadow-[var(--voltjo-shadow-ring)] transition-all duration-200 hover:-translate-y-0.5 hover:border-[rgba(255,77,0,0.22)] ai-feature-card ai-feature-card-${num}`}>
       {side === "left" ? (
         <>
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-[var(--voltjo-border-soft)] bg-zinc-50 shadow-sm">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[var(--voltjo-border)] bg-[var(--voltjo-surface-soft)] shadow-sm">
             <Icon className="size-6 stroke-[1.5] text-[var(--voltjo-black)]" />
           </div>
           <div className="flex-1 text-right">
             <h4 className="text-[15px] font-bold text-[var(--voltjo-black)]">{title}</h4>
             <p className="mt-1 text-[13px] leading-relaxed text-[var(--voltjo-muted)]">{desc}</p>
           </div>
-          <div className="flex h-8 items-center justify-center rounded-md border border-[var(--voltjo-orange)]/20 bg-[rgba(255,106,0,0.05)] px-2.5 text-[13px] font-bold text-[var(--voltjo-orange)]">
+          <div className="flex h-8 items-center justify-center rounded-full border border-[var(--voltjo-orange)]/20 bg-[rgba(255,77,0,0.05)] px-2.5 text-[13px] font-bold text-[var(--voltjo-orange)]">
             {num}
           </div>
         </>
       ) : (
         <>
-          <div className="flex h-8 items-center justify-center rounded-md border border-[var(--voltjo-orange)]/20 bg-[rgba(255,106,0,0.05)] px-2.5 text-[13px] font-bold text-[var(--voltjo-orange)]">
+          <div className="flex h-8 items-center justify-center rounded-full border border-[var(--voltjo-orange)]/20 bg-[rgba(255,77,0,0.05)] px-2.5 text-[13px] font-bold text-[var(--voltjo-orange)]">
             {num}
           </div>
           <div className="flex-1 text-right">
             <h4 className="text-[15px] font-bold text-[var(--voltjo-black)]">{title}</h4>
             <p className="mt-1 text-[13px] leading-relaxed text-[var(--voltjo-muted)]">{desc}</p>
           </div>
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-[var(--voltjo-border-soft)] bg-zinc-50 shadow-sm">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[var(--voltjo-border)] bg-[var(--voltjo-surface-soft)] shadow-sm">
             <Icon className="size-6 stroke-[1.5] text-[var(--voltjo-black)]" />
           </div>
         </>
@@ -78,7 +78,7 @@ const BranchCard = ({ num, title, desc, icon: Icon, side }: BranchCardProps) => 
 
 export function AiAssistantSection() {
   return (
-    <section className="relative overflow-hidden bg-[#fafafa] py-20 md:py-32 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:24px_24px]">
+    <section className="relative overflow-hidden bg-[var(--voltjo-surface-soft)] py-20 md:py-32 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:28px_28px]">
       <Container>
         {/* Header Area */}
         <div className="mb-16 text-center lg:mb-24 flex flex-col items-center">
@@ -88,8 +88,8 @@ export function AiAssistantSection() {
               <span>السيارات</span>
               <TrueFocus 
                 sentence="الكهربائية والهايبرد"
-                borderColor="#ff6a00"
-                glowColor="rgba(255, 106, 0, 0.4)"
+                borderColor="#ff4d00"
+                glowColor="rgba(255, 77, 0, 0.26)"
                 animationDuration={0.6}
                 pauseBetweenAnimations={1.5}
                 blurAmount={2}
@@ -125,7 +125,7 @@ export function AiAssistantSection() {
               
               {/* Rings */}
               <div className="absolute inset-5 rounded-full border border-[var(--voltjo-orange)]/30 bg-gradient-to-tr from-[var(--voltjo-orange)]/5 to-transparent" />
-              <div className="absolute inset-8 rounded-full border border-white/60 bg-white/40 shadow-[0_0_20px_rgba(255,106,0,0.1)] backdrop-blur-md" />
+              <div className="absolute inset-8 rounded-full border border-white/60 bg-white/40 shadow-[0_0_20px_rgba(255,77,0,0.1)] backdrop-blur-md" />
               
               {/* Core */}
               <div className="absolute inset-11 z-10 flex flex-col items-center justify-center rounded-full border border-zinc-100 bg-white shadow-xl">
@@ -163,7 +163,7 @@ export function AiAssistantSection() {
                 
                 {/* Ring Layer */}
                 <div className="absolute inset-2 rounded-full border border-[var(--voltjo-orange)]/40 bg-gradient-to-tr from-[var(--voltjo-orange)]/10 to-transparent ai-hub-ring" />
-                <div className="absolute inset-6 rounded-full border border-white/60 bg-white/30 shadow-[0_0_30px_rgba(255,106,0,0.2)] backdrop-blur-md" />
+                <div className="absolute inset-6 rounded-full border border-white/60 bg-white/30 shadow-[0_0_30px_rgba(255,77,0,0.16)] backdrop-blur-md" />
                 
                 {/* Center Icon Plate */}
                 <div className="absolute inset-10 z-10 flex flex-col items-center justify-center rounded-full border border-zinc-100 bg-white shadow-xl">

@@ -6,7 +6,7 @@ export function FinalCtaSection() {
   return (
     <section className="px-4 py-16 sm:px-6 lg:px-8">
       <Container>
-        <div className="technical-panel mx-auto max-w-5xl rounded-[42px] border border-[rgba(255,106,0,0.18)] bg-white px-7 py-10 text-center shadow-[0_28px_90px_rgba(13,13,13,0.08),inset_0_1px_0_rgba(255,255,255,0.8)] sm:rounded-[64px] sm:px-12 sm:py-12 lg:rounded-[999px] lg:px-16 lg:py-14">
+        <div className="technical-panel mx-auto max-w-5xl rounded-[34px] border border-[var(--voltjo-border)] bg-white px-7 py-10 text-center shadow-[var(--voltjo-shadow-soft)] sm:px-12 sm:py-12 lg:rounded-[999px] lg:px-16 lg:py-14">
           <h2 className="display-heading text-balance text-4xl font-black leading-tight text-[var(--voltjo-black)] sm:text-6xl">
             خلّي قرارك أوضح قبل الشراء
           </h2>

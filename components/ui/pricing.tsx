@@ -91,12 +91,12 @@ const PricingSwitch = ({
 
   return (
     <div className={cn("flex justify-center", className)}>
-      <div className="relative z-10 mx-auto flex w-fit rounded-xl border border-gray-200 bg-neutral-50 p-1">
+      <div className="relative z-10 mx-auto flex w-fit rounded-full border border-[var(--voltjo-border)] bg-[var(--voltjo-surface-soft)] p-1 shadow-[var(--voltjo-shadow-ring)]">
         <button
           type="button"
           onClick={() => handleSwitch("0")}
           className={cn(
-            "relative z-10 h-12 w-fit cursor-pointer rounded-xl px-3 py-1 text-sm font-medium transition-colors sm:px-6 sm:py-2 sm:text-base",
+            "relative z-10 h-12 w-fit cursor-pointer rounded-full px-3 py-1 text-sm font-medium transition-colors sm:px-6 sm:py-2 sm:text-base",
             selected === "0"
               ? "text-white"
               : "text-muted-foreground hover:text-black",
@@ -105,7 +105,7 @@ const PricingSwitch = ({
           {selected === "0" && (
             <motion.span
               layoutId="switch"
-              className="absolute left-0 top-0 h-12 w-full rounded-xl border-4 border-orange-600 bg-gradient-to-t from-orange-500 via-orange-400 to-orange-600 shadow-sm shadow-orange-600"
+              className="absolute left-0 top-0 h-12 w-full rounded-full bg-[var(--voltjo-orange)] shadow-[0_0_0_5px_var(--voltjo-orange-glow)]"
               transition={{ type: "spring", stiffness: 500, damping: 30 }}
             />
           )}
@@ -116,7 +116,7 @@ const PricingSwitch = ({
           type="button"
           onClick={() => handleSwitch("1")}
           className={cn(
-            "relative z-10 h-12 w-fit flex-shrink-0 cursor-pointer rounded-xl px-3 py-1 text-sm font-medium transition-colors sm:px-6 sm:py-2 sm:text-base",
+            "relative z-10 h-12 w-fit flex-shrink-0 cursor-pointer rounded-full px-3 py-1 text-sm font-medium transition-colors sm:px-6 sm:py-2 sm:text-base",
             selected === "1"
               ? "text-white"
               : "text-muted-foreground hover:text-black",
@@ -125,13 +125,13 @@ const PricingSwitch = ({
           {selected === "1" && (
             <motion.span
               layoutId="switch"
-              className="absolute left-0 top-0 h-12 w-full rounded-xl border-4 border-orange-600 bg-gradient-to-t from-orange-500 via-orange-400 to-orange-600 shadow-sm shadow-orange-600"
+              className="absolute left-0 top-0 h-12 w-full rounded-full bg-[var(--voltjo-orange)] shadow-[0_0_0_5px_var(--voltjo-orange-glow)]"
               transition={{ type: "spring", stiffness: 500, damping: 30 }}
             />
           )}
           <span className="relative flex items-center gap-2">
             سنوي
-            <span className="rounded-full bg-orange-50 px-2 py-0.5 text-xs font-medium text-black">
+            <span className="rounded-full border border-[rgba(255,77,0,0.16)] bg-[rgba(255,77,0,0.06)] px-2 py-0.5 text-xs font-medium text-[var(--voltjo-black)]">
               قيد التحضير
             </span>
           </span>
@@ -226,8 +226,8 @@ export default function Pricing() {
             className="h-full"
           >
             <Card
-              className={`relative flex h-full flex-col border border-neutral-200 ${
-                plan.popular ? "bg-orange-50 ring-2 ring-orange-500" : "bg-white"
+              className={`relative flex h-full flex-col overflow-hidden transition-all duration-200 hover:-translate-y-1 ${
+                plan.popular ? "border-[rgba(255,77,0,0.28)] bg-white ring-1 ring-[rgba(255,77,0,0.18)]" : "bg-white"
               }`}
             >
               <CardHeader className="h-[220px] flex flex-col justify-between space-y-0 text-right">
@@ -237,7 +237,7 @@ export default function Pricing() {
                       {plan.name}
                     </h3>
                     {plan.popular ? (
-                      <span className="rounded-full bg-orange-500 px-3 py-1 text-sm font-medium text-white shadow-sm">
+                      <span className="rounded-full bg-[var(--voltjo-orange)] px-3 py-1 text-sm font-medium text-white shadow-[0_0_0_5px_var(--voltjo-orange-glow)]">
                         تمهيدية
                       </span>
                     ) : null}
@@ -273,10 +273,10 @@ export default function Pricing() {
                   onClick={showPricingNotice}
                   className={`mb-3 w-full rounded-xl px-4 py-3 text-base font-bold transition-all ${
                     plan.popular
-                      ? "border border-orange-400 bg-gradient-to-t from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/30 hover:-translate-y-0.5"
+                      ? "border border-transparent bg-[var(--voltjo-orange)] text-white shadow-[0_0_0_5px_var(--voltjo-orange-glow)] hover:-translate-y-0.5 hover:bg-[var(--voltjo-orange-dark)]"
                       : plan.buttonVariant === "outline"
-                        ? "border border-neutral-700 bg-gradient-to-t from-neutral-900 to-neutral-600 text-white shadow-md shadow-neutral-900/30 hover:-translate-y-0.5"
-                        : "border border-gray-200 bg-white text-gray-900 shadow-sm hover:-translate-y-0.5 hover:bg-gray-50"
+                        ? "border border-[var(--voltjo-border)] bg-[var(--voltjo-black)] text-white shadow-sm hover:-translate-y-0.5"
+                        : "border border-[var(--voltjo-border)] bg-white text-[var(--voltjo-black)] shadow-sm hover:-translate-y-0.5 hover:bg-[var(--voltjo-surface-soft)]"
                   }`}
                 >
                   {plan.buttonText}
@@ -285,7 +285,7 @@ export default function Pricing() {
                   <button
                     type="button"
                     onClick={showPricingNotice}
-                    className="mb-6 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-base font-bold text-gray-800 shadow-sm transition-all hover:-translate-y-0.5 hover:bg-gray-50"
+                    className="mb-6 w-full rounded-full border border-[var(--voltjo-border)] bg-white px-4 py-3 text-base font-bold text-[var(--voltjo-black)] shadow-sm transition-all hover:-translate-y-0.5 hover:bg-[var(--voltjo-surface-soft)]"
                   >
                     {plan.secondaryButtonText}
                   </button>
@@ -301,8 +301,8 @@ export default function Pricing() {
                   <ul className="space-y-2 font-semibold">
                     {plan.includes.slice(1).map((feature) => (
                       <li key={feature} className="flex items-center">
-                        <span className="ml-3 mt-0.5 grid h-6 w-6 place-content-center rounded-full border border-orange-500 bg-white">
-                          <CheckCheck className="h-4 w-4 text-orange-500" />
+                        <span className="ml-3 mt-0.5 grid h-6 w-6 place-content-center rounded-full border border-[rgba(255,77,0,0.24)] bg-white">
+                          <CheckCheck className="h-4 w-4 text-[var(--voltjo-orange)]" />
                         </span>
                         <span className="text-sm leading-6 text-gray-600">
                           {feature}
@@ -324,7 +324,7 @@ export default function Pricing() {
         <p
           role="status"
           aria-live="polite"
-          className="mx-auto mt-3 max-w-2xl rounded-full border border-orange-200 bg-orange-50 px-4 py-2 text-center text-sm font-bold leading-7 text-gray-800"
+          className="mx-auto mt-3 max-w-2xl rounded-full border border-[rgba(255,77,0,0.18)] bg-[rgba(255,77,0,0.06)] px-4 py-2 text-center text-sm font-bold leading-7 text-[var(--voltjo-black)]"
         >
           {pricingNotice}
         </p>

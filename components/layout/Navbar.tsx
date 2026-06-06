@@ -27,7 +27,7 @@ export function Navbar({ auth }: { auth?: NavbarAuthState | null }) {
     <div className="px-4 py-4 sm:px-6 lg:px-8">
       <div className="relative z-40 mx-auto max-w-[1240px]">
         <nav
-          className="flex h-[72px] items-center justify-between gap-4 rounded-[8px] border border-[var(--voltjo-border)] bg-white/95 px-4 shadow-none backdrop-blur-sm lg:px-6"
+          className="flex h-[68px] items-center justify-between gap-4 rounded-full border border-[var(--voltjo-border)] bg-white/95 px-4 shadow-[var(--voltjo-shadow-ring)] backdrop-blur-sm lg:px-5"
           aria-label="التنقل الرئيسي"
           dir="ltr"
         >
@@ -43,7 +43,7 @@ export function Navbar({ auth }: { auth?: NavbarAuthState | null }) {
               <Link
                 key={item.href}
                 href={item.href}
-                className="rounded-[6px] px-3 py-2 text-[14px] font-bold text-[var(--voltjo-black)] transition hover:bg-[rgba(13,13,13,0.04)]"
+                className="rounded-full px-3 py-2 text-[14px] font-bold text-[var(--voltjo-black)] transition-colors duration-200 hover:bg-[var(--voltjo-surface-soft)]"
               >
                 {item.label}
               </Link>
@@ -55,13 +55,13 @@ export function Navbar({ auth }: { auth?: NavbarAuthState | null }) {
               <>
                 <Link
                   href="/assistant"
-                  className="flex h-10 items-center justify-center rounded-[8px] border border-[var(--voltjo-border)] bg-white px-4 text-sm font-bold text-[var(--voltjo-black)] transition hover:bg-[rgba(13,13,13,0.04)]"
+                  className="flex h-10 items-center justify-center rounded-full border border-[var(--voltjo-border)] bg-white px-4 text-sm font-bold text-[var(--voltjo-black)] transition-colors hover:bg-[var(--voltjo-surface-soft)]"
                 >
                   المساعد
                 </Link>
                 <Link
                   href="/account"
-                  className="flex h-10 items-center gap-2 rounded-[8px] border border-[var(--voltjo-border)] bg-white px-3.5 text-sm font-bold text-[var(--voltjo-black)] transition hover:bg-[rgba(13,13,13,0.04)]"
+                  className="flex h-10 items-center gap-2 rounded-full border border-[var(--voltjo-border)] bg-white px-3.5 text-sm font-bold text-[var(--voltjo-black)] transition-colors hover:bg-[var(--voltjo-surface-soft)]"
                 >
                   <span className="flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[var(--voltjo-black)] text-[11px] font-black text-white">
                     {auth.avatarUrl ? (
@@ -80,7 +80,7 @@ export function Navbar({ auth }: { auth?: NavbarAuthState | null }) {
             ) : (
               <Link
                 href="/start"
-                className="flex h-10 items-center justify-center rounded-[8px] bg-[var(--voltjo-orange)] px-5 text-sm font-bold text-[#FFFFFF] transition hover:bg-[#e85e00] hover:-translate-y-0.5 shadow-sm hover:shadow-md"
+                className="flex h-10 items-center justify-center rounded-full bg-[var(--voltjo-orange)] px-5 text-sm font-bold text-white shadow-[0_0_0_6px_var(--voltjo-orange-glow)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[var(--voltjo-orange-dark)]"
               >
                 ابدأ الآن
               </Link>
@@ -90,7 +90,7 @@ export function Navbar({ auth }: { auth?: NavbarAuthState | null }) {
           <button
             type="button"
             onClick={() => setMobileOpen((current) => !current)}
-            className="flex h-10 w-10 items-center justify-center rounded-[8px] border border-[var(--voltjo-border)] bg-white text-[var(--voltjo-black)] lg:hidden"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--voltjo-border)] bg-white text-[var(--voltjo-black)] lg:hidden"
             aria-expanded={mobileOpen}
             aria-label="فتح قائمة التنقل"
           >
@@ -99,14 +99,14 @@ export function Navbar({ auth }: { auth?: NavbarAuthState | null }) {
         </nav>
 
         {mobileOpen ? (
-          <div className="absolute left-4 right-4 top-[calc(100%+8px)] rounded-[12px] border border-[var(--voltjo-border)] bg-white p-2 shadow-[0_12px_40px_rgba(13,13,13,0.1)] lg:hidden">
+          <div className="absolute left-4 right-4 top-[calc(100%+8px)] rounded-[20px] border border-[var(--voltjo-border)] bg-white p-2 shadow-[var(--voltjo-shadow-soft)] lg:hidden">
             <div className="grid gap-1">
               {navItems.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
                   onClick={() => setMobileOpen(false)}
-                  className="rounded-[8px] px-4 py-3 text-sm font-bold text-[var(--voltjo-black)] hover:bg-[rgba(13,13,13,0.04)]"
+                  className="rounded-full px-4 py-3 text-sm font-bold text-[var(--voltjo-black)] hover:bg-[var(--voltjo-surface-soft)]"
                 >
                   {item.label}
                 </Link>
@@ -118,14 +118,14 @@ export function Navbar({ auth }: { auth?: NavbarAuthState | null }) {
                   <Link
                     href="/assistant"
                     onClick={() => setMobileOpen(false)}
-                    className="flex w-full items-center justify-center rounded-[8px] border border-[var(--voltjo-border)] bg-white px-4 py-2.5 text-sm font-bold text-[var(--voltjo-black)] transition hover:bg-[rgba(13,13,13,0.04)]"
+                    className="flex w-full items-center justify-center rounded-full border border-[var(--voltjo-border)] bg-white px-4 py-2.5 text-sm font-bold text-[var(--voltjo-black)] transition hover:bg-[var(--voltjo-surface-soft)]"
                   >
                     المساعد
                   </Link>
                   <Link
                     href="/account"
                     onClick={() => setMobileOpen(false)}
-                    className="flex w-full items-center justify-center gap-2 rounded-[8px] border border-[var(--voltjo-border)] bg-white px-4 py-2.5 text-sm font-bold text-[var(--voltjo-black)] transition hover:bg-[rgba(13,13,13,0.04)]"
+                    className="flex w-full items-center justify-center gap-2 rounded-full border border-[var(--voltjo-border)] bg-white px-4 py-2.5 text-sm font-bold text-[var(--voltjo-black)] transition hover:bg-[var(--voltjo-surface-soft)]"
                   >
                     <span className="flex h-6 w-6 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[var(--voltjo-black)] text-[10px] font-black text-white">
                       {auth.avatarUrl ? (
@@ -145,7 +145,7 @@ export function Navbar({ auth }: { auth?: NavbarAuthState | null }) {
                 <Link
                   href="/start"
                   onClick={() => setMobileOpen(false)}
-                  className="flex w-full items-center justify-center rounded-[8px] bg-[var(--voltjo-orange)] px-4 py-2.5 text-sm font-bold text-[#FFFFFF] transition hover:bg-[#e85e00]"
+                  className="flex w-full items-center justify-center rounded-full bg-[var(--voltjo-orange)] px-4 py-2.5 text-sm font-bold text-white transition hover:bg-[var(--voltjo-orange-dark)]"
                 >
                   ابدأ الآن
                 </Link>

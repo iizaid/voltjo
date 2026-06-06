@@ -46,7 +46,7 @@ export function HeroPromptBox() {
 
   return (
     <div className="mx-auto mt-10 max-w-3xl" dir="rtl">
-      <div className="rounded-[20px] border border-[rgba(13,13,13,0.12)] bg-[#FEFEFC] p-3 shadow-[0_4px_16px_rgba(13,13,13,0.04)] transition-shadow focus-within:shadow-[0_4px_20px_rgba(13,13,13,0.08)]">
+      <div className="rounded-[28px] border border-[var(--voltjo-border)] bg-white p-3 shadow-[var(--voltjo-shadow-ring)] transition-shadow focus-within:border-[rgba(255,77,0,0.32)] focus-within:shadow-[0_0_0_6px_var(--voltjo-orange-glow)]">
         {/* Textarea */}
         <textarea
           aria-label="سؤال VoltJo"
@@ -68,7 +68,7 @@ export function HeroPromptBox() {
                 key={action.label}
                 type="button"
                 onClick={() => handleSubmit(action.prompt)}
-                className="inline-flex items-center rounded-lg border border-[rgba(13,13,13,0.08)] bg-white px-3 py-1.5 text-[13px] font-semibold text-[var(--voltjo-muted)] transition hover:border-[rgba(13,13,13,0.16)] hover:text-[var(--voltjo-black)]"
+                className="inline-flex items-center rounded-full border border-[var(--voltjo-border)] bg-[var(--voltjo-surface-soft)] px-3 py-1.5 text-[13px] font-semibold text-[var(--voltjo-muted)] transition hover:border-[rgba(255,77,0,0.24)] hover:text-[var(--voltjo-black)]"
               >
                 {action.label}
               </button>
@@ -80,7 +80,7 @@ export function HeroPromptBox() {
             type="button"
             onClick={() => handleSubmit()}
             aria-label="ابدأ"
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--voltjo-orange)] text-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md hover:bg-[#e85e00]"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--voltjo-orange)] text-white shadow-[0_0_0_5px_var(--voltjo-orange-glow)] transition hover:-translate-y-0.5 hover:bg-[var(--voltjo-orange-dark)]"
           >
             <ArrowUp size={17} />
           </button>

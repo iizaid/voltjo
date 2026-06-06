@@ -1,20 +1,31 @@
 @import "tailwindcss";
 
 :root {
-  --voltjo-black: #0d0d0d;
-  --voltjo-ink: #111111;
-  --voltjo-orange: #ff6a00;
-  --voltjo-orange-dark: #d9480f;
-  --voltjo-orange-soft: rgba(255, 106, 0, 0.1);
-  --voltjo-text: #111111;
-  --voltjo-muted: #5f6673;
-  --voltjo-border: rgba(13, 13, 13, 0.08);
-  --voltjo-border-strong: rgba(13, 13, 13, 0.14);
-  --voltjo-border-soft: rgba(13, 13, 13, 0.055);
+  --voltjo-black: #262626;
+  --voltjo-ink: #262626;
+  --voltjo-orange: #ff4d00;
+  --voltjo-orange-dark: #c2410c;
+  --voltjo-orange-glow: #fcddcc;
+  --voltjo-orange-soft: rgba(255, 77, 0, 0.08);
+  --voltjo-text: #262626;
+  --voltjo-muted: #727272;
+  --voltjo-graphite: #616161;
+  --voltjo-border: #e5e7eb;
+  --voltjo-border-strong: #d8dbe0;
+  --voltjo-border-soft: rgba(229, 231, 235, 0.78);
   --voltjo-bg: #ffffff;
-  --voltjo-bg-soft: #fafafa;
+  --voltjo-bg-soft: #f9f9f9;
   --voltjo-surface: #ffffff;
-  --voltjo-surface-soft: #fafafa;
+  --voltjo-surface-soft: #f9f9f9;
+  --voltjo-surface-warm: #fefdfb;
+  --voltjo-radius-card: 16px;
+  --voltjo-radius-pill: 999px;
+  --voltjo-shadow-soft: rgba(0, 0, 0, 0.02) 0px 40px 48px -20px,
+    rgba(0, 0, 0, 0.03) 0px 32px 32px -20px,
+    rgba(0, 0, 0, 0.03) 0px 16px 24px -12px,
+    rgba(0, 0, 0, 0.03) 0px 0px 0px 1px;
+  --voltjo-shadow-ring: rgb(249, 249, 249) 0px 0px 0px 6px;
+  --voltjo-transition: 220ms cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 * {
@@ -32,7 +43,7 @@ body {
   min-height: 100%;
   overflow-x: clip;
   color: var(--voltjo-text);
-  background: #fff;
+  background: var(--voltjo-bg);
   font-family: var(--font-primary), Arial, "Helvetica Neue", system-ui, sans-serif;
   font-weight: 500;
   text-rendering: optimizeLegibility;
@@ -49,7 +60,7 @@ html[lang="ar"] body {
 .site-shell {
   position: relative;
   overflow-x: clip;
-  background: #fff;
+  background: var(--voltjo-bg);
 }
 
 .site-content {
@@ -99,15 +110,15 @@ input {
   inset: 0;
   opacity: 1;
   background:
-    linear-gradient(rgba(13, 13, 13, 0.064) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(13, 13, 13, 0.064) 1px, transparent 1px);
+    linear-gradient(rgba(229, 231, 235, 0.72) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(229, 231, 235, 0.72) 1px, transparent 1px);
   background-size: 104px 104px;
 }
 
 .tech-glow {
   position: absolute;
   border-radius: 999px;
-  background: radial-gradient(circle, rgba(255, 106, 0, 0.062), transparent 68%);
+  background: radial-gradient(circle, rgba(255, 77, 0, 0.038), transparent 68%);
 }
 
 .tech-glow-a {
@@ -126,10 +137,10 @@ input {
 
 .tech-bg-panel {
   position: absolute;
-  border: 1px solid rgba(13, 13, 13, 0.095);
-  border-radius: 24px;
-  opacity: 0.76;
-  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid var(--voltjo-border-soft);
+  border-radius: var(--voltjo-radius-card);
+  opacity: 0.58;
+  background: rgba(249, 249, 249, 0.24);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
 }
 
@@ -137,8 +148,8 @@ input {
   content: "";
   position: absolute;
   inset: 18px 22px;
-  border: 1px solid rgba(13, 13, 13, 0.075);
-  border-radius: 16px;
+  border: 1px solid rgba(229, 231, 235, 0.7);
+  border-radius: 12px;
 }
 
 .tech-bg-panel::before {
@@ -148,8 +159,8 @@ input {
   border-radius: inherit;
   opacity: 0.75;
   background:
-    linear-gradient(rgba(13, 13, 13, 0.046) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(13, 13, 13, 0.042) 1px, transparent 1px);
+    linear-gradient(rgba(229, 231, 235, 0.58) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(229, 231, 235, 0.54) 1px, transparent 1px);
   background-size: 32px 32px;
 }
 
@@ -283,7 +294,7 @@ input {
 .tech-bg-marker::after {
   content: "";
   position: absolute;
-  background: rgba(255, 106, 0, 0.68);
+  background: rgba(255, 77, 0, 0.58);
   border-radius: 999px;
 }
 
@@ -354,16 +365,14 @@ input {
 }
 
 .soft-shadow {
-  box-shadow:
-    0 22px 70px rgba(13, 13, 13, 0.07),
-    0 1px 0 rgba(13, 13, 13, 0.045);
+  box-shadow: var(--voltjo-shadow-soft);
 }
 
 .input-glow:focus-within {
-  border-color: rgba(255, 106, 0, 0.42);
+  border-color: rgba(255, 77, 0, 0.42);
   box-shadow:
-    0 26px 84px rgba(13, 13, 13, 0.08),
-    0 0 0 6px rgba(255, 106, 0, 0.08);
+    var(--voltjo-shadow-ring),
+    0 0 0 6px rgba(255, 77, 0, 0.06);
 }
 
 .text-type {
@@ -390,7 +399,7 @@ input {
   overflow: hidden;
   border-top: 1px solid var(--voltjo-border-soft);
   border-bottom: 1px solid var(--voltjo-border-soft);
-  background: rgba(255, 255, 255, 0.58);
+  background: rgba(249, 249, 249, 0.72);
   mask-image: linear-gradient(to right, transparent, #000 12%, #000 88%, transparent);
 }
 
@@ -479,7 +488,7 @@ input {
 
 /* ─── Uiverse Loader (andrew-manzyk / young-walrus-64) ─── */
 .voltjo-uiverse-loader {
-  --color-one: #ff6a00;
+  --color-one: #ff4d00;
   --color-two: #be4a1d;
   --color-three: rgba(255, 106, 0, 0.5);
   --color-four: rgba(190, 74, 29, 0.5);
