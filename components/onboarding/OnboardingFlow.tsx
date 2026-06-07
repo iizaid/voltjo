@@ -54,6 +54,7 @@ export function OnboardingFlow({ isAuthenticated }: { isAuthenticated?: boolean 
   const router = useRouter();
   const searchParams = useSearchParams();
   const isOAuthReturn = searchParams.get("auth") === "oauth-success";
+  const isAuthError = searchParams.get("auth_error") === "callback";
 
   const [flowState, setFlowState] = useState<FlowState>("intro");
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -192,6 +193,19 @@ export function OnboardingFlow({ isAuthenticated }: { isAuthenticated?: boolean 
         setFlowState("questions");
         setCurrentQuestionIndex(0);
       }
+      setHasHydrated(true);
+      return () => { clearNextTimeout(); };
+    }
+
+    // OAuth callback failed (auth_error=callback) OR callback claimed success
+    // but the session wasn't persisted on the server (isOAuthReturn && !isAuthenticated).
+    // In both cases show the auth panel with a clear Arabic error notice.
+    if (isAuthError || (isOAuthReturn && !isAuthenticated)) {
+      if (storedDraft && hasDraftAnswers(storedDraft)) {
+        setAnswers(storedDraft);
+      }
+      setFlowNotice("تعذر إكمال تسجيل الدخول. حاول مرة أخرى.");
+      setFlowState("auth");
       setHasHydrated(true);
       return () => { clearNextTimeout(); };
     }

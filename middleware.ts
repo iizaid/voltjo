@@ -40,7 +40,7 @@ export async function middleware(request: NextRequest) {
       getAll() {
         return request.cookies.getAll();
       },
-      setAll(cookiesToSet) {
+      setAll(cookiesToSet, headers) {
         cookiesToSet.forEach(({ name, value }) => {
           request.cookies.set(name, value);
         });
@@ -53,6 +53,12 @@ export async function middleware(request: NextRequest) {
 
         cookiesToSet.forEach(({ name, value, options }) => {
           response.cookies.set(name, value, options);
+        });
+
+        // Forward cache-control headers emitted by @supabase/ssr so that
+        // Cloudflare/CDN proxies do not cache responses that set auth cookies.
+        Object.entries(headers).forEach(([key, value]) => {
+          response.headers.set(key, value);
         });
       },
     },
