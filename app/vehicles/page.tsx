@@ -3,6 +3,8 @@ import Link from "next/link";
 import { Container } from "@/components/ui/Container";
 import { PageReturnBar } from "@/components/ui/PageReturnBar";
 import { listSupportedVehicles } from "@/lib/vehicles/queries";
+
+export const revalidate = 3600;
 import { confidenceLabels, vehicleTypeLabels } from "@/lib/vehicles/types";
 
 export const metadata: Metadata = {

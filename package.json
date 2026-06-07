@@ -11,7 +11,9 @@
     "start": "next start",
     "lint": "eslint . --max-warnings=0",
     "test": "vitest run",
-    "auth:debug:help": "node scripts/print-auth-debug-help.mjs"
+    "auth:debug:help": "node scripts/print-auth-debug-help.mjs",
+    "load:public": "k6 run tests/load/public-smoke.js",
+    "load:auth-health": "k6 run tests/load/auth-health-smoke.js"
   },
   "dependencies": {
     "@number-flow/react": "^0.6.0",

@@ -6,6 +6,8 @@ import { PageReturnBar } from "@/components/ui/PageReturnBar";
 import { getSupportedVehicleBySlug } from "@/lib/vehicles/queries";
 import { confidenceLabels, vehicleTypeLabels } from "@/lib/vehicles/types";
 
+export const revalidate = 3600;
+
 export async function generateMetadata({
   params,
 }: {

@@ -4,6 +4,8 @@ import { ChargingCalculatorClient } from "@/components/vehicles/ChargingCalculat
 import { PageReturnBar } from "@/components/ui/PageReturnBar";
 import { getChargingCostInputs } from "@/lib/vehicles/queries";
 
+export const revalidate = 86400;
+
 export const metadata: Metadata = {
   title: "حاسبة الشحن | VoltJo",
   description:

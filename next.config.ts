@@ -36,12 +36,21 @@ const securityHeaders = [
     value: "on",
   },
   {
+    // Safe for Cloudflare HTTPS. 1-year max-age; includeSubDomains for full coverage.
+    key: "Strict-Transport-Security",
+    value: "max-age=31536000; includeSubDomains",
+  },
+  {
     key: "Content-Security-Policy-Report-Only",
     value: contentSecurityPolicyReportOnly,
   },
 ];
 
 const nextConfig: NextConfig = {
+  experimental: {
+    // Tree-shakes these barrel packages so only imported names enter the client bundle.
+    optimizePackageImports: ["lucide-react", "motion"],
+  },
   async headers() {
     return [
       {
