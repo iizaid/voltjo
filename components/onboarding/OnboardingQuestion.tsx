@@ -19,6 +19,7 @@ export function OnboardingQuestion({
   questionIndex,
   totalQuestions,
   answer,
+  notice,
   canGoBack,
   canContinue,
   onSelect,
@@ -29,6 +30,7 @@ export function OnboardingQuestion({
   questionIndex: number;
   totalQuestions: number;
   answer: string | string[] | undefined;
+  notice?: string | null;
   canGoBack: boolean;
   canContinue: boolean;
   onSelect: (value: string) => void;
@@ -76,6 +78,14 @@ export function OnboardingQuestion({
         </div>
 
         <div className="mt-10 border-b border-[var(--voltjo-border-soft)] pb-8">
+          {notice ? (
+            <p
+              role="status"
+              className="mb-5 inline-flex rounded-full border border-[rgba(255,77,0,0.18)] bg-[rgba(255,77,0,0.055)] px-4 py-2 text-sm font-bold leading-6 text-[var(--voltjo-orange-dark)]"
+            >
+              {notice}
+            </p>
+          ) : null}
           <h1 className="max-w-3xl text-3xl font-black leading-[1.25] text-[var(--voltjo-black)] sm:text-5xl">
             {question.title}
           </h1>

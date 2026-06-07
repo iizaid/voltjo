@@ -1,9 +1,10 @@
 "use client";
 
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "motion/react";
 import { CheckCircle2 } from "lucide-react";
+import { TurnstileWidget } from "@/components/auth/TurnstileWidget";
 import { VoltJoLogo } from "@/components/brand/VoltJoLogo";
 import { signInAction, signUpAction } from "@/lib/auth/actions";
 import { signInWithOAuth, type OAuthProvider } from "@/lib/auth/oauth-client";
@@ -15,18 +16,38 @@ type AuthMode = "signup" | "login";
 export function OnboardingAuthPanel({
   answers,
   notice,
+  isAuthenticated = false,
 }: {
   answers: CustomerProfileDraft;
   notice?: string | null;
+  isAuthenticated?: boolean;
 }) {
   const router = useRouter();
   const [mode, setMode] = useState<AuthMode>("signup");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState("");
   const [authMessage, setAuthMessage] = useState<string | null>(null);
   const [authError, setAuthError] = useState<string | null>(notice || null);
   const [emailConfirmationRequired, setEmailConfirmationRequired] = useState(false);
   const serializedAnswers = useMemo(() => JSON.stringify(answers), [answers]);
+  const isCaptchaEnabled = Boolean(
+    process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim(),
+  );
   const isSignup = mode === "signup";
+  const isEmailSubmitDisabled =
+    isSubmitting || (isCaptchaEnabled && !captchaToken);
+
+  const handleCaptchaVerify = useCallback((token: string) => {
+    setCaptchaToken(token);
+  }, []);
+
+  const handleCaptchaClear = useCallback(() => {
+    setCaptchaToken("");
+  }, []);
+
+  useEffect(() => {
+    setCaptchaToken("");
+  }, [mode]);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -36,6 +57,12 @@ export function OnboardingAuthPanel({
     setAuthError(null);
     setEmailConfirmationRequired(false);
 
+    if (isCaptchaEnabled && !captchaToken) {
+      setAuthError("أكمل التحقق الآلي قبل المتابعة.");
+      setIsSubmitting(false);
+      return;
+    }
+
     const formData = new FormData(event.currentTarget);
     const result =
       mode === "signup"
@@ -43,6 +70,7 @@ export function OnboardingAuthPanel({
         : await signInAction(formData);
 
     if (!result.ok) {
+      setCaptchaToken("");
       setAuthError(
         result.needsOnboarding
           ? "أكمل أسئلة البداية حتى نجهّز ملفك الذكي قبل الدخول."
@@ -74,6 +102,7 @@ export function OnboardingAuthPanel({
 
   const handleOAuth = async (provider: OAuthProvider) => {
     if (isSubmitting) return;
+    if (isAuthenticated) return;
     setIsSubmitting(true);
     setAuthError(null);
     setAuthMessage(null);
@@ -124,6 +153,17 @@ export function OnboardingAuthPanel({
               احفظ ملفك الذكي وتفضيلاتك لتجربة مخصصة يمكنك تعديلها لاحقًا.
             </p>
           </div>
+
+          {isAuthenticated ? (
+            <div
+              role="status"
+              aria-live="polite"
+              className="mt-8 rounded-[20px] border border-[var(--voltjo-border)] bg-[var(--voltjo-surface-soft)] px-5 py-5 text-sm font-bold leading-7 text-[var(--voltjo-black)]"
+            >
+              تم تسجيل الدخول. نجهّز ملفك الآن...
+            </div>
+          ) : (
+            <>
 
           {/* Mode toggle pill */}
           <div className="mt-8 grid grid-cols-2 rounded-full border border-[var(--voltjo-border)] bg-[var(--voltjo-surface-soft)] p-1">
@@ -275,9 +315,17 @@ export function OnboardingAuthPanel({
               />
             </label>
 
+            <TurnstileWidget
+              key={mode}
+              onVerify={handleCaptchaVerify}
+              onClear={handleCaptchaClear}
+            />
+
+            <input type="hidden" name="captchaToken" value={captchaToken} />
+
             <button
               type="submit"
-              disabled={isSubmitting}
+              disabled={isEmailSubmitDisabled}
               className="mt-2 h-12 rounded-full bg-[var(--voltjo-black)] px-6 text-sm font-bold text-white transition hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(13,13,13,0.2)] focus-visible:ring-offset-2 disabled:cursor-wait disabled:bg-[#C9C4BA] disabled:hover:translate-y-0"
             >
               {isSubmitting
@@ -295,6 +343,8 @@ export function OnboardingAuthPanel({
               إلغاء والعودة للرئيسية
             </button>
           </form>
+            </>
+          )}
         </div>
       </div>
 

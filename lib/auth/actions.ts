@@ -52,9 +52,25 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MAX_EMAIL_LENGTH = 254;
 const MAX_PASSWORD_LENGTH = 128;
 const MAX_ONBOARDING_PAYLOAD_LENGTH = 6000;
+const MAX_CAPTCHA_TOKEN_LENGTH = 4096;
+const CAPTCHA_ERROR_MESSAGE = "تعذر التحقق من الطلب. أعد المحاولة.";
 
 function safeAuthErrorMessage() {
   return "تعذر إكمال العملية. تأكد من البيانات وحاول مرة أخرى.";
+}
+
+function isCaptchaEnabled() {
+  return Boolean(process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim());
+}
+
+function isCaptchaError(error: { message?: string; code?: string } | null) {
+  const message = error?.message?.toLowerCase() ?? "";
+  const code = error?.code?.toLowerCase() ?? "";
+  return (
+    message.includes("captcha") ||
+    message.includes("turnstile") ||
+    code.includes("captcha")
+  );
 }
 
 function getFormString(formData: FormData, key: string) {
@@ -64,6 +80,23 @@ function getFormString(formData: FormData, key: string) {
 
 function getFormBoolean(formData: FormData, key: string) {
   return formData.get(key) === "on";
+}
+
+function validateCaptchaToken(formData: FormData) {
+  const rawToken = getFormString(formData, "captchaToken").trim();
+
+  if (!isCaptchaEnabled()) {
+    return {
+      ok: true as const,
+      captchaToken: rawToken || undefined,
+    };
+  }
+
+  if (!rawToken || rawToken.length > MAX_CAPTCHA_TOKEN_LENGTH) {
+    return { ok: false as const, message: CAPTCHA_ERROR_MESSAGE };
+  }
+
+  return { ok: true as const, captchaToken: rawToken };
 }
 
 function getRequestOrigin(headerStore: Headers) {
@@ -184,11 +217,13 @@ export async function signUpAction(formData: FormData): Promise<AuthActionState>
   const emailResult = validateEmail(formData.get("email"));
   const passwordResult = validatePassword(formData.get("password"));
   const draftResult = parseProfileDraftFromForm(formData, { required: true });
+  const captchaResult = validateCaptchaToken(formData);
 
   if (!nameResult.ok) return nameResult;
   if (!emailResult.ok) return emailResult;
   if (!passwordResult.ok) return passwordResult;
   if (!draftResult.ok) return draftResult;
+  if (!captchaResult.ok) return captchaResult;
   if (!draftResult.hasDraft) {
     return { ok: false, message: "أكمل أسئلة الملف الذكي قبل المتابعة." };
   }
@@ -207,6 +242,9 @@ export async function signUpAction(formData: FormData): Promise<AuthActionState>
     email: emailResult.email,
     password: passwordResult.password,
     options: {
+      ...(captchaResult.captchaToken
+        ? { captchaToken: captchaResult.captchaToken }
+        : {}),
       data: {
         full_name: nameResult.name,
       },
@@ -214,7 +252,10 @@ export async function signUpAction(formData: FormData): Promise<AuthActionState>
   });
 
   if (error || !data.user) {
-    return { ok: false, message: safeAuthErrorMessage() };
+    return {
+      ok: false,
+      message: isCaptchaError(error) ? CAPTCHA_ERROR_MESSAGE : safeAuthErrorMessage(),
+    };
   }
 
   if (!data.session) {
@@ -242,10 +283,12 @@ export async function signInAction(formData: FormData): Promise<AuthActionState>
   const emailResult = validateEmail(formData.get("email"));
   const passwordResult = validatePassword(formData.get("password"));
   const draftResult = parseProfileDraftFromForm(formData, { required: false });
+  const captchaResult = validateCaptchaToken(formData);
 
   if (!emailResult.ok) return emailResult;
   if (!passwordResult.ok) return passwordResult;
   if (!draftResult.ok) return draftResult;
+  if (!captchaResult.ok) return captchaResult;
 
   const rateLimit = await checkAuthRateLimit("login", emailResult.email);
   if (!rateLimit.ok) {
@@ -260,10 +303,18 @@ export async function signInAction(formData: FormData): Promise<AuthActionState>
   const { error } = await supabase.auth.signInWithPassword({
     email: emailResult.email,
     password: passwordResult.password,
+    ...(captchaResult.captchaToken
+      ? { options: { captchaToken: captchaResult.captchaToken } }
+      : {}),
   });
 
   if (error) {
-    return { ok: false, message: "بيانات الدخول غير صحيحة أو الحساب غير مؤكد." };
+    return {
+      ok: false,
+      message: isCaptchaError(error)
+        ? CAPTCHA_ERROR_MESSAGE
+        : "بيانات الدخول غير صحيحة أو الحساب غير مؤكد.",
+    };
   }
 
   await clearAuthRateLimit("login", emailResult.email);

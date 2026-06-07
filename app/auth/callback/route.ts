@@ -31,6 +31,8 @@ export async function GET(request: NextRequest) {
       if (!profile?.onboarding_completed) {
         return NextResponse.redirect(new URL("/start?auth=oauth-success", request.url));
       }
+
+      return NextResponse.redirect(new URL("/assistant", request.url));
     }
   }
 

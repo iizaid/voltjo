@@ -310,26 +310,26 @@ Secret handling:
 | SMTP credentials | Supabase Dashboard Custom SMTP or secure provider settings | No |
 | Supabase service-role key | Not needed in this app runtime | No |
 
-Implementation decision for this phase:
+Implementation status after the emergency auth UX fix:
 
-Do not implement CAPTCHA runtime in Phase 9B. The installed Supabase Auth types do support `captchaToken` for `signUp`, `signInWithPassword`, and `resetPasswordForEmail`, but adding the widget changes the auth UI/flow and needs a focused implementation pass with browser QA.
+Turnstile CAPTCHA is now implemented for the onboarding email/password signup and login form only. OAuth buttons remain unchanged and do not require Turnstile. The app renders a frontend Turnstile widget with `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, submits the returned token as `captchaToken`, and passes it to Supabase Auth through `signUp` and `signInWithPassword` options. The Turnstile secret key remains in Supabase Dashboard CAPTCHA settings and is not stored in the app repository.
 
 Confirmed API surface:
 
 - Supabase docs show `options: { captchaToken }` for `signUp`.
 - Installed local `@supabase/auth-js` types expose `captchaToken` for `SignUpWithPasswordCredentials`, `SignInWithPasswordCredentials`, and `resetPasswordForEmail` options.
 
-Recommended implementation plan for the next phase:
+Implementation checklist used:
 
 1. Enable Turnstile CAPTCHA in Supabase Dashboard Auth settings.
 2. Store the Turnstile secret key only in Supabase Dashboard.
 3. Add `NEXT_PUBLIC_TURNSTILE_SITE_KEY` to staging/production hosting only if VoltJo renders the widget.
 4. Add a small Turnstile widget to the `/start` email/password form.
 5. Store the returned token in component state.
-6. Submit the token as a hidden form value, for example `captchaToken`.
+6. Submit the token as hidden form value `captchaToken`.
 7. In `signUpAction`, pass `options: { captchaToken }` to `supabase.auth.signUp`.
 8. In `signInAction`, pass `options: { captchaToken }` to `supabase.auth.signInWithPassword`.
-9. In password reset action, pass `captchaToken` to `resetPasswordForEmail` only if the reset UI collects it.
+9. Keep password reset unchanged until that UI collects a CAPTCHA token.
 10. Keep OAuth flows unchanged unless Supabase provider policy requires CAPTCHA for those endpoints.
 11. Keep Upstash auth/API rate limits.
 12. Test Arabic onboarding layout, keyboard access, failed CAPTCHA, expired token, signup, login, and reset-password flows.
@@ -384,17 +384,15 @@ Reasons:
 - Existing profile/chat/account flows already have the needed tables in migrations `schema.sql` and `001`-`006`.
 - Bot protection should be layered through Supabase Auth CAPTCHA, Upstash rate limiting, and future WAF/IP-device controls, not a new app table.
 
-## Follow-Up Prompt For CAPTCHA Implementation
+## OAuth Return UX Fix
 
-Use this only after the Supabase CAPTCHA provider is configured and the Turnstile site key is available:
+The OAuth return flow should now behave deterministically:
 
-```txt
-Implement Supabase Auth Turnstile CAPTCHA for VoltJo email/password signup and login only.
-Do not change OAuth behavior.
-Use NEXT_PUBLIC_TURNSTILE_SITE_KEY for the widget.
-Do not add TURNSTILE_SECRET_KEY to app env.
-Pass captchaToken to supabase.auth.signUp and signInWithPassword through existing server actions.
-Keep Upstash rate limiting.
-Preserve Arabic onboarding/auth layout.
-Run npm test, npm run lint, npm run build, npm run cf:build.
-```
+1. Google/GitHub starts from the onboarding auth screen and saves the local onboarding draft before redirecting.
+2. `/auth/callback` exchanges the Supabase code for a session.
+3. If the profile is complete, `/auth/callback` redirects directly to `/assistant`.
+4. If the profile is missing or incomplete, `/auth/callback` redirects to `/start?auth=oauth-success`.
+5. `/start?auth=oauth-success` shows a processing screen instead of the login/signup form.
+6. If a local draft exists, the app saves it to the authenticated profile and redirects to `/assistant`.
+7. If no local draft exists, the app sends the user back to the questions step with a clear Arabic notice.
+8. If profile saving fails, the user sees a clear Arabic error and can retry or review answers.
