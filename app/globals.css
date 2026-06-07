@@ -553,6 +553,8 @@ input {
   --time-animation: 2s;
   --size: 1.4;
   position: relative;
+  width: 100px;
+  height: 100px;
   border-radius: 50%;
   transform: scale(var(--size));
   box-shadow:
@@ -577,60 +579,54 @@ input {
     inset 0 -10px 10px 0 var(--color-four);
 }
 
-.voltjo-uiverse-box {
-  width: 100px;
-  height: 100px;
-  background: linear-gradient(180deg, var(--color-one) 30%, var(--color-two) 70%);
-  mask: url(#clipping);
-  -webkit-mask: url(#clipping);
-}
-
 .voltjo-uiverse-loader svg {
   position: absolute;
+  top: 0;
+  left: 0;
 }
 
-.voltjo-uiverse-loader svg #clipping {
+.voltjo-uiverse-loader svg #voltjo-clipping {
   filter: contrast(15);
   animation: uiverse-roundness calc(var(--time-animation) / 2) linear infinite;
 }
 
-.voltjo-uiverse-loader svg #clipping polygon {
+.voltjo-uiverse-loader svg #voltjo-clipping polygon {
   filter: blur(7px);
 }
 
-.voltjo-uiverse-loader svg #clipping polygon:nth-child(1) {
+.voltjo-uiverse-loader svg #voltjo-clipping polygon:nth-child(1) {
   transform-origin: 75% 25%;
   transform: rotate(90deg);
 }
 
-.voltjo-uiverse-loader svg #clipping polygon:nth-child(2) {
+.voltjo-uiverse-loader svg #voltjo-clipping polygon:nth-child(2) {
   transform-origin: 50% 50%;
   animation: uiverse-rotation var(--time-animation) linear infinite reverse;
 }
 
-.voltjo-uiverse-loader svg #clipping polygon:nth-child(3) {
+.voltjo-uiverse-loader svg #voltjo-clipping polygon:nth-child(3) {
   transform-origin: 50% 60%;
   animation: uiverse-rotation var(--time-animation) linear infinite;
   animation-delay: calc(var(--time-animation) / -3);
 }
 
-.voltjo-uiverse-loader svg #clipping polygon:nth-child(4) {
+.voltjo-uiverse-loader svg #voltjo-clipping polygon:nth-child(4) {
   transform-origin: 40% 40%;
   animation: uiverse-rotation var(--time-animation) linear infinite reverse;
 }
 
-.voltjo-uiverse-loader svg #clipping polygon:nth-child(5) {
+.voltjo-uiverse-loader svg #voltjo-clipping polygon:nth-child(5) {
   transform-origin: 40% 40%;
   animation: uiverse-rotation var(--time-animation) linear infinite reverse;
   animation-delay: calc(var(--time-animation) / -2);
 }
 
-.voltjo-uiverse-loader svg #clipping polygon:nth-child(6) {
+.voltjo-uiverse-loader svg #voltjo-clipping polygon:nth-child(6) {
   transform-origin: 60% 40%;
   animation: uiverse-rotation var(--time-animation) linear infinite;
 }
 
-.voltjo-uiverse-loader svg #clipping polygon:nth-child(7) {
+.voltjo-uiverse-loader svg #voltjo-clipping polygon:nth-child(7) {
   transform-origin: 60% 40%;
   animation: uiverse-rotation var(--time-animation) linear infinite;
   animation-delay: calc(var(--time-animation) / -1.5);

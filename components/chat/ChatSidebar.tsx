@@ -213,7 +213,7 @@ export function ChatSidebar({
               ref={searchInputRef}
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
-              className="min-w-0 flex-1 bg-transparent text-[13px] font-medium outline-none placeholder:text-[#6F6A60]"
+              className="min-w-0 flex-1 bg-transparent text-[16px] font-medium outline-none placeholder:text-[#6F6A60]"
               placeholder="ابحث في المحادثات..."
             />
             {searchQuery && (

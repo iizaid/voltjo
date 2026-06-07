@@ -50,7 +50,7 @@ export function HeroPromptBox() {
         {/* Textarea */}
         <textarea
           aria-label="سؤال VoltJo"
-          className="min-h-[72px] w-full resize-none bg-transparent px-2 py-2 text-right text-[15px] font-medium leading-7 text-[var(--voltjo-black)] outline-none placeholder:text-[var(--voltjo-muted)]"
+          className="min-h-[72px] w-full resize-none bg-transparent px-2 py-2 text-right text-[16px] font-medium leading-7 text-[var(--voltjo-black)] outline-none placeholder:text-[var(--voltjo-muted)]"
           placeholder="اسأل عن سيارة، قارن بين موديلين، أو قدّر تكلفة الشحن..."
           rows={2}
           maxLength={MAX_CHAT_MESSAGE_LENGTH}
