@@ -50,12 +50,29 @@ function hasDraftAnswers(answers: CustomerProfileDraft) {
   return Object.keys(answers).length > 0;
 }
 
+function getAuthErrorNotice(reason: string): string {
+  switch (reason) {
+    case "provider_error":
+      return "تم إلغاء تسجيل الدخول أو رفضه من مزود الحساب.";
+    case "missing_code":
+      return "تعذر إكمال تسجيل الدخول لأن رابط الرجوع لم يحتوِ على رمز التحقق.";
+    case "exchange_failed":
+      return "تعذر تحويل تسجيل الدخول إلى جلسة آمنة. حاول مرة أخرى.";
+    case "no_session_after_exchange":
+    case "no_session_after_wait":
+      return "تم الرجوع من مزود الحساب، لكن لم يتم إنشاء جلسة دخول. حاول مرة أخرى.";
+    default:
+      return "تعذر إكمال تسجيل الدخول. حاول مرة أخرى.";
+  }
+}
+
 export function OnboardingFlow({ isAuthenticated }: { isAuthenticated?: boolean }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const isOAuthReturn = searchParams.get("auth") === "oauth-success";
   const isAuthError = searchParams.get("auth_error") === "callback";
   const isEmailConfirmed = searchParams.get("email_confirmed") === "true";
+  const authErrorReason = searchParams.get("reason") ?? "";
 
   const [flowState, setFlowState] = useState<FlowState>("intro");
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -215,7 +232,11 @@ export function OnboardingFlow({ isAuthenticated }: { isAuthenticated?: boolean 
       if (storedDraft && hasDraftAnswers(storedDraft)) {
         setAnswers(storedDraft);
       }
-      setFlowNotice("تعذر إكمال تسجيل الدخول. حاول مرة أخرى.");
+      setFlowNotice(
+        isAuthError
+          ? getAuthErrorNotice(authErrorReason)
+          : "تعذر إكمال تسجيل الدخول. حاول مرة أخرى.",
+      );
       setFlowState("auth");
       setHasHydrated(true);
       return () => { clearNextTimeout(); };
