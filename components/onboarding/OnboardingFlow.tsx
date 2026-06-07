@@ -50,10 +50,12 @@ function hasDraftAnswers(answers: CustomerProfileDraft) {
   return Object.keys(answers).length > 0;
 }
 
-function getAuthErrorNotice(reason: string): string {
+function getAuthErrorNotice(reason: string, oauthError?: string): string {
   switch (reason) {
     case "provider_error":
-      return "تم إلغاء تسجيل الدخول أو رفضه من مزود الحساب.";
+      return oauthError === "access_denied"
+        ? "تم إلغاء تسجيل الدخول أو لم يتم منح الصلاحية من مزود الحساب."
+        : "تعذر إكمال تسجيل الدخول من مزود الحساب. حاول مرة أخرى.";
     case "missing_code":
       return "تعذر إكمال تسجيل الدخول لأن رابط الرجوع لم يحتوِ على رمز التحقق.";
     case "exchange_failed":
@@ -73,6 +75,7 @@ export function OnboardingFlow({ isAuthenticated }: { isAuthenticated?: boolean 
   const isAuthError = searchParams.get("auth_error") === "callback";
   const isEmailConfirmed = searchParams.get("email_confirmed") === "true";
   const authErrorReason = searchParams.get("reason") ?? "";
+  const oauthError = searchParams.get("oauth_error") ?? "";
 
   const [flowState, setFlowState] = useState<FlowState>("intro");
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -234,7 +237,7 @@ export function OnboardingFlow({ isAuthenticated }: { isAuthenticated?: boolean 
       }
       setFlowNotice(
         isAuthError
-          ? getAuthErrorNotice(authErrorReason)
+          ? getAuthErrorNotice(authErrorReason, oauthError)
           : "تعذر إكمال تسجيل الدخول. حاول مرة أخرى.",
       );
       setFlowState("auth");
@@ -301,24 +304,38 @@ export function OnboardingFlow({ isAuthenticated }: { isAuthenticated?: boolean 
     setIsSavingProfile(true);
     setProcessingError(null);
 
-    saveOnboardingProfileAction(answers).then((result) => {
-      if (result.ok) {
-        clearOnboardingDraft();
-        router.push("/assistant");
-        router.refresh();
-      } else {
+    const timeoutId = setTimeout(() => {
+      setIsSavingProfile(false);
+      setProcessingError(
+        "تم تسجيل الدخول، لكن استغرق حفظ ملفك وقتًا أطول من المتوقع. حاول مرة أخرى.",
+      );
+    }, 12000);
+
+    saveOnboardingProfileAction(answers)
+      .then((result) => {
+        clearTimeout(timeoutId);
+        if (result.ok) {
+          clearOnboardingDraft();
+          window.location.replace("/assistant");
+        } else {
+          setIsSavingProfile(false);
+          setProcessingError(
+            "تم تسجيل الدخول، لكن تعذر حفظ ملفك الذكي. راجع إجاباتك وحاول مرة أخرى.",
+          );
+        }
+      })
+      .catch(() => {
+        clearTimeout(timeoutId);
         setIsSavingProfile(false);
         setProcessingError(
           "تم تسجيل الدخول، لكن تعذر حفظ ملفك الذكي. راجع إجاباتك وحاول مرة أخرى.",
         );
-      }
-    });
+      });
   }, [
     answers,
     flowState,
     hasHydrated,
     isAuthenticated,
-    router,
     saveRetryCount,
   ]);
 

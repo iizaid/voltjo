@@ -8,6 +8,13 @@ function sleep(ms: number) {
   return new Promise<void>((resolve) => setTimeout(resolve, ms));
 }
 
+const SAFE_OAUTH_ERROR_RE = /[^a-zA-Z0-9_-]/g;
+const MAX_OAUTH_ERROR_LEN = 80;
+
+function sanitizeOAuthError(raw: string): string {
+  return raw.replace(SAFE_OAUTH_ERROR_RE, "").slice(0, MAX_OAUTH_ERROR_LEN);
+}
+
 export function AuthCallbackClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -25,7 +32,13 @@ export function AuthCallbackClient() {
 
       try {
         if (error) {
-          fail("provider_error");
+          const safeProviderError = sanitizeOAuthError(error);
+          if (process.env.NODE_ENV === "development") {
+            console.warn("[auth] provider error present:", Boolean(safeProviderError), "access_denied:", safeProviderError === "access_denied");
+          }
+          window.location.replace(
+            `/start?auth_error=callback&reason=provider_error&oauth_error=${encodeURIComponent(safeProviderError)}`,
+          );
           return;
         }
 
@@ -42,7 +55,7 @@ export function AuthCallbackClient() {
           data: { session: existingSession },
         } = await supabase.auth.getSession();
         if (existingSession) {
-          router.replace("/start?auth=oauth-success");
+          window.location.replace("/start?auth=oauth-success");
           return;
         }
 
@@ -57,7 +70,7 @@ export function AuthCallbackClient() {
               data: { session: retrySession },
             } = await supabase.auth.getSession();
             if (retrySession) {
-              router.replace("/start?auth=oauth-success");
+              window.location.replace("/start?auth=oauth-success");
             } else {
               fail("exchange_failed");
             }
@@ -69,7 +82,7 @@ export function AuthCallbackClient() {
             data: { session },
           } = await supabase.auth.getSession();
           if (session) {
-            router.replace("/start?auth=oauth-success");
+            window.location.replace("/start?auth=oauth-success");
             return;
           }
 
@@ -79,7 +92,7 @@ export function AuthCallbackClient() {
             data: { session: delayedSession },
           } = await supabase.auth.getSession();
           if (delayedSession) {
-            router.replace("/start?auth=oauth-success");
+            window.location.replace("/start?auth=oauth-success");
           } else {
             fail("no_session_after_exchange");
           }
@@ -93,7 +106,7 @@ export function AuthCallbackClient() {
           data: { session: waitSession },
         } = await supabase.auth.getSession();
         if (waitSession) {
-          router.replace("/start?auth=oauth-success");
+          window.location.replace("/start?auth=oauth-success");
         } else {
           fail("missing_code");
         }
