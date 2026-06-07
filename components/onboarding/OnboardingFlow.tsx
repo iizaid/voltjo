@@ -10,6 +10,12 @@ import { OnboardingQuestion } from "@/components/onboarding/OnboardingQuestion";
 import { onboardingQuestions } from "@/lib/onboarding/questions";
 import { saveOnboardingProfileAction } from "@/lib/auth/actions";
 import {
+  isAuthDebugEnabled,
+  appendAuthDebugEvent,
+  createAuthDebugId,
+  type AuthDebugEvent,
+} from "@/lib/auth/auth-debug";
+import {
   loadOnboardingDraft,
   saveOnboardingDraft,
   loadOnboardingProgress,
@@ -22,6 +28,20 @@ import type {
   CustomerProfileDraft,
   OnboardingQuestion as OnboardingQuestionData,
 } from "@/lib/onboarding/types";
+
+function dbg(
+  stage: string,
+  extra: Partial<Omit<AuthDebugEvent, "id" | "timestamp" | "stage">> = {},
+) {
+  if (!isAuthDebugEnabled()) return;
+  appendAuthDebugEvent({
+    id: createAuthDebugId(),
+    timestamp: new Date().toISOString(),
+    stage,
+    path: typeof window !== "undefined" ? window.location.pathname : undefined,
+    ...extra,
+  });
+}
 
 type FlowState = "intro" | "consent" | "questions" | "auth" | "processing";
 
@@ -205,11 +225,26 @@ export function OnboardingFlow({ isAuthenticated }: { isAuthenticated?: boolean 
     const hasPrivacyConsent = loadOnboardingPrivacyConsent();
     const nextAfterIntro: FlowState = hasPrivacyConsent ? "questions" : "consent";
 
+    dbg("onboarding_loaded", {
+      note: [
+        isOAuthReturn ? "oauth_return" : null,
+        isAuthError ? "auth_error" : null,
+        isEmailConfirmed ? "email_confirmed" : null,
+      ]
+        .filter(Boolean)
+        .join(",") || undefined,
+    });
+
     if (isOAuthReturn && isAuthenticated) {
+      dbg("oauth_success_param_detected");
+      dbg("authenticated_state_true");
       if (storedDraft && hasDraftAnswers(storedDraft)) {
+        dbg("draft_found");
         setAnswers(storedDraft);
         setFlowState("processing");
+        dbg("processing_started");
       } else {
+        dbg("draft_missing");
         setFlowNotice("تم تسجيل الدخول. أكمل الأسئلة القصيرة حتى نجهّز ملفك.");
         setFlowState("questions");
         setCurrentQuestionIndex(0);
@@ -219,6 +254,7 @@ export function OnboardingFlow({ isAuthenticated }: { isAuthenticated?: boolean 
     }
 
     if (isEmailConfirmed && !isAuthenticated) {
+      dbg("authenticated_state_false", { note: "email_confirmed_flow" });
       if (storedDraft && hasDraftAnswers(storedDraft)) {
         setAnswers(storedDraft);
       }
@@ -232,6 +268,12 @@ export function OnboardingFlow({ isAuthenticated }: { isAuthenticated?: boolean 
     // but the session wasn't persisted on the server (isOAuthReturn && !isAuthenticated).
     // In both cases show the auth panel with a clear Arabic error notice.
     if (isAuthError || (isOAuthReturn && !isAuthenticated)) {
+      if (isAuthError) {
+        dbg("auth_error_param_detected", { reason: authErrorReason, oauthError });
+      } else {
+        dbg("oauth_success_param_detected");
+        dbg("authenticated_state_false", { note: "session_missing_on_server" });
+      }
       if (storedDraft && hasDraftAnswers(storedDraft)) {
         setAnswers(storedDraft);
       }
@@ -304,7 +346,10 @@ export function OnboardingFlow({ isAuthenticated }: { isAuthenticated?: boolean 
     setIsSavingProfile(true);
     setProcessingError(null);
 
+    dbg("profile_save_started", { sessionPresent: isAuthenticated });
+
     const timeoutId = setTimeout(() => {
+      dbg("profile_save_timeout");
       setIsSavingProfile(false);
       setProcessingError(
         "تم تسجيل الدخول، لكن استغرق حفظ ملفك وقتًا أطول من المتوقع. حاول مرة أخرى.",
@@ -315,9 +360,12 @@ export function OnboardingFlow({ isAuthenticated }: { isAuthenticated?: boolean 
       .then((result) => {
         clearTimeout(timeoutId);
         if (result.ok) {
+          dbg("profile_save_success");
           clearOnboardingDraft();
+          dbg("hard_redirect_to_assistant");
           window.location.replace("/assistant");
         } else {
+          dbg("profile_save_failed");
           setIsSavingProfile(false);
           setProcessingError(
             "تم تسجيل الدخول، لكن تعذر حفظ ملفك الذكي. راجع إجاباتك وحاول مرة أخرى.",
@@ -326,6 +374,7 @@ export function OnboardingFlow({ isAuthenticated }: { isAuthenticated?: boolean 
       })
       .catch(() => {
         clearTimeout(timeoutId);
+        dbg("profile_save_failed", { note: "caught_error" });
         setIsSavingProfile(false);
         setProcessingError(
           "تم تسجيل الدخول، لكن تعذر حفظ ملفك الذكي. راجع إجاباتك وحاول مرة أخرى.",

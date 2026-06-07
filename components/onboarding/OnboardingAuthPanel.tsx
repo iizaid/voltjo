@@ -10,6 +10,11 @@ import { signInAction, signUpAction } from "@/lib/auth/actions";
 import { signInWithOAuth, type OAuthProvider } from "@/lib/auth/oauth-client";
 import { clearOnboardingDraft, saveOnboardingDraft } from "@/lib/onboarding/storage";
 import type { CustomerProfileDraft } from "@/lib/onboarding/types";
+import {
+  isAuthDebugEnabled,
+  appendAuthDebugEvent,
+  createAuthDebugId,
+} from "@/lib/auth/auth-debug";
 
 type AuthMode = "signup" | "login";
 
@@ -107,7 +112,31 @@ export function OnboardingAuthPanel({
     setAuthError(null);
     setAuthMessage(null);
     setEmailConfirmationRequired(false);
+
+    if (isAuthDebugEnabled()) {
+      const hasDraft = Object.keys(answers).length > 0;
+      appendAuthDebugEvent({
+        id: createAuthDebugId(),
+        timestamp: new Date().toISOString(),
+        stage: "oauth_button_clicked",
+        provider,
+        path: window.location.pathname,
+        note: hasDraft ? "draft_present" : "no_draft",
+      });
+    }
+
     saveOnboardingDraft(answers);
+
+    if (isAuthDebugEnabled()) {
+      appendAuthDebugEvent({
+        id: createAuthDebugId(),
+        timestamp: new Date().toISOString(),
+        stage: "oauth_redirect_start",
+        provider,
+        path: window.location.pathname,
+      });
+    }
+
     try {
       await signInWithOAuth(provider);
     } catch {

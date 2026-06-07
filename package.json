@@ -10,7 +10,8 @@
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
     "start": "next start",
     "lint": "eslint . --max-warnings=0",
-    "test": "vitest run"
+    "test": "vitest run",
+    "auth:debug:help": "node scripts/print-auth-debug-help.mjs"
   },
   "dependencies": {
     "@number-flow/react": "^0.6.0",

@@ -5,7 +5,7 @@ import { getSupabaseEnv } from "@/lib/supabase/env";
 
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+export async function GET(request: Request) {
   const [{ user, profile }, cookieStore] = await Promise.all([
     getCurrentUserAndProfile(),
     cookies(),
@@ -13,6 +13,7 @@ export async function GET() {
 
   const { url, anonKey } = getSupabaseEnv();
   const allCookies = cookieStore.getAll();
+  const reqUrl = new URL(request.url);
 
   return NextResponse.json(
     {
@@ -31,6 +32,8 @@ export async function GET() {
       hasSupabaseCodeVerifierCookie: allCookies.some((c) =>
         c.name.includes("-code-verifier"),
       ),
+      requestUrlPath: reqUrl.pathname,
+      safeQueryParamNames: [...reqUrl.searchParams.keys()],
       timestamp: new Date().toISOString(),
     },
     {
