@@ -73,5 +73,8 @@ VoltJo
 ## Operational Notes
 
 - Review every auth email template before production launch, not only signup confirmation.
+- Verify signup confirmation, password reset, and email-change templates before public launch.
 - Check Arabic rendering in major inboxes, especially Gmail web/mobile.
 - Confirm that the email link target points back to the VoltJo auth callback flow, not a generic Supabase-hosted experience.
+- Email delivery currently depends on Supabase Auth email configuration. Production should use Custom SMTP or an equivalent branded sender setup in the Supabase/provider dashboard.
+- Keep SMTP usernames, passwords, API keys, and provider tokens out of the app repository and out of client-side environment variables.

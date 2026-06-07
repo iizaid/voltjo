@@ -40,7 +40,17 @@ Prepare production-quality Supabase Auth email delivery without adding secrets o
 - Team decision recorded: confirmation on/off for staging and production.
 - Sender domain and SMTP provider chosen.
 - Supabase dashboard setup steps documented.
-- Signup, login, confirmation, and reset-password smoke tests pass.
+- Signup, login, confirmation, reset-password, and email-change template smoke tests pass.
+
+## Current Phase 9B Status Note
+
+- Google and GitHub OAuth providers are enabled in Supabase Dashboard by the user.
+- Redirect URLs are configured according to the current handoff context.
+- Email/SMTP is not configured yet.
+- Email confirmation and password reset still depend on Supabase Auth email configuration.
+- Production should use Custom SMTP or an equivalent branded sender configured in Supabase/provider dashboards.
+- Do not add SMTP secrets, Resend tokens, or provider credentials to the app repository.
+- Do not add SMTP secrets to `NEXT_PUBLIC_*`.
 
 ## Commands To Run
 
