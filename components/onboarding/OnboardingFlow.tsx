@@ -55,6 +55,7 @@ export function OnboardingFlow({ isAuthenticated }: { isAuthenticated?: boolean 
   const searchParams = useSearchParams();
   const isOAuthReturn = searchParams.get("auth") === "oauth-success";
   const isAuthError = searchParams.get("auth_error") === "callback";
+  const isEmailConfirmed = searchParams.get("email_confirmed") === "true";
 
   const [flowState, setFlowState] = useState<FlowState>("intro");
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -193,6 +194,16 @@ export function OnboardingFlow({ isAuthenticated }: { isAuthenticated?: boolean 
         setFlowState("questions");
         setCurrentQuestionIndex(0);
       }
+      setHasHydrated(true);
+      return () => { clearNextTimeout(); };
+    }
+
+    if (isEmailConfirmed && !isAuthenticated) {
+      if (storedDraft && hasDraftAnswers(storedDraft)) {
+        setAnswers(storedDraft);
+      }
+      setFlowNotice("تم تأكيد بريدك الإلكتروني. سجّل الدخول الآن لإكمال ملفك.");
+      setFlowState("auth");
       setHasHydrated(true);
       return () => { clearNextTimeout(); };
     }

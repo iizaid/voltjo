@@ -3,11 +3,8 @@ import { createServerClient } from "@supabase/ssr";
 import type { Database } from "@/lib/supabase/database.types";
 import { getSupabaseEnv } from "@/lib/supabase/env";
 
-const PROTECTED_PREFIXES = ["/dashboard", "/account"];
+const PROTECTED_PREFIXES = ["/dashboard", "/account", "/assistant"];
 
-// /assistant remains public in this phase so users can try the local demo chat
-// before creating an account. Future phases can move it behind auth once chat
-// persistence and AI usage policies are ready.
 function isProtectedPath(pathname: string) {
   return PROTECTED_PREFIXES.some(
     (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),

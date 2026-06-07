@@ -25,6 +25,12 @@ export async function GET() {
       hasSupabaseCookieNamePrefix: allCookies.some((c) =>
         c.name.startsWith("sb-"),
       ),
+      hasSupabaseAuthTokenCookie: allCookies.some((c) =>
+        c.name.includes("-auth-token"),
+      ),
+      hasSupabaseCodeVerifierCookie: allCookies.some((c) =>
+        c.name.includes("-code-verifier"),
+      ),
       timestamp: new Date().toISOString(),
     },
     {
