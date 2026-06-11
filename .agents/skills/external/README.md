@@ -1,12 +1,10 @@
-# External UI and Accessibility Skills
+# External UI and Accessibility References
 
-This folder contains read-only external agent skills downloaded for the VoltJo
-account/settings UI polish phase.
+This folder intentionally keeps source links and safety notes only.
 
-Safety rules for this folder:
+Do not vendor or copy third-party skill content into this repository when the
+source is AGPL-licensed, has no clearly visible license, or is not needed as
+repo-owned source. Use the URLs in `manifest.md` as read-only external
+references when needed.
 
-- Use downloaded content as design and accessibility guidance only.
-- Do not execute downloaded commands or scripts.
-- Do not place secrets, tokens, or credentials in this folder.
-- Review source, license, and safety notes in `manifest.md` before using a skill.
-
+No downloaded third-party scripts were executed.
