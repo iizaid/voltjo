@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ArrowRight, BadgeCheck, ChevronLeft, LogOut } from "lucide-react";
+import { BadgeCheck, LogOut } from "lucide-react";
 import { AvatarCustomizer } from "@/components/account/AvatarCustomizer";
 import { DeleteAccountRequest } from "@/components/account/DeleteAccountRequest";
 import { PasswordResetAction } from "@/components/account/PasswordResetAction";
@@ -32,8 +32,8 @@ type AccountSection = (typeof ACCOUNT_SECTIONS)[number];
 
 const uiEase = "ease-[cubic-bezier(0.23,1,0.32,1)]";
 const pressableBase = `inline-flex min-h-11 items-center justify-center rounded-full text-sm font-bold transition-[background-color,color,border-color,box-shadow,transform,opacity] duration-200 ${uiEase} active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(38,38,38,0.16)] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60`;
-const primaryButtonClass = `${pressableBase} bg-[var(--voltjo-black)] px-5 text-white shadow-[0_10px_22px_rgba(13,13,13,0.08)] hover:-translate-y-0.5 hover:bg-[#111]`;
-const secondaryButtonClass = `${pressableBase} border border-[rgba(38,38,38,0.08)] bg-white px-5 text-[var(--voltjo-black)] shadow-[0_1px_0_rgba(255,255,255,0.8)] hover:-translate-y-0.5 hover:border-[rgba(38,38,38,0.12)] hover:bg-[#F7F7F3]`;
+const primaryButtonClass = `${pressableBase} bg-[var(--voltjo-black)] px-5 text-white shadow-[0_1px_0_rgba(255,255,255,0.16)_inset,0_1px_2px_rgba(13,13,13,0.16)] hover:-translate-y-px hover:bg-[#171717] hover:shadow-[0_6px_16px_rgba(13,13,13,0.12)]`;
+const secondaryButtonClass = `${pressableBase} border border-[rgba(38,38,38,0.08)] bg-white px-5 text-[var(--voltjo-black)] shadow-[0_1px_0_rgba(255,255,255,0.8)] hover:-translate-y-px hover:border-[rgba(38,38,38,0.14)] hover:bg-[#F7F7F3] hover:shadow-[0_6px_16px_rgba(13,13,13,0.06)]`;
 const fieldClass = "h-12 rounded-[18px] border border-[rgba(38,38,38,0.08)] bg-white px-4 text-base font-semibold text-[var(--voltjo-black)] outline-none transition-[border-color,box-shadow,background-color] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] focus:border-[rgba(38,38,38,0.18)] focus:shadow-[0_0_0_4px_rgba(255,77,0,0.08)]";
 const readOnlyFieldClass = "h-12 rounded-[18px] border border-transparent bg-[#F4F4EF] px-4 text-base font-semibold text-[var(--voltjo-muted)] outline-none";
 
@@ -146,18 +146,13 @@ function SidebarItem({
     <Link
       href={href}
       aria-current={active ? "page" : undefined}
-      className={`group flex min-h-11 items-center justify-between rounded-[18px] px-3.5 py-3 text-sm font-bold transition-[background-color,color,transform] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(38,38,38,0.14)] focus-visible:ring-offset-2 ${
+      className={`group flex min-h-11 items-center rounded-[18px] px-3.5 py-3 text-sm font-bold transition-[background-color,color,transform] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(38,38,38,0.14)] focus-visible:ring-offset-2 ${
         active
           ? "bg-[#F4F1EC] text-[var(--voltjo-black)] shadow-[inset_0_0_0_1px_rgba(38,38,38,0.04)]"
           : "text-[var(--voltjo-muted)] hover:bg-[#F7F7F3] hover:text-[var(--voltjo-black)]"
       }`}
     >
       <span>{label}</span>
-      {active ? (
-        <span className="grid h-7 w-7 place-items-center rounded-full bg-white text-[var(--voltjo-orange)] shadow-[0_1px_0_rgba(38,38,38,0.04)]">
-          <ChevronLeft size={15} />
-        </span>
-      ) : null}
     </Link>
   );
 }
@@ -606,7 +601,7 @@ export default async function AccountPage({ searchParams }: Props) {
   const { user, profile } = await getCurrentUserAndProfile();
 
   if (!user) {
-    redirect("/start");
+    redirect("/start?next=/account");
   }
   const currentUser = user;
 
@@ -625,9 +620,8 @@ export default async function AccountPage({ searchParams }: Props) {
             <header className="space-y-2">
               <Link
                 href="/assistant"
-                className="inline-flex min-h-10 flex-row-reverse items-center gap-2 rounded-full bg-white/82 px-3.5 text-sm font-bold text-[var(--voltjo-muted)] shadow-[0_1px_0_rgba(255,255,255,0.9)] ring-1 ring-[rgba(38,38,38,0.06)] transition-[background-color,color,box-shadow,transform] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] hover:-translate-y-0.5 hover:bg-white hover:text-[var(--voltjo-black)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(38,38,38,0.16)] focus-visible:ring-offset-2"
+                className="inline-flex min-h-10 items-center rounded-full bg-white/82 px-4 text-sm font-bold text-[var(--voltjo-muted)] shadow-[0_1px_0_rgba(255,255,255,0.9)] ring-1 ring-[rgba(38,38,38,0.06)] transition-[background-color,color,box-shadow,transform] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] hover:-translate-y-px hover:bg-white hover:text-[var(--voltjo-black)] hover:shadow-[0_6px_16px_rgba(13,13,13,0.05)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(38,38,38,0.16)] focus-visible:ring-offset-2"
               >
-                <ArrowRight size={16} />
                 <span>العودة إلى المساعد</span>
               </Link>
               <h1 className="text-[32px] font-extrabold leading-tight text-[var(--voltjo-black)] sm:text-[36px]">
