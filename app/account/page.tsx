@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { BadgeCheck, LogOut } from "lucide-react";
+import { AccountMobileNav } from "@/components/account/AccountMobileNav";
 import { AvatarCustomizer } from "@/components/account/AvatarCustomizer";
 import { DeleteAccountRequest } from "@/components/account/DeleteAccountRequest";
 import { PasswordResetAction } from "@/components/account/PasswordResetAction";
@@ -423,8 +424,10 @@ function SecuritySection() {
 
 function PrivacySection({
   profile,
+  userEmail,
 }: {
   profile: CurrentProfile | null;
+  userEmail: string;
 }) {
   const privacySettings = normalizePrivacySettings(profile?.privacy_settings);
 
@@ -459,7 +462,7 @@ function PrivacySection({
             </Link>
           </div>
 
-          <DeleteAccountRequest />
+          <DeleteAccountRequest userEmail={userEmail} />
         </div>
       </SettingsCard>
     </div>
@@ -589,7 +592,7 @@ function AccountSettingsContent({
     case "security":
       return <SecuritySection />;
     case "privacy":
-      return <PrivacySection profile={profile} />;
+      return <PrivacySection profile={profile} userEmail={userEmail} />;
   }
 }
 
@@ -618,12 +621,18 @@ export default async function AccountPage({ searchParams }: Props) {
         <div className="grid gap-6 lg:grid-cols-[minmax(0,860px)_240px] lg:items-start lg:justify-center">
           <section className="space-y-6">
             <header className="space-y-2">
-              <Link
-                href="/assistant"
-                className="inline-flex min-h-10 items-center rounded-full bg-white/82 px-4 text-sm font-bold text-[var(--voltjo-muted)] shadow-[0_1px_0_rgba(255,255,255,0.9)] ring-1 ring-[rgba(38,38,38,0.06)] transition-[background-color,color,box-shadow,transform] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] hover:-translate-y-px hover:bg-white hover:text-[var(--voltjo-black)] hover:shadow-[0_6px_16px_rgba(13,13,13,0.05)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(38,38,38,0.16)] focus-visible:ring-offset-2"
-              >
-                <span>العودة إلى المساعد</span>
-              </Link>
+              <div className="flex items-center justify-between gap-3">
+                <Link
+                  href="/assistant"
+                  className="inline-flex min-h-10 items-center rounded-full bg-white/82 px-4 text-sm font-bold text-[var(--voltjo-muted)] shadow-[0_1px_0_rgba(255,255,255,0.9)] ring-1 ring-[rgba(38,38,38,0.06)] transition-[background-color,color,box-shadow,transform] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] hover:-translate-y-px hover:bg-white hover:text-[var(--voltjo-black)] hover:shadow-[0_6px_16px_rgba(13,13,13,0.05)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(38,38,38,0.16)] focus-visible:ring-offset-2"
+                >
+                  <span>العودة إلى المساعد</span>
+                </Link>
+                <AccountMobileNav
+                  activeSection={activeSection}
+                  signOutAction={signOutAction}
+                />
+              </div>
               <h1 className="text-[32px] font-extrabold leading-tight text-[var(--voltjo-black)] sm:text-[36px]">
                 {sectionMeta.title}
               </h1>
@@ -644,7 +653,7 @@ export default async function AccountPage({ searchParams }: Props) {
             />
           </section>
 
-          <aside className="rounded-[28px] bg-white/86 p-4 shadow-[0_1px_0_rgba(255,255,255,0.9),0_16px_48px_rgba(13,13,13,0.045)] ring-1 ring-[rgba(38,38,38,0.06)] lg:sticky lg:top-6 lg:h-fit">
+          <aside className="hidden rounded-[28px] bg-white/86 p-4 shadow-[0_1px_0_rgba(255,255,255,0.9),0_16px_48px_rgba(13,13,13,0.045)] ring-1 ring-[rgba(38,38,38,0.06)] lg:sticky lg:top-6 lg:block lg:h-fit">
             <div>
               <p className="text-lg font-extrabold text-[var(--voltjo-black)]">
                 الإعدادات
