@@ -10,6 +10,10 @@ import {
 
 const PREVIEW_SIZE = 256;
 const OUTPUT_SIZE = 512;
+const primaryButtonClass =
+  "inline-flex min-h-11 items-center justify-center rounded-full bg-[var(--voltjo-black)] px-5 text-sm font-bold text-white shadow-[0_10px_22px_rgba(13,13,13,0.08)] transition-[background-color,box-shadow,transform,opacity] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] hover:-translate-y-0.5 hover:bg-[#111] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(38,38,38,0.16)] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60";
+const secondaryButtonClass =
+  "inline-flex min-h-11 items-center justify-center rounded-full border border-[rgba(38,38,38,0.08)] bg-white px-5 text-sm font-bold text-[var(--voltjo-black)] shadow-[0_1px_0_rgba(255,255,255,0.8)] transition-[background-color,color,border-color,box-shadow,transform,opacity] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] hover:-translate-y-0.5 hover:border-[rgba(38,38,38,0.12)] hover:bg-[#F7F7F3] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(38,38,38,0.16)] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60";
 
 type UploadState = {
   ok: boolean;
@@ -35,6 +39,7 @@ export function AvatarCustomizer({
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement | null>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
+  const closeButtonRef = useRef<HTMLButtonElement | null>(null);
   const positionRef = useRef({ x: 0, y: 0 });
   const objectUrlRef = useRef<string | null>(null);
   const rafRef = useRef<number | null>(null);
@@ -108,6 +113,30 @@ export function AvatarCustomizer({
     }
     setLocalPreviewUrl(null);
   }
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const previousActiveElement =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
+
+    closeButtonRef.current?.focus();
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        closeModal();
+      }
+    }
+
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      previousActiveElement?.focus();
+    };
+  }, [isOpen]);
 
   function handleFileSelection(file: File) {
     if (!ALLOWED_AVATAR_IMAGE_TYPES.includes(file.type as (typeof ALLOWED_AVATAR_IMAGE_TYPES)[number])) {
@@ -244,28 +273,35 @@ export function AvatarCustomizer({
       <button
         type="button"
         onClick={() => setIsOpen(true)}
-        className="inline-flex h-10 items-center justify-center rounded-[14px] border border-[rgba(13,13,13,0.08)] bg-white px-4 text-sm font-bold text-[var(--voltjo-black)] transition hover:bg-[#FAFAF7]"
+        className={secondaryButtonClass}
       >
         تغيير الصورة
       </button>
 
       {isOpen ? (
-        <div className="fixed inset-0 z-[220] flex items-center justify-center bg-[rgba(13,13,13,0.38)] p-4">
+        <div className="fixed inset-0 z-[220] flex items-center justify-center bg-[rgba(13,13,13,0.34)] p-4 backdrop-blur-sm">
           <div
-            className="w-full max-w-[720px] rounded-[28px] border border-[rgba(13,13,13,0.08)] bg-white p-5 shadow-[0_28px_80px_rgba(13,13,13,0.16)] sm:p-7"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="avatar-dialog-title"
+            className="max-h-[calc(100dvh-2rem)] w-full max-w-[720px] overflow-y-auto rounded-[32px] bg-white p-5 shadow-[0_32px_90px_rgba(13,13,13,0.18)] ring-1 ring-[rgba(255,255,255,0.72)] sm:p-7"
             dir="rtl"
           >
             <div className="flex items-start justify-between gap-4">
               <button
+                ref={closeButtonRef}
                 type="button"
                 onClick={closeModal}
-                className="flex h-11 w-11 items-center justify-center rounded-full border border-[rgba(13,13,13,0.08)] bg-white text-[var(--voltjo-black)] transition hover:bg-[#FAFAF7]"
+                className="flex h-11 w-11 items-center justify-center rounded-full bg-[#F7F7F3] text-[var(--voltjo-black)] transition-[background-color,transform] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] hover:bg-[#EFEFE8] active:scale-[0.96] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(38,38,38,0.16)] focus-visible:ring-offset-2"
                 aria-label="إغلاق"
               >
                 <X size={18} />
               </button>
               <div className="flex-1 text-right">
-                <h3 className="text-[28px] font-black text-[var(--voltjo-black)]">
+                <h3
+                  id="avatar-dialog-title"
+                  className="text-[26px] font-extrabold text-[var(--voltjo-black)] sm:text-[28px]"
+                >
                   تغيير الصورة الشخصية
                 </h3>
                 <p className="mt-2 text-sm font-medium leading-7 text-[var(--voltjo-muted)]">
@@ -276,7 +312,7 @@ export function AvatarCustomizer({
 
             <div className="mt-6 grid gap-6 lg:grid-cols-[280px_minmax(0,1fr)] lg:items-start">
               <div className="flex flex-col items-center gap-4">
-                <div className="relative h-64 w-64 overflow-hidden rounded-full border border-[rgba(13,13,13,0.08)] bg-[#F6F3EE] shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]">
+                <div className="relative h-64 w-64 overflow-hidden rounded-full bg-[#F4F1EC] shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_18px_42px_rgba(13,13,13,0.08)] ring-1 ring-[rgba(38,38,38,0.06)]">
                   {localPreviewUrl ? (
                     <img
                       ref={imageRef}
@@ -352,7 +388,7 @@ export function AvatarCustomizer({
                   <button
                     type="button"
                     onClick={() => inputRef.current?.click()}
-                    className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-[14px] border border-[rgba(13,13,13,0.08)] bg-white px-4 text-sm font-bold text-[var(--voltjo-black)] transition hover:bg-[#FAFAF7]"
+                    className={`${secondaryButtonClass} w-full gap-2`}
                   >
                     <Upload size={16} />
                     اختيار صورة
@@ -381,9 +417,9 @@ export function AvatarCustomizer({
               </div>
 
               <div className="space-y-5">
-                <div className="rounded-[22px] border border-[rgba(13,13,13,0.08)] bg-[#FBFBF9] p-5">
+                <div className="rounded-[24px] bg-[#F7F7F3] p-5 ring-1 ring-[rgba(38,38,38,0.04)]">
                   <div className="flex items-center justify-between gap-4">
-                    <p className="text-sm font-black text-[var(--voltjo-black)]">
+                    <p className="text-sm font-extrabold text-[var(--voltjo-black)]">
                       مستوى التقريب
                     </p>
                     <span className="text-sm font-bold text-[var(--voltjo-muted)]">
@@ -406,11 +442,11 @@ export function AvatarCustomizer({
                       });
                     }}
                     disabled={!hasLocalImage}
-                    className="mt-4 h-2 w-full cursor-pointer appearance-none rounded-full bg-[rgba(13,13,13,0.08)] accent-[var(--voltjo-orange)] disabled:cursor-not-allowed"
+                    className="mt-4 h-2 w-full cursor-pointer appearance-none rounded-full bg-[rgba(13,13,13,0.08)] accent-[var(--voltjo-orange)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(38,38,38,0.16)] focus-visible:ring-offset-4 disabled:cursor-not-allowed"
                   />
                 </div>
 
-                <div className="rounded-[22px] border border-[rgba(13,13,13,0.08)] bg-[#FBFBF9] p-5 text-sm font-medium leading-7 text-[var(--voltjo-muted)]">
+                <div className="rounded-[24px] bg-[#F7F7F3] p-5 text-sm font-medium leading-7 text-[var(--voltjo-muted)] ring-1 ring-[rgba(38,38,38,0.04)]">
                   <p>
                     اسحب الصورة داخل الإطار لتحريكها، ثم استخدم شريط التقريب حتى
                     تصل إلى النتيجة المناسبة.
@@ -418,7 +454,11 @@ export function AvatarCustomizer({
                 </div>
 
                 {errorMessage ? (
-                  <div className="rounded-[16px] border border-red-200 bg-red-50 px-4 py-3 text-sm font-bold text-red-700">
+                  <div
+                    role="alert"
+                    aria-live="assertive"
+                    className="rounded-[18px] bg-red-50 px-4 py-3 text-sm font-bold text-red-700 ring-1 ring-red-200"
+                  >
                     {errorMessage}
                   </div>
                 ) : null}
@@ -427,7 +467,7 @@ export function AvatarCustomizer({
                   <button
                     type="button"
                     onClick={closeModal}
-                    className="inline-flex h-11 items-center justify-center rounded-[14px] border border-[rgba(13,13,13,0.08)] bg-white px-5 text-sm font-bold text-[var(--voltjo-black)] transition hover:bg-[#FAFAF7]"
+                    className={secondaryButtonClass}
                   >
                     إلغاء
                   </button>
@@ -435,10 +475,10 @@ export function AvatarCustomizer({
                     type="button"
                     onClick={handleSave}
                     disabled={isSaving || !hasLocalImage}
-                    className="inline-flex h-11 items-center justify-center gap-2 rounded-[14px] bg-[var(--voltjo-black)] px-5 text-sm font-bold text-white transition disabled:cursor-not-allowed disabled:opacity-65"
+                    className={`${primaryButtonClass} gap-2`}
                   >
                     {isSaving ? <Loader2 size={16} className="animate-spin" /> : <Plus size={16} />}
-                    {isSaving ? "جارٍ الحفظ..." : "حفظ الصورة"}
+                    {isSaving ? "جارٍ الحفظ…" : "حفظ الصورة"}
                   </button>
                 </div>
               </div>

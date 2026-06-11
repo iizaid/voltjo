@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ArrowLeft, BadgeCheck, ChevronLeft, LogOut } from "lucide-react";
+import { ArrowRight, BadgeCheck, ChevronLeft, LogOut } from "lucide-react";
 import { AvatarCustomizer } from "@/components/account/AvatarCustomizer";
 import { DeleteAccountRequest } from "@/components/account/DeleteAccountRequest";
 import { PasswordResetAction } from "@/components/account/PasswordResetAction";
@@ -29,6 +29,13 @@ type Props = {
 const ACCOUNT_SECTIONS = ["profile", "account", "security", "privacy"] as const;
 
 type AccountSection = (typeof ACCOUNT_SECTIONS)[number];
+
+const uiEase = "ease-[cubic-bezier(0.23,1,0.32,1)]";
+const pressableBase = `inline-flex min-h-11 items-center justify-center rounded-full text-sm font-bold transition-[background-color,color,border-color,box-shadow,transform,opacity] duration-200 ${uiEase} active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(38,38,38,0.16)] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60`;
+const primaryButtonClass = `${pressableBase} bg-[var(--voltjo-black)] px-5 text-white shadow-[0_10px_22px_rgba(13,13,13,0.08)] hover:-translate-y-0.5 hover:bg-[#111]`;
+const secondaryButtonClass = `${pressableBase} border border-[rgba(38,38,38,0.08)] bg-white px-5 text-[var(--voltjo-black)] shadow-[0_1px_0_rgba(255,255,255,0.8)] hover:-translate-y-0.5 hover:border-[rgba(38,38,38,0.12)] hover:bg-[#F7F7F3]`;
+const fieldClass = "h-12 rounded-[18px] border border-[rgba(38,38,38,0.08)] bg-white px-4 text-base font-semibold text-[var(--voltjo-black)] outline-none transition-[border-color,box-shadow,background-color] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] focus:border-[rgba(38,38,38,0.18)] focus:shadow-[0_0_0_4px_rgba(255,77,0,0.08)]";
+const readOnlyFieldClass = "h-12 rounded-[18px] border border-transparent bg-[#F4F4EF] px-4 text-base font-semibold text-[var(--voltjo-muted)] outline-none";
 
 function resolveString(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
@@ -138,15 +145,18 @@ function SidebarItem({
   return (
     <Link
       href={href}
-      className={`flex items-center justify-between rounded-[16px] px-3 py-3 text-sm font-bold transition ${
+      aria-current={active ? "page" : undefined}
+      className={`group flex min-h-11 items-center justify-between rounded-[18px] px-3.5 py-3 text-sm font-bold transition-[background-color,color,transform] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(38,38,38,0.14)] focus-visible:ring-offset-2 ${
         active
-          ? "bg-[rgba(255,106,0,0.08)] text-[var(--voltjo-black)]"
-          : "text-[var(--voltjo-muted)] hover:bg-[#F6F6F2] hover:text-[var(--voltjo-black)]"
+          ? "bg-[#F4F1EC] text-[var(--voltjo-black)] shadow-[inset_0_0_0_1px_rgba(38,38,38,0.04)]"
+          : "text-[var(--voltjo-muted)] hover:bg-[#F7F7F3] hover:text-[var(--voltjo-black)]"
       }`}
     >
       <span>{label}</span>
       {active ? (
-        <ChevronLeft size={16} className="text-[var(--voltjo-orange)]" />
+        <span className="grid h-7 w-7 place-items-center rounded-full bg-white text-[var(--voltjo-orange)] shadow-[0_1px_0_rgba(38,38,38,0.04)]">
+          <ChevronLeft size={15} />
+        </span>
       ) : null}
     </Link>
   );
@@ -162,13 +172,13 @@ function SettingsCard({
   children: ReactNode;
 }) {
   return (
-    <section className="rounded-[22px] border border-[rgba(13,13,13,0.08)] bg-white p-6 shadow-[0_8px_26px_rgba(13,13,13,0.03)] sm:p-7">
+    <section className="rounded-[28px] bg-white/90 p-5 shadow-[0_1px_0_rgba(255,255,255,0.9),0_18px_54px_rgba(13,13,13,0.045)] ring-1 ring-[rgba(38,38,38,0.06)] sm:p-7">
       <div className="mb-5">
-        <h2 className="text-[24px] font-black leading-tight text-[var(--voltjo-black)]">
+        <h2 className="text-[22px] font-extrabold leading-tight text-[var(--voltjo-black)] sm:text-[24px]">
           {title}
         </h2>
         {description ? (
-          <p className="mt-2 text-sm font-medium leading-7 text-[var(--voltjo-muted)]">
+          <p className="mt-2 max-w-2xl text-sm font-medium leading-7 text-[var(--voltjo-muted)]">
             {description}
           </p>
         ) : null}
@@ -187,10 +197,12 @@ function StatusNotice({
 }) {
   return (
     <div
-      className={`rounded-[16px] border px-4 py-3 text-sm font-bold ${
+      role={tone === "error" ? "alert" : "status"}
+      aria-live={tone === "error" ? "assertive" : "polite"}
+      className={`rounded-[18px] px-4 py-3 text-sm font-bold ring-1 ${
         tone === "success"
-          ? "border-emerald-200 bg-emerald-50 text-emerald-800"
-          : "border-red-200 bg-red-50 text-red-700"
+          ? "bg-emerald-50 text-emerald-800 ring-emerald-200"
+          : "bg-red-50 text-red-700 ring-red-200"
       }`}
     >
       {message}
@@ -204,12 +216,15 @@ function InfoGrid({
   items: Array<{ label: string; value: string; muted?: boolean }>;
 }) {
   return (
-    <div className="grid gap-x-10 gap-y-6 sm:grid-cols-2">
+    <div className="grid gap-3 sm:grid-cols-2">
       {items.map((item) => (
-        <div key={item.label} className="space-y-1.5">
-          <p className="text-sm font-bold text-[var(--voltjo-muted)]">{item.label}</p>
+        <div
+          key={item.label}
+          className="rounded-[18px] bg-[#F7F7F3] px-4 py-3 ring-1 ring-[rgba(38,38,38,0.04)]"
+        >
+          <p className="text-xs font-bold text-[var(--voltjo-muted)]">{item.label}</p>
           <p
-            className={`text-base font-black leading-7 ${
+            className={`mt-1 text-sm font-extrabold leading-7 ${
               item.muted ? "text-[var(--voltjo-muted)]" : "text-[var(--voltjo-black)]"
             }`}
           >
@@ -254,13 +269,13 @@ function ProfileSummary({
     <div className="space-y-5">
       <InfoGrid items={items} />
 
-      <div className="border-t border-[rgba(13,13,13,0.06)] pt-5">
+      <div className="pt-1">
         <p className="text-sm font-bold text-[var(--voltjo-muted)]">الأولويات</p>
         <div className="mt-3 flex flex-wrap gap-2">
           {(priorities.length ? priorities : [UNKNOWN_LABEL]).map((priority) => (
             <span
               key={priority}
-              className="rounded-full border border-[rgba(13,13,13,0.08)] bg-[#FAFAF7] px-3 py-1.5 text-sm font-bold text-[var(--voltjo-black)]"
+              className="rounded-full bg-[#F4F1EC] px-3 py-1.5 text-sm font-bold text-[var(--voltjo-black)] ring-1 ring-[rgba(38,38,38,0.04)]"
             >
               {priority}
             </span>
@@ -271,7 +286,7 @@ function ProfileSummary({
       <div className="pt-1">
         <Link
           href="/start"
-          className="inline-flex h-11 items-center justify-center rounded-[14px] border border-[rgba(13,13,13,0.08)] bg-white px-5 text-sm font-bold text-[var(--voltjo-black)] transition hover:bg-[#FAFAF7]"
+          className={secondaryButtonClass}
         >
           تعديل الملف الذكي
         </Link>
@@ -315,18 +330,23 @@ function AccountSectionContent({
               الاسم الكامل
               <input
                 name="fullName"
+                autoComplete="name"
                 defaultValue={profile?.full_name ?? ""}
                 placeholder={displayName}
-                className="h-12 rounded-[14px] border border-[rgba(13,13,13,0.08)] bg-white px-4 text-base font-semibold text-[var(--voltjo-black)] outline-none transition focus:border-[rgba(255,106,0,0.35)]"
+                className={fieldClass}
               />
             </label>
 
             <label className="grid gap-2 text-sm font-bold text-[var(--voltjo-black)]">
               البريد الإلكتروني
               <input
+                name="email"
+                type="email"
+                autoComplete="email"
                 value={userEmail}
                 readOnly
-                className="h-12 rounded-[14px] border border-[rgba(13,13,13,0.08)] bg-[#F8F8F4] px-4 text-base font-semibold text-[var(--voltjo-muted)] outline-none"
+                dir="ltr"
+                className={`${readOnlyFieldClass} text-left`}
               />
             </label>
 
@@ -334,8 +354,9 @@ function AccountSectionContent({
               البلد
               <select
                 name="country"
+                autoComplete="country-name"
                 defaultValue={selectedCountry}
-                className="h-12 rounded-[14px] border border-[rgba(13,13,13,0.08)] bg-white px-4 text-base font-semibold text-[var(--voltjo-black)] outline-none transition focus:border-[rgba(255,106,0,0.35)]"
+                className={fieldClass}
               >
                 {COUNTRY_OPTIONS.map((item) => (
                   <option key={item.value} value={item.value}>
@@ -349,8 +370,9 @@ function AccountSectionContent({
               المدينة داخل الأردن
               <select
                 name="city"
+                autoComplete="address-level2"
                 defaultValue={selectedCity}
-                className="h-12 rounded-[14px] border border-[rgba(13,13,13,0.08)] bg-white px-4 text-base font-semibold text-[var(--voltjo-black)] outline-none transition focus:border-[rgba(255,106,0,0.35)]"
+                className={fieldClass}
               >
                 {JORDAN_CITY_OPTIONS.map((item) => (
                   <option key={item.value} value={item.value}>
@@ -367,7 +389,7 @@ function AccountSectionContent({
 
           <button
             type="submit"
-            className="inline-flex h-11 items-center justify-center rounded-[14px] bg-[var(--voltjo-black)] px-5 text-sm font-bold text-white transition hover:opacity-95"
+            className={primaryButtonClass}
           >
             حفظ معلومات الحساب
           </button>
@@ -394,7 +416,7 @@ function SecuritySection() {
         <form action={signOutAction}>
           <button
             type="submit"
-            className="inline-flex h-11 items-center justify-center rounded-[14px] bg-[var(--voltjo-black)] px-5 text-sm font-bold text-white transition hover:opacity-95"
+            className={primaryButtonClass}
           >
             تسجيل الخروج
           </button>
@@ -425,9 +447,9 @@ function PrivacySection({
         description="يمكنك تنزيل نسخة JSON من بياناتك الحالية، من دون كلمات مرور أو جلسات أو مفاتيح خاصة."
       >
         <div className="space-y-4">
-          <div className="flex flex-col gap-4 rounded-[18px] border border-[rgba(13,13,13,0.08)] bg-[#FBFBF9] p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-4 rounded-[22px] bg-[#F7F7F3] p-4 ring-1 ring-[rgba(38,38,38,0.04)] sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="text-sm font-black text-[var(--voltjo-black)]">
+              <p className="text-sm font-extrabold text-[var(--voltjo-black)]">
                 تصدير البيانات
               </p>
               <p className="mt-1 text-sm font-medium leading-6 text-[var(--voltjo-muted)]">
@@ -436,7 +458,7 @@ function PrivacySection({
             </div>
             <Link
               href="/api/account/export"
-              className="inline-flex h-10 items-center justify-center rounded-[14px] border border-[rgba(13,13,13,0.08)] bg-white px-4 text-sm font-bold text-[var(--voltjo-black)] transition hover:bg-[#FAFAF7]"
+              className={secondaryButtonClass}
             >
               تصدير بياناتي
             </Link>
@@ -477,7 +499,7 @@ function ProfileSection({
       <SettingsCard title="الملف الشخصي">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-4">
-            <span className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[rgba(13,13,13,0.08)] bg-[#FFF1E8] text-3xl font-black text-[var(--voltjo-orange)]">
+            <span className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-[28px] bg-[#FFF1E8] text-3xl font-black text-[var(--voltjo-orange)] shadow-[inset_0_0_0_1px_rgba(255,77,0,0.10),0_10px_28px_rgba(255,77,0,0.08)]">
               {avatarUrl ? (
                 <img
                   src={avatarUrl}
@@ -491,11 +513,11 @@ function ProfileSection({
 
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
-                <h2 className="text-[28px] font-black leading-tight text-[var(--voltjo-black)]">
+                <h2 className="text-[26px] font-extrabold leading-tight text-[var(--voltjo-black)] sm:text-[28px]">
                   {displayName}
                 </h2>
                 {emailConfirmed ? (
-                  <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-extrabold text-emerald-700">
+                  <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-extrabold text-emerald-700 ring-1 ring-emerald-200">
                     <BadgeCheck size={14} />
                     البريد مفعّل
                   </span>
@@ -594,7 +616,7 @@ export default async function AccountPage({ searchParams }: Props) {
 
   return (
     <main
-      className="min-h-dvh bg-[#FAFAF8] px-4 py-6 text-[var(--voltjo-black)] sm:px-6 lg:px-8 lg:py-8"
+      className="min-h-dvh bg-[#F7F7F3] px-4 py-6 text-[var(--voltjo-black)] sm:px-6 lg:px-8 lg:py-8"
       dir="rtl"
     >
       <div className="mx-auto max-w-[1220px]">
@@ -603,15 +625,15 @@ export default async function AccountPage({ searchParams }: Props) {
             <header className="space-y-2">
               <Link
                 href="/assistant"
-                className="inline-flex items-center gap-2 text-sm font-bold text-[var(--voltjo-muted)] transition hover:text-[var(--voltjo-black)]"
+                className="inline-flex min-h-10 flex-row-reverse items-center gap-2 rounded-full bg-white/82 px-3.5 text-sm font-bold text-[var(--voltjo-muted)] shadow-[0_1px_0_rgba(255,255,255,0.9)] ring-1 ring-[rgba(38,38,38,0.06)] transition-[background-color,color,box-shadow,transform] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] hover:-translate-y-0.5 hover:bg-white hover:text-[var(--voltjo-black)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(38,38,38,0.16)] focus-visible:ring-offset-2"
               >
-                <ArrowLeft size={16} />
+                <ArrowRight size={16} />
                 <span>العودة إلى المساعد</span>
               </Link>
-              <h1 className="text-[30px] font-black leading-tight text-[var(--voltjo-black)]">
+              <h1 className="text-[32px] font-extrabold leading-tight text-[var(--voltjo-black)] sm:text-[36px]">
                 {sectionMeta.title}
               </h1>
-              <p className="text-sm font-medium leading-7 text-[var(--voltjo-muted)]">
+              <p className="max-w-2xl text-sm font-medium leading-7 text-[var(--voltjo-muted)]">
                 {sectionMeta.subtitle}
               </p>
             </header>
@@ -628,9 +650,9 @@ export default async function AccountPage({ searchParams }: Props) {
             />
           </section>
 
-          <aside className="rounded-[24px] border border-[rgba(13,13,13,0.08)] bg-white p-4 shadow-[0_10px_30px_rgba(13,13,13,0.03)] lg:sticky lg:top-6 lg:h-fit">
+          <aside className="rounded-[28px] bg-white/86 p-4 shadow-[0_1px_0_rgba(255,255,255,0.9),0_16px_48px_rgba(13,13,13,0.045)] ring-1 ring-[rgba(38,38,38,0.06)] lg:sticky lg:top-6 lg:h-fit">
             <div>
-              <p className="text-lg font-black text-[var(--voltjo-black)]">
+              <p className="text-lg font-extrabold text-[var(--voltjo-black)]">
                 الإعدادات
               </p>
             </div>
@@ -661,7 +683,7 @@ export default async function AccountPage({ searchParams }: Props) {
             <form action={signOutAction} className="mt-6">
               <button
                 type="submit"
-                className="flex h-11 w-full items-center justify-center gap-2 rounded-[16px] border border-[rgba(13,13,13,0.08)] bg-white text-sm font-bold text-[var(--voltjo-black)] transition hover:bg-[#F5F5F1]"
+                className={`${secondaryButtonClass} w-full gap-2`}
               >
                 <LogOut size={16} />
                 تسجيل الخروج

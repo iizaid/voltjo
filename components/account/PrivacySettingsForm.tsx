@@ -9,6 +9,9 @@ const initialState = {
   message: "",
 };
 
+const primaryButtonClass =
+  "inline-flex min-h-11 items-center justify-center rounded-full bg-[var(--voltjo-black)] px-5 text-sm font-bold text-white shadow-[0_10px_22px_rgba(13,13,13,0.08)] transition-[background-color,box-shadow,transform,opacity] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] hover:-translate-y-0.5 hover:bg-[#111] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(38,38,38,0.16)] focus-visible:ring-offset-2 disabled:cursor-wait disabled:opacity-60";
+
 function CheckboxRow({
   name,
   label,
@@ -21,15 +24,15 @@ function CheckboxRow({
   defaultChecked: boolean;
 }) {
   return (
-    <label className="flex items-start gap-3 rounded-[18px] border border-[rgba(13,13,13,0.08)] bg-[#FBFBF9] p-4">
+    <label className="group flex cursor-pointer items-start gap-3 rounded-[22px] bg-[#F7F7F3] p-4 ring-1 ring-[rgba(38,38,38,0.04)] transition-[background-color,box-shadow,transform] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] hover:-translate-y-0.5 hover:bg-[#F4F4EF] focus-within:ring-[rgba(38,38,38,0.16)]">
       <input
         type="checkbox"
         name={name}
         defaultChecked={defaultChecked}
-        className="mt-1 h-4 w-4 rounded border-[rgba(13,13,13,0.18)] accent-[var(--voltjo-orange)]"
+        className="mt-1 h-5 w-5 rounded border-[rgba(38,38,38,0.22)] accent-[var(--voltjo-orange)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(38,38,38,0.16)] focus-visible:ring-offset-2"
       />
       <span>
-        <span className="block text-sm font-black text-[var(--voltjo-black)]">
+        <span className="block text-sm font-extrabold text-[var(--voltjo-black)]">
           {label}
         </span>
         <span className="mt-1 block text-sm font-medium leading-6 text-[var(--voltjo-muted)]">
@@ -73,6 +76,8 @@ export function PrivacySettingsForm({
 
       {state.message ? (
         <p
+          role={state.ok ? "status" : "alert"}
+          aria-live={state.ok ? "polite" : "assertive"}
           className={`text-sm font-bold ${
             state.ok ? "text-emerald-700" : "text-red-700"
           }`}
@@ -84,9 +89,9 @@ export function PrivacySettingsForm({
       <button
         type="submit"
         disabled={isPending}
-        className="inline-flex h-11 items-center justify-center rounded-[14px] bg-[var(--voltjo-black)] px-5 text-sm font-bold text-white disabled:cursor-wait disabled:opacity-70"
+        className={primaryButtonClass}
       >
-        {isPending ? "جارٍ الحفظ..." : "حفظ إعدادات الخصوصية"}
+        {isPending ? "جارٍ الحفظ…" : "حفظ إعدادات الخصوصية"}
       </button>
     </form>
   );
