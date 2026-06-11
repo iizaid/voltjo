@@ -14,6 +14,11 @@ describe("getSafeRedirectPath", () => {
     expect(getSafeRedirectPath(null)).toBe("/assistant");
   });
 
+  it("uses a custom fallback when provided", () => {
+    expect(getSafeRedirectPath(null, "/start")).toBe("/start");
+    expect(getSafeRedirectPath("https://example.com", "/start")).toBe("/start");
+  });
+
   it("returns default when param is empty string", () => {
     expect(getSafeRedirectPath("")).toBe("/assistant");
   });
