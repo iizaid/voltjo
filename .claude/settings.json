@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node scripts/semgrep-scan.mjs --hook",
+            "timeout": 120
+          }
+        ]
+      }
+    ]
+  }
+}

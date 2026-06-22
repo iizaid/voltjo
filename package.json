@@ -13,7 +13,9 @@
     "test": "vitest run",
     "auth:debug:help": "node scripts/print-auth-debug-help.mjs",
     "load:public": "k6 run tests/load/public-smoke.js",
-    "load:auth-health": "k6 run tests/load/auth-health-smoke.js"
+    "load:auth-health": "k6 run tests/load/auth-health-smoke.js",
+    "security:sast": "node scripts/semgrep-scan.mjs",
+    "security:sast:changed": "node scripts/semgrep-scan.mjs --changed"
   },
   "dependencies": {
     "@number-flow/react": "^0.6.0",

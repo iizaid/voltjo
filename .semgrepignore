@@ -1,0 +1,14 @@
+# Paths Semgrep should never scan (build output, deps, generated, vendored).
+node_modules/
+.next/
+.open-next/
+.wrangler/
+out/
+dist/
+build/
+coverage/
+.git/
+*.min.js
+*.map
+public/
+.vercel/

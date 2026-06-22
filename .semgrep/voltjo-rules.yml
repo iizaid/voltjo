@@ -1,0 +1,43 @@
+# VoltJo project-local Semgrep rules.
+# These complement the registry packs (p/nextjs, p/react, p/secrets, ...) with
+# rules specific to this Supabase + Next.js + Upstash stack.
+rules:
+  - id: voltjo-dangerously-set-inner-html
+    message: >
+      dangerouslySetInnerHTML can introduce XSS. Render as text, or sanitize the
+      HTML with a vetted sanitizer before injecting it.
+    severity: WARNING
+    languages: [typescript, javascript]
+    pattern-either:
+      - pattern: <$EL ... dangerouslySetInnerHTML={$X} ... />
+      - pattern: <$EL ... dangerouslySetInnerHTML={$X} ...>...</$EL>
+
+  - id: voltjo-supabase-service-role-exposure
+    message: >
+      Supabase service-role key referenced. This key bypasses Row Level Security
+      and must ONLY be used in server-side code (route handlers, server actions,
+      server components) — never in "use client" files or anything bundled to the
+      browser.
+    severity: ERROR
+    languages: [typescript, javascript]
+    pattern-either:
+      - pattern: process.env.SUPABASE_SERVICE_ROLE_KEY
+      - pattern: process.env.SERVICE_ROLE_KEY
+
+  - id: voltjo-next-public-holds-secret
+    message: >
+      NEXT_PUBLIC_* env vars are inlined into the client bundle and visible to
+      anyone. Do not put secrets, API keys, tokens, or passwords behind this prefix.
+    severity: WARNING
+    languages: [typescript, javascript]
+    pattern-regex: NEXT_PUBLIC_[A-Z0-9_]*(SECRET|KEY|TOKEN|PASSWORD|PRIVATE)
+
+  - id: voltjo-no-eval-or-function-ctor
+    message: >
+      eval() and the Function constructor execute arbitrary strings as code and
+      are a code-injection risk. Replace with explicit logic.
+    severity: ERROR
+    languages: [typescript, javascript]
+    pattern-either:
+      - pattern: eval(...)
+      - pattern: new Function(...)
