@@ -30,7 +30,13 @@ rules:
       anyone. Do not put secrets, API keys, tokens, or passwords behind this prefix.
     severity: WARNING
     languages: [typescript, javascript]
-    pattern-regex: NEXT_PUBLIC_[A-Z0-9_]*(SECRET|KEY|TOKEN|PASSWORD|PRIVATE)
+    patterns:
+      # Flag NEXT_PUBLIC_ vars that look secret-bearing...
+      - pattern-regex: NEXT_PUBLIC_[A-Z0-9_]*(SECRET|KEY|TOKEN|PASSWORD|PRIVATE)
+      # ...but allow keys that are PUBLIC by design (Turnstile site key,
+      # Supabase anon key, Stripe publishable key). Rust regex = no lookahead,
+      # so subtract the allowlist with pattern-not-regex.
+      - pattern-not-regex: NEXT_PUBLIC_[A-Z0-9_]*(SITE_KEY|ANON_KEY|PUBLISHABLE)
 
   - id: voltjo-no-eval-or-function-ctor
     message: >
