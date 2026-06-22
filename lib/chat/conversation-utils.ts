@@ -57,6 +57,18 @@ export function generateConversationTitle(text: string): string {
 /**
  * Creates a brand new conversation state.
  */
+// Cryptographically strong id suffix. Uses crypto.randomUUID (available in
+// modern browsers in secure contexts and in Node), with a getRandomValues
+// fallback. Avoids Math.random, which CodeQL flags as insecure randomness.
+function secureSuffix(): string {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID().replace(/-/g, "").slice(0, 9);
+  }
+  const bytes = new Uint8Array(6);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("").slice(0, 9);
+}
+
 export function createConversation(options?: {
   title?: string;
   category?: ChatCategory;
@@ -67,7 +79,7 @@ export function createConversation(options?: {
   const category = options?.category || "عام";
   const messages = options?.messages || [];
 
-  const randomSuffix = Math.random().toString(36).substring(2, 11);
+  const randomSuffix = secureSuffix();
   const id = `conv-${Date.now()}-${randomSuffix}`;
 
   return {
@@ -84,7 +96,7 @@ export function createConversation(options?: {
  * Creates a new user message with optional structured attachment metadata.
  */
 export function createUserMessage(content: string, attachment?: ChatAttachment): ChatMessage {
-  const randomSuffix = Math.random().toString(36).substring(2, 11);
+  const randomSuffix = secureSuffix();
   const id = `msg-${Date.now()}-${randomSuffix}`;
 
   return {
@@ -100,7 +112,7 @@ export function createUserMessage(content: string, attachment?: ChatAttachment):
  * Generates an assistant placeholder message with "sending" status.
  */
 export function createAssistantPlaceholder(metadata?: ChatMessageMetadata): ChatMessage {
-  const randomSuffix = Math.random().toString(36).substring(2, 11);
+  const randomSuffix = secureSuffix();
   const id = `placeholder-${Date.now()}-${randomSuffix}`;
 
   return {
