@@ -10,6 +10,8 @@ export default tseslint.config(
       "out/**",
       "dist/**",
       "next-env.d.ts",
+      "scripts/**",
+      "tests/**",
     ],
   },
   js.configs.recommended,

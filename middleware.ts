@@ -19,18 +19,26 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL("/start", request.url));
     }
 
-    return NextResponse.next({
-      request: {
-        headers: request.headers,
-      },
-    });
+    return NextResponse.next();
   }
 
-  let response = NextResponse.next({
-    request: {
-      headers: request.headers,
-    },
-  });
+  const isProtected = isProtectedPath(request.nextUrl.pathname);
+  const hasSessionCookie = request.cookies.getAll().some((cookie) =>
+    cookie.name.startsWith("sb-")
+  );
+
+  // Optimization: If no auth cookie exists, anonymous user is assumed.
+  // Bypass getUser() network call entirely.
+  if (!hasSessionCookie) {
+    if (isProtected) {
+      const redirectUrl = new URL("/start", request.url);
+      redirectUrl.searchParams.set("next", request.nextUrl.pathname);
+      return NextResponse.redirect(redirectUrl);
+    }
+    return NextResponse.next();
+  }
+
+  let response = NextResponse.next();
 
   const supabase = createServerClient<Database>(url, anonKey, {
     cookies: {
@@ -65,7 +73,7 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user && isProtectedPath(request.nextUrl.pathname)) {
+  if (!user && isProtected) {
     const redirectUrl = new URL("/start", request.url);
     redirectUrl.searchParams.set("next", request.nextUrl.pathname);
     return NextResponse.redirect(redirectUrl);

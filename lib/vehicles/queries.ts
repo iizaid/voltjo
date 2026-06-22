@@ -1,6 +1,6 @@
 import "server-only";
 
-import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/server";
 import type { Database } from "@/lib/supabase/database.types";
 import type {
   ChargingCostInputs,
@@ -75,7 +75,7 @@ function mapVehicle(
 }
 
 export async function listVehicleBrands(): Promise<VehicleBrand[]> {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   if (!supabase) return [];
 
   const { data, error } = await supabase
@@ -90,7 +90,7 @@ export async function listVehicleBrands(): Promise<VehicleBrand[]> {
 export async function listSupportedVehicles(
   filters?: VehicleFilters,
 ): Promise<SupportedVehicle[]> {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   if (!supabase) return [];
 
   const { data, error } = await supabase
@@ -117,7 +117,7 @@ export async function listSupportedVehicles(
 export async function getSupportedVehicleBySlug(
   slug: string,
 ): Promise<SupportedVehicle | null> {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   if (!supabase) return null;
 
   const { data, error } = await supabase
@@ -144,7 +144,7 @@ export async function getSupportedVehicleBySlug(
 }
 
 export async function listChargingLocations(): Promise<ChargingLocation[]> {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   if (!supabase) return [];
 
   const { data, error } = await supabase

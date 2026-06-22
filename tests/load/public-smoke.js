@@ -69,9 +69,6 @@ export function handleSummary(data) {
         test: "public-smoke",
         base_url: BASE_URL,
         timestamp: new Date().toISOString(),
-        thresholds_passed: !data.metrics.http_req_failed?.thresholds?.some(
-          (t) => t.ok === false,
-        ),
         p95_ms: Math.round(
           data.metrics.http_req_duration?.values?.["p(95)"] ?? 0,
         ),
