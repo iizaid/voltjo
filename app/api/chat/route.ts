@@ -1,4 +1,6 @@
-import { getAiProvider } from "@/lib/ai/provider";
+import { generateAiChatResponse } from "@/lib/ai/provider";
+import { getAiConfig } from "@/lib/ai/config";
+import { AiError, userMessageForAiError, type AiErrorCode } from "@/lib/ai/errors";
 import { validateAiChatRequest } from "@/lib/ai/validation";
 import {
   createChatConversation,
@@ -63,8 +65,24 @@ async function tryFindOwnedConversation(conversationId: string) {
   }
 }
 
+function statusForAiError(code: AiErrorCode): number {
+  switch (code) {
+    case "RATE_LIMIT":
+    case "QUOTA":
+      return 429;
+    case "TIMEOUT":
+      return 504;
+    case "CONFIG_MISSING":
+    case "UPSTREAM":
+      return 503;
+    default:
+      return 500;
+  }
+}
+
 export async function POST(request: Request) {
   const ip = getIpFromRequest(request);
+  const requestId = crypto.randomUUID();
   const contentLength = request.headers.get("content-length");
   if (contentLength) {
     const parsedLength = Number.parseInt(contentLength, 10);
@@ -167,7 +185,6 @@ export async function POST(request: Request) {
   }
 
   try {
-    const provider = getAiProvider();
     let persistedConversationId: string | null = null;
     let canPersistAssistantMessage = false;
 
@@ -200,7 +217,7 @@ export async function POST(request: Request) {
           metadata: {
             modelId: validation.data.modelId,
             thinkingMode: validation.data.thinkingMode,
-            provider: "mock",
+            provider: getAiConfig().primaryProvider,
           },
           status: "done",
         });
@@ -214,8 +231,11 @@ export async function POST(request: Request) {
     }
 
     const message = await withTimeout({
-      promise: provider.generateChatResponse(validation.data),
-      timeoutMs: 30_000,
+      promise: generateAiChatResponse(validation.data, {
+        actor: user ? "user" : "anon",
+        requestId,
+      }),
+      timeoutMs: 45_000,
       errorMessage: "AI provider timed out",
     });
 
@@ -236,7 +256,16 @@ export async function POST(request: Request) {
     }, {
       headers: buildRateLimitHeaders(rateLimit.limit, rateLimit.remaining, rateLimit.resetAt),
     });
-  } catch {
+  } catch (error) {
+    if (error instanceof AiError) {
+      return apiError({
+        code: error.code,
+        message: userMessageForAiError(error.code),
+        status: statusForAiError(error.code),
+        headers: { "Cache-Control": "no-store, max-age=0" },
+      });
+    }
+
     return apiError({
       code: "CHAT_GENERATION_FAILED",
       message: "تعذر تجهيز الرد الآن. حاول مرة أخرى.",

@@ -1,5 +1,20 @@
+/**
+ * Public AI types shared across server and client. No "mock" provider exists
+ * anymore — every model maps to a real provider under the hood.
+ */
+
+// User-facing model selector in the chat UI. These are friendly labels, not
+// raw provider ids; the registry maps each to a concrete provider.
 export type AiModelId = "voltjo" | "gemini" | "kimi";
-export type AiProviderId = "mock" | "openai" | "gemini" | "kimi";
+
+// Concrete backend providers. Adding one here + a provider file + registry entry
+// is all that is required to onboard a new vendor.
+export type AiProviderId =
+  | "gemini"
+  | "openai"
+  | "kimi"
+  | "deepseek"
+  | "anthropic";
 
 export type AiChatAttachment = {
   id: string;
@@ -16,6 +31,12 @@ export type AiChatRequest = {
   attachment?: AiChatAttachment | null;
 };
 
+export type AiTokenUsage = {
+  promptTokens: number;
+  completionTokens: number;
+  totalTokens: number;
+} | null;
+
 export type AiChatResponse = {
   id: string;
   role: "assistant";
@@ -27,10 +48,45 @@ export type AiChatResponse = {
     modelId: AiModelId;
     thinkingMode: boolean;
     provider: AiProviderId;
+    model?: string;
+    usage?: AiTokenUsage;
+    latencyMs?: number;
   };
 };
 
-export type AiProvider = {
+/** Static description of a provider, used for the registry and health UI. */
+export type AiProviderMetadata = {
   id: AiProviderId;
-  generateChatResponse(request: AiChatRequest): Promise<AiChatResponse>;
+  label: string;
+  /** Env var that holds this provider's secret key. */
+  envKey: string;
+  /** Default model id sent to the provider API. */
+  defaultModel: string;
+  supportsStreaming: boolean;
 };
+
+export type AiProviderHealth = {
+  id: AiProviderId;
+  configured: boolean;
+  healthy: boolean;
+  checkedAt: string;
+  detail?: string;
+};
+
+/** Optional server-side context passed to a provider (e.g. injected vehicle data). */
+export type AiGenerationContext = {
+  systemPrompt: string;
+  requestId: string;
+};
+
+export interface AiProvider {
+  readonly metadata: AiProviderMetadata;
+  /** True when the required key is present. */
+  isConfigured(): boolean;
+  generateChatResponse(
+    request: AiChatRequest,
+    context: AiGenerationContext,
+  ): Promise<AiChatResponse>;
+  /** Lightweight liveness/config probe. Must never throw. */
+  healthCheck(): Promise<AiProviderHealth>;
+}

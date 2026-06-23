@@ -40,15 +40,17 @@ export function InitialSiteLoader() {
 
     setInitialLoaderStatus("running");
 
+    // Hold the splash briefly, then play the 920ms exit animation. The remove
+    // delay stays >920ms after exit starts so the animation can finish cleanly.
     const exitTimer = window.setTimeout(() => {
       setIsExiting(true);
-    }, 2600);
+    }, 700);
 
     const removeTimer = window.setTimeout(() => {
       setInitialLoaderStatus("complete");
       announceInitialLoaderComplete();
       setShouldRender(false);
-    }, 3500);
+    }, 1640);
 
     return () => {
       window.clearTimeout(exitTimer);
