@@ -16,19 +16,27 @@ import type { AiChatRequest, AiChatResponse } from "@/lib/ai/types";
  */
 export async function generateAiChatResponse(
   request: AiChatRequest,
-  options: { actor: "user" | "anon"; requestId: string },
+  options: { actor: "user" | "anon"; requestId: string; signal?: AbortSignal },
 ): Promise<AiChatResponse> {
   assertAiConfigured(getAiConfig());
   const chain = assertResolvableProvider();
 
   const systemPrompt = await buildSystemPrompt(request);
-  const context = { systemPrompt, requestId: options.requestId };
+  const context = {
+    systemPrompt,
+    requestId: options.requestId,
+    signal: options.signal,
+  };
 
   const elapsed = startTimer();
   let attempts = 0;
   let lastError: AiError | null = null;
 
   for (const provider of chain) {
+    // Stop walking the fallback chain if the request-level deadline elapsed.
+    if (options.signal?.aborted) {
+      throw new AiError("TIMEOUT", "Request aborted before completion.");
+    }
     attempts += 1;
     try {
       const response = await provider.generateChatResponse(request, context);

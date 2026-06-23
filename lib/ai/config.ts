@@ -18,6 +18,8 @@ export const PROVIDER_ENV_KEYS: Record<AiProviderId, string> = {
   kimi: "KIMI_API_KEY",
   deepseek: "DEEPSEEK_API_KEY",
   anthropic: "ANTHROPIC_API_KEY",
+  qwen: "QWEN_API_KEY",
+  nvidia: "NVIDIA_API_KEY",
 };
 
 const VALID_PROVIDER_IDS = Object.keys(PROVIDER_ENV_KEYS) as AiProviderId[];

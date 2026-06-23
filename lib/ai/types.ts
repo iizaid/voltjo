@@ -5,7 +5,14 @@
 
 // User-facing model selector in the chat UI. These are friendly labels, not
 // raw provider ids; the registry maps each to a concrete provider.
-export type AiModelId = "voltjo" | "gemini" | "kimi";
+export type AiModelId =
+  | "voltjo"
+  | "gemini"
+  | "deepseek"
+  | "kimi"
+  | "nvidia"
+  | "qwen"
+  | "openai";
 
 // Concrete backend providers. Adding one here + a provider file + registry entry
 // is all that is required to onboard a new vendor.
@@ -14,7 +21,9 @@ export type AiProviderId =
   | "openai"
   | "kimi"
   | "deepseek"
-  | "anthropic";
+  | "anthropic"
+  | "qwen"
+  | "nvidia";
 
 export type AiChatAttachment = {
   id: string;
@@ -77,6 +86,12 @@ export type AiProviderHealth = {
 export type AiGenerationContext = {
   systemPrompt: string;
   requestId: string;
+  /**
+   * Request-level cancellation signal. When aborted (timeout or client
+   * disconnect) providers MUST cancel in-flight fetches, retries, and backoff so
+   * no upstream call is orphaned. Optional for backward compatibility.
+   */
+  signal?: AbortSignal;
 };
 
 export interface AiProvider {

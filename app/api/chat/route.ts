@@ -1,5 +1,6 @@
 import { generateAiChatResponse } from "@/lib/ai/provider";
 import { getAiConfig } from "@/lib/ai/config";
+import { checkAiBudget, recordAiUsage } from "@/lib/ai/cost-control";
 import { AiError, userMessageForAiError, type AiErrorCode } from "@/lib/ai/errors";
 import { validateAiChatRequest } from "@/lib/ai/validation";
 import {
@@ -10,23 +11,11 @@ import {
 import { getCurrentUser } from "@/lib/server/auth";
 import { apiError, apiSuccess } from "@/lib/server/api-response";
 import { checkRateLimit } from "@/lib/server/rate-limit";
+import { getClientIp } from "@/lib/server/client-ip";
 import { readJsonWithByteLimit } from "@/lib/server/request-body";
-import { withTimeout } from "@/lib/server/timeout";
+import { combineAbortSignals, runWithAbortableTimeout } from "@/lib/server/timeout";
 
 const MAX_CHAT_API_BODY_BYTES = 12 * 1024;
-
-function getIpFromRequest(request: Request) {
-  const forwardedFor = request.headers.get("x-forwarded-for");
-  if (forwardedFor) {
-    const firstIp = forwardedFor.split(",")[0]?.trim();
-    if (firstIp) return firstIp;
-  }
-
-  const realIp = request.headers.get("x-real-ip");
-  if (realIp) return realIp.trim();
-
-  return "unknown";
-}
 
 function buildRateLimitHeaders(limit: number, remaining: number, resetAt: number) {
   return {
@@ -81,7 +70,7 @@ function statusForAiError(code: AiErrorCode): number {
 }
 
 export async function POST(request: Request) {
-  const ip = getIpFromRequest(request);
+  const ip = getClientIp(request);
   const requestId = crypto.randomUUID();
   const contentLength = request.headers.get("content-length");
   if (contentLength) {
@@ -184,6 +173,22 @@ export async function POST(request: Request) {
     });
   }
 
+  // Cost protection: refuse before any spend (and before creating a conversation)
+  // when a daily budget is exhausted or the emergency breaker is open.
+  const actor: "user" | "anon" = user ? "user" : "anon";
+  const budget = await checkAiBudget({ actor, userId: user?.id ?? null, ip });
+  if (!budget.ok) {
+    return apiError({
+      code: "AI_BUDGET_EXHAUSTED",
+      message: budget.message,
+      status: 429,
+      headers: {
+        "Cache-Control": "no-store, max-age=0",
+        "Retry-After": "3600",
+      },
+    });
+  }
+
   try {
     let persistedConversationId: string | null = null;
     let canPersistAssistantMessage = false;
@@ -230,13 +235,26 @@ export async function POST(request: Request) {
       }
     }
 
-    const message = await withTimeout({
-      promise: generateAiChatResponse(validation.data, {
-        actor: user ? "user" : "anon",
-        requestId,
-      }),
+    const message = await runWithAbortableTimeout({
       timeoutMs: 45_000,
       errorMessage: "AI provider timed out",
+      work: (timeoutSignal) =>
+        generateAiChatResponse(validation.data, {
+          actor,
+          requestId,
+          // Cancel the provider when EITHER our deadline elapses OR the client
+          // disconnects — no orphaned Gemini calls survive past the request.
+          signal: combineAbortSignals(timeoutSignal, request.signal),
+        }),
+    });
+
+    // Cost accounting: charge the tokens this request actually consumed so daily
+    // budgets and the global circuit breaker stay accurate.
+    await recordAiUsage({
+      actor,
+      userId: user?.id ?? null,
+      ip,
+      tokens: message.metadata.usage?.totalTokens ?? null,
     });
 
     if (user && persistedConversationId && canPersistAssistantMessage) {

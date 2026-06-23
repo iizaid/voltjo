@@ -37,12 +37,15 @@ function sanitizeConversationTitle(title: string) {
 async function touchChatConversation(
   supabase: NonNullable<Awaited<ReturnType<typeof createClient>>>,
   conversationId: string,
+  userId: string,
 ) {
   try {
     await supabase
       .from("chat_conversations")
       .update({ updated_at: new Date().toISOString() })
-      .eq("id", conversationId);
+      .eq("id", conversationId)
+      // Defense-in-depth: explicit ownership filter on top of RLS.
+      .eq("user_id", userId);
   } catch {
     // Touching updated_at is best-effort only in this phase.
   }
@@ -122,7 +125,7 @@ export async function createChatMessage(input: {
     return { ok: false, error: "Failed to create chat message." };
   }
 
-  await touchChatConversation(supabase, input.conversationId);
+  await touchChatConversation(supabase, input.conversationId, user.id);
 
   return { ok: true, data };
 }
@@ -139,6 +142,8 @@ export async function findOwnedChatConversation(
     .from("chat_conversations")
     .select("id")
     .eq("id", conversationId)
+    // Defense-in-depth: explicit ownership filter on top of RLS.
+    .eq("user_id", user.id)
     .maybeSingle();
 
   if (selectError) {
@@ -159,6 +164,8 @@ export async function listUserChatConversations(): Promise<
   const { data, error: selectError } = await supabase
     .from("chat_conversations")
     .select("*")
+    // Defense-in-depth: explicit ownership filter on top of RLS.
+    .eq("user_id", user.id)
     .order("updated_at", { ascending: false });
 
   if (selectError || !data) {
@@ -180,6 +187,8 @@ export async function listConversationMessages(
     .from("chat_messages")
     .select("*")
     .eq("conversation_id", conversationId)
+    // Defense-in-depth: explicit ownership filter on top of RLS.
+    .eq("user_id", user.id)
     .order("created_at", { ascending: true });
 
   if (selectError || !data) {
@@ -200,7 +209,9 @@ export async function deleteChatConversation(
   const { error: deleteError } = await supabase
     .from("chat_conversations")
     .delete()
-    .eq("id", conversationId);
+    .eq("id", conversationId)
+    // Defense-in-depth: explicit ownership filter on top of RLS.
+    .eq("user_id", user.id);
 
   if (deleteError) {
     return { ok: false, error: "Failed to delete chat conversation." };
@@ -227,6 +238,8 @@ export async function renameChatConversation(
     .from("chat_conversations")
     .update({ title: nextTitle })
     .eq("id", conversationId)
+    // Defense-in-depth: explicit ownership filter on top of RLS.
+    .eq("user_id", user.id)
     .select("*")
     .single();
 

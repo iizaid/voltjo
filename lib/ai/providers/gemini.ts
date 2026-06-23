@@ -76,8 +76,23 @@ function extractUsage(body: GeminiResponseBody): AiTokenUsage {
   };
 }
 
-function sleep(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+/** Sleep that resolves early (rejects) if the external signal aborts mid-backoff. */
+function sleep(ms: number, signal?: AbortSignal): Promise<void> {
+  return new Promise((resolve, reject) => {
+    if (signal?.aborted) {
+      reject(new AiError("TIMEOUT", "Aborted during backoff.", { providerId: "gemini" }));
+      return;
+    }
+    const timer = setTimeout(() => {
+      signal?.removeEventListener("abort", onAbort);
+      resolve();
+    }, ms);
+    const onAbort = () => {
+      clearTimeout(timer);
+      reject(new AiError("TIMEOUT", "Aborted during backoff.", { providerId: "gemini" }));
+    };
+    signal?.addEventListener("abort", onAbort, { once: true });
+  });
 }
 
 async function callGeminiOnce(
@@ -85,9 +100,17 @@ async function callGeminiOnce(
   model: string,
   payload: unknown,
   timeoutMs: number,
+  externalSignal?: AbortSignal,
 ): Promise<GeminiResponseBody> {
+  // Per-attempt timeout, combined with the request-level signal so EITHER the
+  // local deadline OR an upstream cancellation aborts the in-flight fetch.
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
+  const onExternalAbort = () => controller.abort();
+  if (externalSignal) {
+    if (externalSignal.aborted) controller.abort();
+    else externalSignal.addEventListener("abort", onExternalAbort, { once: true });
+  }
 
   try {
     const res = await fetch(
@@ -134,6 +157,7 @@ async function callGeminiOnce(
     });
   } finally {
     clearTimeout(timer);
+    externalSignal?.removeEventListener("abort", onExternalAbort);
   }
 }
 
@@ -151,12 +175,19 @@ async function generateChatResponse(
   const config = getAiConfig();
   const model = resolveModel();
   const payload = buildRequestBody(request, context);
+  const signal = context.signal;
 
   let lastError: AiError | null = null;
 
   for (let attempt = 0; attempt <= config.maxRetries; attempt++) {
+    // Honor a request-level cancellation before starting another attempt.
+    if (signal?.aborted) {
+      throw new AiError("TIMEOUT", "Gemini request aborted (deadline).", {
+        providerId: "gemini",
+      });
+    }
     try {
-      const body = await callGeminiOnce(apiKey, model, payload, config.timeoutMs);
+      const body = await callGeminiOnce(apiKey, model, payload, config.timeoutMs, signal);
 
       if (body.promptFeedback?.blockReason) {
         throw new AiError("SAFETY", `Blocked: ${body.promptFeedback.blockReason}`, {
@@ -195,7 +226,8 @@ async function generateChatResponse(
         throw lastError;
       }
       // Exponential backoff with jitter before retrying a retryable failure.
-      await sleep(250 * 2 ** attempt + Math.random() * 100);
+      // Abortable: a request-level timeout interrupts the wait immediately.
+      await sleep(250 * 2 ** attempt + Math.random() * 100, signal);
     }
   }
 

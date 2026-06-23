@@ -1,5 +1,7 @@
 export type VehicleType = "ev" | "phev" | "hev";
 export type VehicleConfidence = "official" | "dealer" | "owner_reported" | "estimate";
+export type VehicleDrivetrain = "fwd" | "rwd" | "awd";
+export type VehicleAvailability = "available" | "preorder" | "discontinued" | "unconfirmed";
 
 export type VehicleBrand = {
   id: string;
@@ -37,6 +39,15 @@ export type SupportedVehicle = {
   chargingPort: string | null;
   dcFastCharging: boolean | null;
   homeChargingSupported: boolean | null;
+  drivetrain: VehicleDrivetrain | null;
+  acChargeKw: number | null;
+  dcChargeKw: number | null;
+  efficiencyKwh100km: number | null;
+  charge1080Min: number | null;
+  availability: VehicleAvailability;
+  useCaseTags: string[];
+  strengthsAr: string[];
+  weaknessesAr: string[];
   summaryAr: string | null;
   jordanNotesAr: string | null;
   dataConfidence: VehicleConfidence;

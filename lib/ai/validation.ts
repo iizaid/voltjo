@@ -4,12 +4,13 @@ import {
   MAX_CHAT_MESSAGE_LENGTH,
 } from "@/lib/chat/constants";
 import type { AiChatRequest, AiModelId } from "@/lib/ai/types";
+import { CHAT_MODELS } from "@/lib/ai/model-display";
 
 type ValidationResult =
   | { ok: true; data: AiChatRequest }
   | { ok: false; code: string; message: string; status: number };
 
-const VALID_MODELS: AiModelId[] = ["voltjo", "gemini", "kimi"];
+const VALID_MODELS: AiModelId[] = CHAT_MODELS.map((model) => model.id);
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 

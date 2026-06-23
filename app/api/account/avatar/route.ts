@@ -5,6 +5,7 @@ import {
   MAX_AVATAR_IMAGE_SIZE_BYTES,
 } from "@/lib/account/settings";
 import { checkRateLimit } from "@/lib/server/rate-limit";
+import { getClientIp } from "@/lib/server/client-ip";
 import { createClient } from "@/lib/supabase/server";
 
 const AVATAR_BUCKET = "avatars";
@@ -16,19 +17,6 @@ const MAX_AVATAR_REQUEST_BYTES = MAX_AVATAR_IMAGE_SIZE_BYTES + 256 * 1024;
 // crypto.randomUUID() is a Node global in this (Node runtime) route — no new dependency.
 function getAvatarPath(userId: string, extension: string) {
   return `${userId}/${crypto.randomUUID()}.${extension}`;
-}
-
-function getIpFromRequest(request: Request) {
-  const forwardedFor = request.headers.get("x-forwarded-for");
-  if (forwardedFor) {
-    const firstIp = forwardedFor.split(",")[0]?.trim();
-    if (firstIp) return firstIp;
-  }
-
-  const realIp = request.headers.get("x-real-ip");
-  if (realIp) return realIp.trim();
-
-  return "unknown";
 }
 
 function isSchemaMissingError(error: { code?: string | null; message?: string | null }) {
@@ -113,7 +101,7 @@ export async function POST(request: Request) {
   }
 
   const rateLimit = await checkRateLimit({
-    key: user?.id || getIpFromRequest(request),
+    key: user?.id || getClientIp(request),
     action: "avatar-upload",
     limit: 5,
     windowMs: 10 * 60 * 1000,

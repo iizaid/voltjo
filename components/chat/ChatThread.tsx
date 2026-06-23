@@ -5,6 +5,7 @@ import { ChatComposer } from "@/components/chat/ChatComposer";
 import { ChatMessage } from "@/components/chat/ChatMessage";
 import type { ChatMessage as ChatMessageType, ChatAttachment } from "@/lib/chat/types";
 import { motion, AnimatePresence } from "motion/react";
+import type { ModelDisplay } from "@/lib/ai/model-display";
 
 export function ChatThread({
   messages,
@@ -36,8 +37,8 @@ export function ChatThread({
   attachment: ChatAttachment | null;
   onAttachmentChange: (att: ChatAttachment | null) => void;
   onNotice: (message: string) => void;
-  selectedModel: { id: string; name: string; description: string };
-  onModelChange: (model: { id: string; name: string; description: string }) => void;
+  selectedModel: ModelDisplay;
+  onModelChange: (model: ModelDisplay) => void;
   typingMessageId: string | null;
   thinkingMode: boolean;
   onThinkingModeChange: (enabled: boolean) => void;

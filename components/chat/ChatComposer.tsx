@@ -10,6 +10,10 @@ import {
   Paperclip,
   Plus,
   X,
+  Sparkles,
+  Brain,
+  Compass,
+  Cpu,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
@@ -22,7 +26,25 @@ import {
   MAX_CHAT_ATTACHMENT_SIZE_BYTES,
   MAX_CHAT_MESSAGE_LENGTH,
 } from "@/lib/chat/constants";
-import { CHAT_MODELS } from "@/components/chat/ChatShell";
+import { CHAT_MODELS, type ModelDisplay } from "@/lib/ai/model-display";
+
+function getModelIcon(iconName: string, size = 16) {
+  const cls = "shrink-0";
+  switch (iconName) {
+    case "voltjo":
+      return <Sparkles size={size} className={`text-[var(--voltjo-orange)] ${cls}`} />;
+    case "google":
+      return <Sparkles size={size} className={`text-blue-500 ${cls}`} />;
+    case "deepseek":
+      return <Brain size={size} className={`text-purple-500 ${cls}`} />;
+    case "kimi":
+      return <Compass size={size} className={`text-emerald-500 ${cls}`} />;
+    case "nvidia":
+      return <Cpu size={size} className={`text-[#76b900] ${cls}`} />;
+    default:
+      return <Sparkles size={size} className={`text-[#6F6A60] ${cls}`} />;
+  }
+}
 
 export function ChatComposer({
   value,
@@ -44,8 +66,8 @@ export function ChatComposer({
   attachment?: ChatAttachment | null;
   onAttachmentChange?: (att: ChatAttachment | null) => void;
   onNotice?: (message: string) => void;
-  selectedModel: { id: string; name: string; description: string };
-  onModelChange: (model: { id: string; name: string; description: string }) => void;
+  selectedModel: ModelDisplay;
+  onModelChange: (model: ModelDisplay) => void;
   thinkingMode: boolean;
   onThinkingModeChange: (enabled: boolean) => void;
 }) {
@@ -57,6 +79,80 @@ export function ChatComposer({
   
   const [modelSelectorOpen, setModelSelectorOpen] = useState(false);
   const modelRef = useRef<HTMLDivElement>(null);
+  const modelTriggerRef = useRef<HTMLButtonElement>(null);
+  const optionRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const [focusedModelIndex, setFocusedModelIndex] = useState(0);
+
+  // Indices of selectable (non coming-soon) models — the keyboard nav order.
+  const selectableModelIndices = CHAT_MODELS.reduce<number[]>((acc, model, index) => {
+    if (!model.comingSoon) acc.push(index);
+    return acc;
+  }, []);
+
+  const openModelSelector = () => {
+    const selectedIndex = CHAT_MODELS.findIndex((m) => m.id === selectedModel.id);
+    const startIndex =
+      selectedIndex >= 0 && !CHAT_MODELS[selectedIndex].comingSoon
+        ? selectedIndex
+        : (selectableModelIndices[0] ?? 0);
+    setFocusedModelIndex(startIndex);
+    setModelSelectorOpen(true);
+  };
+
+  const closeModelSelector = (returnFocus = false) => {
+    setModelSelectorOpen(false);
+    if (returnFocus) modelTriggerRef.current?.focus();
+  };
+
+  const moveModelFocus = (direction: 1 | -1) => {
+    const pos = selectableModelIndices.indexOf(focusedModelIndex);
+    const safePos = pos === -1 ? 0 : pos;
+    const next =
+      selectableModelIndices[
+        (safePos + direction + selectableModelIndices.length) % selectableModelIndices.length
+      ];
+    setFocusedModelIndex(next);
+  };
+
+  // Move DOM focus to the active option whenever it changes while open.
+  useEffect(() => {
+    if (modelSelectorOpen) optionRefs.current[focusedModelIndex]?.focus();
+  }, [modelSelectorOpen, focusedModelIndex]);
+
+  const handleModelListKeyDown = (event: React.KeyboardEvent) => {
+    switch (event.key) {
+      case "ArrowDown":
+        event.preventDefault();
+        moveModelFocus(1);
+        break;
+      case "ArrowUp":
+        event.preventDefault();
+        moveModelFocus(-1);
+        break;
+      case "Home":
+        event.preventDefault();
+        setFocusedModelIndex(selectableModelIndices[0] ?? 0);
+        break;
+      case "End":
+        event.preventDefault();
+        setFocusedModelIndex(selectableModelIndices[selectableModelIndices.length - 1] ?? 0);
+        break;
+      case "Escape":
+        event.preventDefault();
+        closeModelSelector(true);
+        break;
+      case "Enter":
+      case " ": {
+        event.preventDefault();
+        const model = CHAT_MODELS[focusedModelIndex];
+        if (model && !model.comingSoon) {
+          onModelChange(model);
+          closeModelSelector(true);
+        }
+        break;
+      }
+    }
+  };
 
   const handleSubmit = () => {
     onSubmit(value);
@@ -268,53 +364,126 @@ export function ChatComposer({
             <div className="flex min-w-0 items-center gap-1.5">
               <div className="relative" ref={modelRef} dir="rtl">
                 <button
+                  ref={modelTriggerRef}
                   type="button"
-                  onClick={() => setModelSelectorOpen(!modelSelectorOpen)}
-                  className="flex h-9 items-center gap-1.5 rounded-xl px-2.5 text-[13px] font-semibold text-[#1F1F1D] transition hover:bg-[#F8F7F4]"
+                  aria-haspopup="listbox"
+                  aria-expanded={modelSelectorOpen}
+                  aria-label={`النموذج المحدد: ${selectedModel.displayName}. اضغط لتغيير النموذج`}
+                  onClick={() => (modelSelectorOpen ? closeModelSelector() : openModelSelector())}
+                  onKeyDown={(event) => {
+                    if (!modelSelectorOpen && (event.key === "ArrowDown" || event.key === "Enter" || event.key === " ")) {
+                      event.preventDefault();
+                      openModelSelector();
+                    }
+                  }}
+                  className="flex h-9 items-center gap-1.5 rounded-xl px-2.5 text-[13px] font-semibold text-[#1F1F1D] transition hover:bg-[#F8F7F4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(255,106,0,0.4)]"
                 >
-                  <span dir="ltr">{selectedModel.name}</span>
+                  <span className="flex items-center gap-1.5">
+                    {getModelIcon(selectedModel.icon, 15)}
+                    <span dir="ltr">{selectedModel.displayName}</span>
+                  </span>
                   <ChevronDown
                     size={13}
-                    className={`text-[#6F6A60] transition ${modelSelectorOpen ? "rotate-180" : ""}`}
+                    className={`text-[#6F6A60] transition-transform duration-200 ${modelSelectorOpen ? "rotate-180" : ""}`}
                   />
                 </button>
 
                 <AnimatePresence>
                   {modelSelectorOpen && (
                     <motion.div
-                      initial={{ opacity: 0, y: 4, scale: 0.98 }}
+                      initial={{ opacity: 0, y: 6, scale: 0.97 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 4, scale: 0.98 }}
-                      transition={{ duration: 0.15, ease: "easeOut" }}
-                      className="absolute bottom-full right-0 z-50 mb-2 w-[280px] overflow-hidden rounded-2xl border border-[rgba(13,13,13,0.08)] bg-white p-1.5 shadow-[0_18px_45px_rgba(31,31,29,0.12)]"
+                      exit={{ opacity: 0, y: 6, scale: 0.97 }}
+                      transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+                      role="listbox"
+                      aria-label="اختيار نموذج الذكاء الاصطناعي"
+                      aria-activedescendant={`model-option-${CHAT_MODELS[focusedModelIndex]?.id}`}
+                      onKeyDown={handleModelListKeyDown}
+                      className="absolute bottom-full right-0 z-50 mb-2.5 w-[clamp(280px,90vw,340px)] overflow-hidden rounded-3xl border border-[rgba(13,13,13,0.08)] bg-[#FEFEFC] p-2 shadow-[0_24px_60px_rgba(31,31,29,0.16)]"
                     >
-                      {CHAT_MODELS.map((model) => (
-                        <button
-                          key={model.id}
-                          type="button"
-                          onClick={() => {
-                            onModelChange(model);
-                            setModelSelectorOpen(false);
-                          }}
-                          className={`flex w-full items-start justify-between gap-3 rounded-xl px-3 py-2.5 text-right transition ${
-                            selectedModel.id === model.id 
-                              ? "bg-[rgba(255,106,0,0.075)] text-[#1F1F1D]" 
-                              : "text-[#6F6A60] hover:bg-[#F8F7F4] hover:text-[#1F1F1D]"
-                          }`}
-                        >
-                          <span className="min-w-0">
-                            <span className="block text-[13px] font-bold" dir="ltr">
-                              {model.name}
-                            </span>
-                            <span className="mt-0.5 block text-[11px] font-semibold leading-5 text-[#6F6A60]">
-                              {model.description}
-                            </span>
-                          </span>
-                          {selectedModel.id === model.id ? (
-                            <Check size={15} className="mt-1 shrink-0 text-[var(--voltjo-orange)]" />
-                          ) : null}
-                        </button>
-                      ))}
+                      <p className="px-2.5 pb-1.5 pt-1 text-[11px] font-bold uppercase tracking-wide text-[#A8A296]">
+                        اختر النموذج
+                      </p>
+                      <div className="max-h-[min(60vh,380px)] space-y-1 overflow-y-auto">
+                        {CHAT_MODELS.map((model, index) => {
+                          const isSelected = selectedModel.id === model.id;
+                          const isComingSoon = model.comingSoon;
+
+                          return (
+                            <button
+                              key={model.id}
+                              id={`model-option-${model.id}`}
+                              ref={(el) => {
+                                optionRefs.current[index] = el;
+                              }}
+                              type="button"
+                              role="option"
+                              aria-selected={isSelected}
+                              aria-disabled={isComingSoon}
+                              tabIndex={-1}
+                              onClick={() => {
+                                if (!isComingSoon) {
+                                  onModelChange(model);
+                                  closeModelSelector(true);
+                                }
+                              }}
+                              onMouseEnter={() => !isComingSoon && setFocusedModelIndex(index)}
+                              className={`group flex w-full items-start gap-3 rounded-2xl px-3 py-3 text-right transition-colors duration-150 focus-visible:outline-none ${
+                                isComingSoon
+                                  ? "cursor-not-allowed opacity-55"
+                                  : isSelected
+                                    ? "bg-[#FFF1E8] ring-1 ring-[rgba(255,106,0,0.28)]"
+                                    : "hover:bg-[#F4F2EC] focus-visible:bg-[#F4F2EC]"
+                              }`}
+                            >
+                              <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white shadow-[0_2px_6px_rgba(31,31,29,0.05)] ring-1 ring-[rgba(13,13,13,0.05)]">
+                                {getModelIcon(model.icon, 18)}
+                              </span>
+
+                              <span className="min-w-0 flex-1">
+                                <span className="flex items-center gap-2">
+                                  <span className="text-[14px] font-bold text-[#1F1F1D]" dir="ltr">
+                                    {model.displayName}
+                                  </span>
+                                  {model.recommended && (
+                                    <span className="inline-flex items-center rounded-full bg-[var(--voltjo-orange)] px-2 py-0.5 text-[9px] font-black text-white">
+                                      موصى به
+                                    </span>
+                                  )}
+                                  {isComingSoon && (
+                                    <span className="inline-flex items-center rounded-full border border-[rgba(31,31,29,0.12)] bg-[#F2F0EA] px-2 py-0.5 text-[9px] font-black text-[#8A8478]">
+                                      قريباً
+                                    </span>
+                                  )}
+                                </span>
+
+                                <span className="mt-1 block text-[11.5px] font-medium leading-5 text-[#6F6A60]">
+                                  {model.description}
+                                </span>
+
+                                {model.tags.length > 0 && (
+                                  <span className="mt-2 flex flex-wrap gap-1.5">
+                                    {model.tags.map((tag) => (
+                                      <span
+                                        key={tag}
+                                        className="inline-flex items-center rounded-md bg-[#F2F0EA] px-1.5 py-0.5 text-[10px] font-bold text-[#6F6A60] group-hover:bg-white"
+                                      >
+                                        {tag}
+                                      </span>
+                                    ))}
+                                  </span>
+                                )}
+                              </span>
+
+                              <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center">
+                                {isSelected && (
+                                  <Check size={16} className="text-[var(--voltjo-orange)]" strokeWidth={3} />
+                                )}
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
                     </motion.div>
                   )}
                 </AnimatePresence>

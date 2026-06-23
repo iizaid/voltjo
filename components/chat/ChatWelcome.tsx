@@ -4,6 +4,8 @@ import { VoltJoChatMark } from "@/components/chat/VoltJoChatMark";
 import type { ChatAttachment } from "@/lib/chat/types";
 import { motion } from "motion/react";
 
+import type { ModelDisplay } from "@/lib/ai/model-display";
+
 export function ChatWelcome({
   composerValue,
   notice,
@@ -26,8 +28,8 @@ export function ChatWelcome({
   attachment: ChatAttachment | null;
   onAttachmentChange: (att: ChatAttachment | null) => void;
   onNotice: (message: string) => void;
-  selectedModel: { id: string; name: string; description: string };
-  onModelChange: (model: { id: string; name: string; description: string }) => void;
+  selectedModel: ModelDisplay;
+  onModelChange: (model: ModelDisplay) => void;
   thinkingMode: boolean;
   onThinkingModeChange: (enabled: boolean) => void;
 }) {

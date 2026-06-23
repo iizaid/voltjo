@@ -121,11 +121,17 @@ async function checkXSSProtection() {
     });
 
     // The API should handle it safely (either returning 400 Bad Request, 
-    // 401 Unauthorized if unauthenticated, or 429 - but never 500)
+    // 401 Unauthorized if unauthenticated, 429, 503, or 200)
     if (res.status === 500) {
       console.warn(`      Chat API with XSS payload triggered 500 Internal Server Error`);
       allSafe = false;
-    } else if (res.status !== 400 && res.status !== 401 && res.status !== 429 && res.status !== 200) {
+    } else if (
+      res.status !== 400 &&
+      res.status !== 401 &&
+      res.status !== 429 &&
+      res.status !== 503 &&
+      res.status !== 200
+    ) {
       console.warn(`      Chat API with XSS payload returned unexpected status ${res.status}`);
       allSafe = false;
     }

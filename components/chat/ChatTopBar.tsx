@@ -3,12 +3,14 @@
 import { Menu } from "lucide-react";
 import { VoltJoLogo } from "@/components/brand/VoltJoLogo";
 
+import type { ModelDisplay } from "@/lib/ai/model-display";
+
 export function ChatTopBar({
   onOpenSidebar,
   selectedModel,
 }: {
   onOpenSidebar: () => void;
-  selectedModel: { id: string; name: string; description: string };
+  selectedModel: ModelDisplay;
 }) {
   return (
     <header className="flex h-14 shrink-0 items-center justify-between px-4 relative z-10 border-b border-[rgba(13,13,13,0.04)] bg-white/50 backdrop-blur-sm">
@@ -28,7 +30,7 @@ export function ChatTopBar({
           </div>
           <div className="text-center">
             <p className="text-[14px] font-bold text-[#1F1F1D]" dir="ltr">
-              {selectedModel.name}
+              {selectedModel.displayName}
             </p>
             <p className="hidden text-[11px] font-semibold text-[#6F6A60] sm:block">
               مستشار السيارات الكهربائية والهايبرد في الأردن

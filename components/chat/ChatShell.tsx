@@ -5,6 +5,7 @@ import { ChatSidebar } from "@/components/chat/ChatSidebar";
 import { ChatThread } from "@/components/chat/ChatThread";
 import type { ChatConversation, ChatAttachment } from "@/lib/chat/types";
 import { sendChatMessage } from "@/lib/chat/api-client";
+import { CHAT_MODELS, type ModelDisplay } from "@/lib/ai/model-display";
 import {
   loadConversations,
   saveConversations,
@@ -38,25 +39,7 @@ export type ChatAccount = {
   avatarUrl?: string | null;
 };
 
-export const CHAT_MODELS = [
-  {
-    id: "voltjo",
-    name: "VoltJo Max",
-    description: "الأفضل لتحليل السيارات والسوق الأردني",
-  },
-  {
-    id: "gemini",
-    name: "نمط سريع",
-    description: "تجريبي - يستخدم ردود VoltJo التجريبية الآن",
-  },
-  {
-    id: "kimi",
-    name: "نمط موسع",
-    description: "تجريبي - يستخدم ردود VoltJo التجريبية الآن",
-  },
-];
 
-export type ChatModel = (typeof CHAT_MODELS)[number];
 
 export function ChatShell({
   account,
@@ -75,7 +58,7 @@ export function ChatShell({
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [hasHydratedConversations, setHasHydratedConversations] = useState(false);
-  const [selectedModel, setSelectedModel] = useState(CHAT_MODELS[0]);
+  const [selectedModel, setSelectedModel] = useState<ModelDisplay>(CHAT_MODELS[0]);
   const [typingMessageId, setTypingMessageId] = useState<string | null>(null);
   const [thinkingMode, setThinkingMode] = useState(false);
 
