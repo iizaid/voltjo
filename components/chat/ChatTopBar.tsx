@@ -1,6 +1,6 @@
 "use client";
 
-import { Menu } from "lucide-react";
+import { Menu, ChevronDown } from "lucide-react";
 import { VoltJoLogo } from "@/components/brand/VoltJoLogo";
 
 import type { ModelDisplay } from "@/lib/ai/model-display";
@@ -8,9 +8,11 @@ import type { ModelDisplay } from "@/lib/ai/model-display";
 export function ChatTopBar({
   onOpenSidebar,
   selectedModel,
+  onToggleModelSelector,
 }: {
   onOpenSidebar: () => void;
   selectedModel: ModelDisplay;
+  onToggleModelSelector: () => void;
 }) {
   return (
     <header className="flex h-14 shrink-0 items-center justify-between px-4 relative z-10 border-b border-[rgba(13,13,13,0.04)] bg-white/50 backdrop-blur-sm">
@@ -28,11 +30,19 @@ export function ChatTopBar({
           <div className="lg:hidden">
             <VoltJoLogo compact />
           </div>
-          <div className="text-center">
-            <p className="text-[14px] font-bold text-[#1F1F1D]" dir="ltr">
-              {selectedModel.displayName}
-            </p>
-            <p className="hidden text-[11px] font-semibold text-[#6F6A60] sm:block">
+          <div className="flex flex-col items-center">
+            <button
+              type="button"
+              onClick={onToggleModelSelector}
+              className="flex items-center gap-1 rounded-lg px-2 py-0.5 hover:bg-[rgba(31,31,29,0.05)] transition-colors active:scale-[0.98]"
+              aria-label={`تغيير النموذج، الحالي: ${selectedModel.displayName}`}
+            >
+              <span className="text-[14px] font-bold text-[#1F1F1D]" dir="ltr">
+                {selectedModel.displayName}
+              </span>
+              <ChevronDown size={13} className="text-[#6F6A60]" />
+            </button>
+            <p className="hidden text-[11px] font-semibold text-[#6F6A60] sm:block mt-0.5">
               مستشار السيارات الكهربائية والهايبرد في الأردن
             </p>
           </div>

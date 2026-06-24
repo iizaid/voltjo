@@ -1,6 +1,7 @@
 import "server-only";
 
-import { getSupportedVehicleBySlug, listSupportedVehicles } from "@/lib/vehicles/queries";
+import { getSupportedVehicleBySlug } from "@/lib/vehicles/queries";
+import { getCachedVehicleCatalog } from "@/lib/vehicles/catalog-cache";
 import type { SupportedVehicle } from "@/lib/vehicles/types";
 
 function normalizeText(value: string) {
@@ -82,7 +83,7 @@ export async function buildVehicleContextForPrompt(message: string) {
   const normalizedMessage = normalizeText(message);
   if (!normalizedMessage) return null;
 
-  const vehicles = await listSupportedVehicles();
+  const vehicles = await getCachedVehicleCatalog();
   const matches = vehicles.filter((vehicle) => {
     const haystack = normalizeText(
       [vehicle.slug, vehicle.nameAr, vehicle.nameEn, vehicle.brand.nameAr, vehicle.brand.nameEn].join(" "),

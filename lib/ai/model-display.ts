@@ -64,7 +64,12 @@ export const MODEL_DISPLAY_CONFIG: Partial<Record<AiModelId, ModelDisplay>> = {
     displayName: "DeepSeek R1",
     description: "ممتاز للتحليل العميق والاستفسارات التقنية",
     recommended: false,
-    comingSoon: false,
+    // Not yet registered server-side (only Gemini is wired in lib/ai/registry.ts).
+    // Marked coming-soon so the selector never promises an engine the backend
+    // would silently substitute with Gemini. Flip to false once a real DeepSeek
+    // provider is registered AND model-aware routing is wired (see
+    // plans/model-routing-strategy.md, Path B).
+    comingSoon: true,
     tags: ["تفكير عميق", "برمجة"],
     icon: "deepseek",
   },

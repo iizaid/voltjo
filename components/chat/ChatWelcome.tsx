@@ -19,6 +19,8 @@ export function ChatWelcome({
   onModelChange,
   thinkingMode,
   onThinkingModeChange,
+  modelSelectorOpen,
+  onModelSelectorOpenChange,
 }: {
   composerValue: string;
   notice: string | null;
@@ -32,6 +34,8 @@ export function ChatWelcome({
   onModelChange: (model: ModelDisplay) => void;
   thinkingMode: boolean;
   onThinkingModeChange: (enabled: boolean) => void;
+  modelSelectorOpen: boolean;
+  onModelSelectorOpenChange: (open: boolean) => void;
 }) {
   return (
     <section className="mx-auto flex w-full max-w-[820px] flex-col items-center text-center" dir="rtl">
@@ -84,6 +88,8 @@ export function ChatWelcome({
           onModelChange={onModelChange}
           thinkingMode={thinkingMode}
           onThinkingModeChange={onThinkingModeChange}
+          modelSelectorOpen={modelSelectorOpen}
+          onModelSelectorOpenChange={onModelSelectorOpenChange}
         />
         {notice ? (
           <p className="mx-auto mt-3 max-w-[820px] text-center text-[12px] font-medium text-[#6F6A60]">

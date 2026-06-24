@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Paperclip } from "lucide-react";
+import { Paperclip, RotateCcw } from "lucide-react";
 import { motion } from "motion/react";
 import { AssistantTypingText } from "@/components/chat/AssistantTypingText";
 import { VoltJoChatMark } from "@/components/chat/VoltJoChatMark";
@@ -11,10 +11,14 @@ export function ChatMessage({
   message,
   animateAssistant = false,
   onTypingComplete,
+  onRetry,
+  retryDisabled = false,
 }: {
   message: ChatMessageType;
   animateAssistant?: boolean;
   onTypingComplete?: (id: string) => void;
+  onRetry?: (id: string) => void;
+  retryDisabled?: boolean;
 }) {
   const isUser = message.role === "user";
   const [typingComplete, setTypingComplete] = useState(!animateAssistant);
@@ -58,10 +62,21 @@ export function ChatMessage({
     return (
       <article className="flex w-full justify-end" data-role="assistant">
         <div
-          className="max-w-[min(680px,90%)] rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-right text-[13px] font-medium leading-7 text-red-700"
+          className="flex max-w-[min(680px,90%)] flex-col items-end gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-right text-[13px] font-medium leading-7 text-red-700"
           dir="rtl"
         >
-          {message.content || "حدث خطأ غير متوقع. حاول مرة أخرى."}
+          <span>{message.content || "حدث خطأ غير متوقع. حاول مرة أخرى."}</span>
+          {onRetry ? (
+            <button
+              type="button"
+              onClick={() => onRetry(message.id)}
+              disabled={retryDisabled}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-white px-3 py-1.5 text-[12px] font-bold text-red-600 shadow-sm transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <RotateCcw size={13} />
+              إعادة المحاولة
+            </button>
+          ) : null}
         </div>
       </article>
     );

@@ -163,7 +163,10 @@ export function ChatSidebar({
       )}
 
       {/* ── Header ── */}
-      <div className="flex items-center justify-between gap-3 px-4 pt-5 pb-2">
+      <div
+        className="flex items-center justify-between gap-3 px-4 pb-2"
+        style={{ paddingTop: "calc(1.25rem + env(safe-area-inset-top, 0px))" }}
+      >
         <div className="cursor-pointer">
           <div className="lg:hidden">
             <VoltJoLogo />
@@ -269,7 +272,9 @@ export function ChatSidebar({
                       type="button"
                       aria-label="حذف المحادثة"
                       onClick={(e) => { e.stopPropagation(); setConfirmingDeleteId(conversation.id); }}
-                      className="absolute left-2 hidden p-1.5 text-[#6F6A60] transition hover:text-red-500 group-hover:block"
+                      // Always visible in the mobile/tablet drawer (touch has no
+                      // :hover); hover-revealed only on desktop (lg+).
+                      className="absolute left-2 block p-1.5 text-[#6F6A60] transition hover:text-red-500 lg:hidden lg:group-hover:block"
                     >
                       <Trash2 size={13} />
                     </button>
@@ -286,7 +291,11 @@ export function ChatSidebar({
       </div>
 
       {/* ── Simplified Account Footer ── */}
-      <div className="relative border-t border-[rgba(31,31,29,0.08)] p-3" ref={menuRef}>
+      <div
+        className="relative border-t border-[rgba(31,31,29,0.08)] p-3"
+        ref={menuRef}
+        style={{ paddingBottom: "calc(0.75rem + env(safe-area-inset-bottom, 0px))" }}
+      >
         <AnimatePresence>
           {accountMenuOpen && !collapsed && (
             <motion.div

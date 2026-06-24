@@ -275,6 +275,102 @@ export function ChatShell({
 
   submitPromptRef.current = submitPrompt;
 
+  // Re-run a failed assistant message in place: find its preceding user turn,
+  // flip the failed bubble back to "sending", call the API again, and replace
+  // it with the result — without adding a duplicate user message.
+  const handleRetryMessage = async (failedMessageId: string) => {
+    if (isLoading) return;
+
+    const conversation = conversations.find((c) =>
+      c.messages.some((m) => m.id === failedMessageId),
+    );
+    if (!conversation) return;
+
+    const failedIndex = conversation.messages.findIndex((m) => m.id === failedMessageId);
+    if (failedIndex < 1) return;
+
+    // The user turn that produced this assistant message is the prior user message.
+    let userMessage = null as (typeof conversation.messages)[number] | null;
+    for (let i = failedIndex - 1; i >= 0; i--) {
+      if (conversation.messages[i].role === "user") {
+        userMessage = conversation.messages[i];
+        break;
+      }
+    }
+    if (!userMessage) return;
+
+    const targetId = conversation.id;
+    const requestModelId = conversation.messages[failedIndex].metadata?.modelId ?? selectedModel.id;
+    const requestThinkingMode =
+      conversation.messages[failedIndex].metadata?.thinkingMode ?? thinkingMode;
+
+    setNotice(null);
+    setTypingMessageId(null);
+    setIsLoading(true);
+
+    // Flip the failed bubble back to a "sending" placeholder.
+    setConversations((prev) =>
+      prev.map((c) =>
+        c.id === targetId
+          ? {
+              ...c,
+              messages: c.messages.map((m) =>
+                m.id === failedMessageId
+                  ? { ...m, status: "sending" as const, content: "" }
+                  : m,
+              ),
+            }
+          : c,
+      ),
+    );
+
+    try {
+      const response = await sendChatMessage({
+        message: userMessage.content || userMessage.attachment?.name || "مرفق",
+        modelId: requestModelId,
+        thinkingMode: requestThinkingMode,
+        conversationId: conversation.serverId ?? null,
+        attachment: userMessage.attachment ?? null,
+      });
+      const completed = completeAssistantMessage(
+        { ...conversation.messages[failedIndex], status: "sending" },
+        response.message,
+      );
+      setTypingMessageId(completed.id);
+      setConversations((prev) =>
+        prev.map((c) =>
+          c.id === targetId
+            ? {
+                ...c,
+                serverId: response.conversationId ?? c.serverId,
+                messages: c.messages.map((m) => (m.id === failedMessageId ? completed : m)),
+                updatedAt: new Date().toISOString(),
+              }
+            : c,
+        ),
+      );
+    } catch (err) {
+      const errMsg = err instanceof Error ? err.message : undefined;
+      setConversations((prev) =>
+        prev.map((c) =>
+          c.id === targetId
+            ? {
+                ...c,
+                messages: c.messages.map((m) =>
+                  m.id === failedMessageId
+                    ? failAssistantMessage({ ...m, status: "sending" }, errMsg)
+                    : m,
+                ),
+                updatedAt: new Date().toISOString(),
+              }
+            : c,
+        ),
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (!hasHydratedConversations) return;
     if (!initialPrompt?.trim()) return;
@@ -338,6 +434,7 @@ export function ChatShell({
         thinkingMode={thinkingMode}
         onThinkingModeChange={setThinkingMode}
         onAssistantTypingComplete={handleAssistantTypingComplete}
+        onRetryMessage={handleRetryMessage}
       />
     </div>
   );
