@@ -2,6 +2,7 @@
 
 import maplibregl from "maplibre-gl";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { Crosshair, LocateFixed, MapPinned, Navigation, X } from "lucide-react";
 import {
   Map,
@@ -38,6 +39,7 @@ function hasCoordinates(location: ChargingLocation) {
   return typeof location.latitude === "number" && typeof location.longitude === "number";
 }
 
+// Map directions URL
 function buildDirectionsUrl(latitude: number, longitude: number) {
   return `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`;
 }
@@ -133,6 +135,7 @@ export function ChargingMapClient({ locations, isAuthenticated }: Props) {
   const [geoError, setGeoError] = useState<string | null>(null);
   const [saveLocation, setSaveLocation] = useState(false);
   const [transientNotice, setTransientNotice] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
 
   const mappedLocations = useMemo(
     () => locations.filter(hasCoordinates),
@@ -140,6 +143,7 @@ export function ChargingMapClient({ locations, isAuthenticated }: Props) {
   );
 
   useEffect(() => {
+    setMounted(true);
     setPromptVisible(shouldShowPromptInitially());
   }, []);
 
@@ -245,20 +249,20 @@ export function ChargingMapClient({ locations, isAuthenticated }: Props) {
   };
 
   return (
-    <div className="relative" dir="rtl">
+    <div className="relative h-full w-full" dir="rtl">
       {transientNotice ? (
         <div className="pointer-events-none absolute left-1/2 top-4 z-30 -translate-x-1/2 rounded-full border border-[var(--voltjo-border)] bg-white px-4 py-2 text-sm font-semibold text-[var(--voltjo-black)] shadow-[0_12px_30px_rgba(13,13,13,0.08)]">
           {transientNotice}
         </div>
       ) : null}
 
-      <div className="relative overflow-hidden rounded-[28px] border border-[var(--voltjo-border)] bg-white">
+      <div className="relative h-full w-full overflow-hidden bg-[var(--voltjo-bg-soft)]">
         <LocateOverlayButton
           onActivate={handleLocateControl}
           disabled={requestingLocation}
         />
 
-        <div className="relative h-[640px] min-h-[640px] md:h-[740px] md:min-h-[740px]">
+        <div className="relative h-full w-full">
           <Map
             center={[jordanCenter.longitude, jordanCenter.latitude]}
             zoom={jordanCenter.zoom}
@@ -372,8 +376,8 @@ export function ChargingMapClient({ locations, isAuthenticated }: Props) {
         </div>
       </div>
 
-      {promptVisible ? (
-        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/10 p-4">
+      {mounted && promptVisible ? createPortal(
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4" dir="rtl">
           <div className="w-full max-w-[620px] rounded-[24px] border border-[var(--voltjo-border)] bg-white p-6 shadow-[0_20px_60px_rgba(13,13,13,0.12)] sm:p-7">
             <div className="flex items-start justify-between gap-4">
               <div className="text-right">
@@ -438,7 +442,8 @@ export function ChargingMapClient({ locations, isAuthenticated }: Props) {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       ) : null}
     </div>
   );

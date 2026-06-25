@@ -466,9 +466,125 @@ export type Database = {
           },
         ];
       };
+      vehicle_knowledge: {
+        Row: {
+          id: string;
+          vehicle_id: string;
+          category: string;
+          section: string;
+          content: string;
+          source_ref: string | null;
+          source_file: string | null;
+          page_ref: string | null;
+          market: string;
+          confidence: string;
+          confidence_raw: string | null;
+          content_hash: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          vehicle_id: string;
+          category: string;
+          section: string;
+          content: string;
+          source_ref?: string | null;
+          source_file?: string | null;
+          page_ref?: string | null;
+          market?: string;
+          confidence?: string;
+          confidence_raw?: string | null;
+          content_hash: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          vehicle_id?: string;
+          category?: string;
+          section?: string;
+          content?: string;
+          source_ref?: string | null;
+          source_file?: string | null;
+          page_ref?: string | null;
+          market?: string;
+          confidence?: string;
+          confidence_raw?: string | null;
+          content_hash?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_knowledge_vehicle_id_fkey";
+            columns: ["vehicle_id"];
+            isOneToOne: false;
+            referencedRelation: "supported_vehicles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      vehicle_aliases: {
+        Row: {
+          id: string;
+          vehicle_id: string;
+          alias: string;
+          alias_norm: string;
+          lang: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          vehicle_id: string;
+          alias: string;
+          alias_norm: string;
+          lang?: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          vehicle_id?: string;
+          alias?: string;
+          alias_norm?: string;
+          lang?: string;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_aliases_vehicle_id_fkey";
+            columns: ["vehicle_id"];
+            isOneToOne: false;
+            referencedRelation: "supported_vehicles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Functions: {
+      search_vehicle_knowledge: {
+        Args: {
+          p_vehicle_ids: string[];
+          p_query: string;
+          p_category?: string | null;
+          p_limit?: number;
+        };
+        Returns: {
+          id: string;
+          vehicle_id: string;
+          category: string;
+          section: string;
+          content: string;
+          source_ref: string | null;
+          source_file: string | null;
+          page_ref: string | null;
+          confidence: string;
+          confidence_raw: string | null;
+          rank: number;
+        }[];
+      };
+    };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;
   };

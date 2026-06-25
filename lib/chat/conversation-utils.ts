@@ -48,10 +48,35 @@ export function generateConversationTitle(text: string): string {
   if (!trimmed) {
     return "محادثة جديدة";
   }
-  if (trimmed.length > 36) {
-    return trimmed.slice(0, 36) + "…";
+
+  const fillers = new Set([
+    "كيف", "ممكن", "كم", "شو", "ايش", "متى", "وين", "ليش", "هل", "بدي", "اريد", "أريد",
+    "لو", "سمحت", "يعطيك", "العافية", "مرحبا", "سلام", "سؤال", "احكيلي", "عن",
+    "بالله", "يا", "ريت", "مين", "ما", "هي", "هو", "يحتاج", "يأخذ", "بياخذ",
+    "تأخذ", "بتأخذ", "قديش", "وش", "ابي", "تكفى", "ساعة", "وقت", "مدة", "مساعدة", 
+    "استفسار", "اسأل", "أسأل", "رأيك", "اعرف", "أعرف", "معلومات", "تفاصيل",
+    "الرجاء", "ارجوك", "أرجوك", "احسب", "احسبلي", "تحسبلي", "اعطني", "أعطني",
+    "سيارة", "السيارة"
+  ]);
+
+  const words = trimmed.split(/\s+/);
+  const meaningfulWords = words.filter(w => {
+    const cleanWord = w.replace(/^[\W_]+|[\W_]+$/g, '').toLowerCase();
+    return !fillers.has(cleanWord) && cleanWord.length > 0;
+  });
+
+  const finalWords = meaningfulWords.length > 0 ? meaningfulWords : words;
+  const smartTitle = finalWords.slice(0, 4).join(" ");
+
+  if (smartTitle.length < trimmed.length && finalWords.length > 4) {
+    return smartTitle + "…";
   }
-  return trimmed;
+
+  if (smartTitle.length > 32) {
+    return smartTitle.slice(0, 32) + "…";
+  }
+
+  return smartTitle;
 }
 
 /**

@@ -2,15 +2,40 @@ import "server-only";
 
 import { getSupportedVehicleBySlug } from "@/lib/vehicles/queries";
 import { getCachedVehicleCatalog } from "@/lib/vehicles/catalog-cache";
+import { getCachedVehicleAliases } from "@/lib/ai/vehicle-alias-cache";
+import { normalizeArabic, normalizedContains } from "@/lib/ai/normalize-arabic";
+import { detectIntent, type KnowledgeCategory } from "@/lib/ai/intent";
+import {
+  assembleGroundedContext,
+  computeRetrievalConfidence,
+  retrieveKnowledgeChunks,
+} from "@/lib/ai/retrieval";
+import type { Citation, RetrievalConfidence } from "@/lib/ai/types";
 import type { SupportedVehicle } from "@/lib/vehicles/types";
 
-function normalizeText(value: string) {
-  return value
-    .toLowerCase()
-    .replace(/[^\p{L}\p{N}\s-]/gu, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-}
+export type RetrievalOptions = {
+  /** Carry-over subject from prior turns (memory). Used only when nothing matches. */
+  lastVehicleIds?: string[];
+  /** Max chunks for a single-vehicle query (comparison uses 2 per vehicle). */
+  maxChunks?: number;
+};
+
+export type RetrievalResult = {
+  /** Grounded context block, or null when there is nothing verified to inject. */
+  contextText: string | null;
+  citations: Citation[];
+  retrievalConfidence: RetrievalConfidence;
+  matchedVehicleIds: string[];
+  intent: KnowledgeCategory | null;
+};
+
+export const EMPTY_RETRIEVAL: RetrievalResult = {
+  contextText: null,
+  citations: [],
+  retrievalConfidence: "LOW",
+  matchedVehicleIds: [],
+  intent: null,
+};
 
 function buildVehicleSummaryText(vehicle: SupportedVehicle) {
   const priceRange =
@@ -79,21 +104,122 @@ export async function getVehicleContextBySlug(slug: string) {
   return buildVehicleSummaryText(vehicle);
 }
 
-export async function buildVehicleContextForPrompt(message: string) {
-  const normalizedMessage = normalizeText(message);
-  if (!normalizedMessage) return null;
+/**
+ * Detect which supported vehicle(s) a message refers to. Precision-first:
+ *   1. exact alias hit (vehicle_aliases, normalized) — the reliable path;
+ *   2. catalog token fallback on significant tokens (≥4 chars, non-numeric) so a
+ *      stray "3" or "05" cannot false-match;
+ *   3. carry-over subject from prior turns when nothing else matches.
+ * Returns at most 2 ids (comparison cap).
+ */
+function detectVehicleIds(
+  normalizedMessage: string,
+  catalog: SupportedVehicle[],
+  aliases: { vehicleId: string; aliasNorm: string }[],
+  lastVehicleIds?: string[],
+): string[] {
+  const matched = new Set<string>();
 
-  const vehicles = await getCachedVehicleCatalog();
-  const matches = vehicles.filter((vehicle) => {
-    const haystack = normalizeText(
-      [vehicle.slug, vehicle.nameAr, vehicle.nameEn, vehicle.brand.nameAr, vehicle.brand.nameEn].join(" "),
+  // (1) alias match — high precision.
+  for (const alias of aliases) {
+    if (normalizedContains(normalizedMessage, alias.aliasNorm)) matched.add(alias.vehicleId);
+  }
+
+  // (2) catalog token fallback — only when aliases found nothing.
+  if (matched.size === 0) {
+    for (const vehicle of catalog) {
+      const haystack = normalizeArabic(
+        [vehicle.slug.replace(/-/g, " "), vehicle.nameAr, vehicle.nameEn].join(" "),
+      );
+      const significant = haystack
+        .split(" ")
+        .filter((t) => t.length >= 4 && !/^\d+$/.test(t));
+      if (significant.some((token) => normalizedContains(normalizedMessage, token))) {
+        matched.add(vehicle.id);
+      }
+    }
+  }
+
+  // (3) carry-over subject — multi-turn ("وكم سعرها؟" after naming a car).
+  if (matched.size === 0 && lastVehicleIds?.length) {
+    for (const id of lastVehicleIds) matched.add(id);
+  }
+
+  return Array.from(matched).slice(0, 2);
+}
+
+/**
+ * RAG-lite context builder: detect vehicle(s) + intent, retrieve grounded chunks,
+ * gate on confidence, and assemble a token-budgeted, cited context block. Always
+ * resolves (never throws) — retrieval is best-effort and must never block a reply.
+ */
+export async function buildVehicleContextForPrompt(
+  message: string,
+  options: RetrievalOptions = {},
+): Promise<RetrievalResult> {
+  const DEBUG = process.env.RAG_DEBUG === "1";
+  const d = (...a: unknown[]) => DEBUG && console.log("[RAG]", ...a);
+
+  d("incoming message:", message);
+
+  const normalizedMessage = normalizeArabic(message);
+  d("normalized message:", normalizedMessage);
+  if (!normalizedMessage) return EMPTY_RETRIEVAL;
+
+  const [catalog, aliases] = await Promise.all([
+    getCachedVehicleCatalog(),
+    getCachedVehicleAliases(),
+  ]);
+
+  d("alias cache size:", aliases.length);
+
+  const matchedIds = detectVehicleIds(
+    normalizedMessage,
+    catalog,
+    aliases,
+    options.lastVehicleIds,
+  );
+  d("alias matches → vehicle IDs:", matchedIds);
+
+  const intent = detectIntent(message);
+  d("detected intent:", intent);
+
+  const matchedVehicles = catalog.filter((v) => matchedIds.includes(v.id)).slice(0, 2);
+  const finalIds = matchedVehicles.map((v) => v.id);
+  d("matched vehicles:", matchedVehicles.map((v) => v.slug));
+
+  const structuredText = matchedVehicles.length
+    ? matchedVehicles.map(buildVehicleSummaryText).join("\n\n")
+    : null;
+  d("structured vehicle context injected:", !!structuredText);
+
+  let chunks: Awaited<ReturnType<typeof retrieveKnowledgeChunks>> = [];
+  if (matchedVehicles.length === 2) {
+    // Comparison: 2 chunks per vehicle so neither side starves the other.
+    const perVehicle = await Promise.all(
+      matchedVehicles.map((v) =>
+        retrieveKnowledgeChunks({ vehicleIds: [v.id], query: message, category: intent, limit: 2 }),
+      ),
     );
+    chunks = perVehicle.flat();
+  } else if (matchedVehicles.length === 1) {
+    chunks = await retrieveKnowledgeChunks({
+      vehicleIds: finalIds,
+      query: message,
+      category: intent,
+      limit: options.maxChunks ?? 4,
+    });
+  }
 
-    return haystack.split(" ").some((token) => token && normalizedMessage.includes(token));
-  });
+  d("retrieved chunk count:", chunks.length);
+  d("retrieved chunk sections:", chunks.map((c) => c.section));
 
-  if (matches.length === 0) return null;
+  const retrievalConfidence = computeRetrievalConfidence(chunks);
+  d("retrieval confidence:", retrievalConfidence);
 
-  const topMatches = matches.slice(0, 2);
-  return topMatches.map(buildVehicleSummaryText).join("\n\n");
+  const { contextText, citations } = assembleGroundedContext(structuredText, chunks);
+  d("context text length:", contextText?.length ?? 0);
+  d("RAG chunks injected:", chunks.length > 0);
+
+  return { contextText, citations, retrievalConfidence, matchedVehicleIds: finalIds, intent };
 }

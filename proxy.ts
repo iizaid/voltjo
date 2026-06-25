@@ -11,7 +11,7 @@ function isProtectedPath(pathname: string) {
   );
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { url, anonKey } = getSupabaseEnv();
 
   if (!url || !anonKey) {
@@ -27,8 +27,8 @@ export async function middleware(request: NextRequest) {
     cookie.name.startsWith("sb-")
   );
 
-  // Optimization: If no auth cookie exists, anonymous user is assumed.
-  // Bypass getUser() network call entirely.
+  // Optimisation: if no Supabase session cookie exists the user is anonymous.
+  // Skip the getUser() network round-trip entirely.
   if (!hasSessionCookie) {
     if (isProtected) {
       const redirectUrl = new URL("/start", request.url);
@@ -60,7 +60,7 @@ export async function middleware(request: NextRequest) {
           response.cookies.set(name, value, options);
         });
 
-        // Forward cache-control headers emitted by @supabase/ssr so that
+        // Forward Cache-Control headers emitted by @supabase/ssr so that
         // Cloudflare/CDN proxies do not cache responses that set auth cookies.
         Object.entries(headers).forEach(([key, value]) => {
           response.headers.set(key, value);

@@ -66,24 +66,24 @@ export default function TermsPage() {
             {termsSections.map((section) => (
               <section
                 key={section.title}
-                className="rounded-[24px] border border-[var(--voltjo-border)] bg-white p-6 shadow-[0_18px_50px_rgba(13,13,13,0.05)]"
+                className="mb-10"
               >
-                <h2 className="text-2xl font-black text-[var(--voltjo-black)]">
+                <h2 className="mb-4 text-2xl font-bold text-[var(--voltjo-black)]">
                   {section.title}
                 </h2>
-                <p className="mt-4 text-sm font-semibold leading-8 text-[var(--voltjo-muted)]">
+                <p className="text-base font-medium leading-relaxed text-[var(--voltjo-muted)]">
                   {section.body}
                 </p>
               </section>
             ))}
 
-            <section className="rounded-[24px] border border-[rgba(255,106,0,0.18)] bg-[rgba(255,106,0,0.06)] p-6">
-              <h2 className="text-2xl font-black text-[var(--voltjo-black)]">
+            <section className="mb-10">
+              <h2 className="mb-4 text-2xl font-bold text-[var(--voltjo-black)]">
                 التواصل
               </h2>
-              <p className="mt-4 text-sm font-semibold leading-8 text-[var(--voltjo-muted)]">
+              <p className="text-base font-medium leading-relaxed text-[var(--voltjo-muted)]">
                 للأسئلة حول هذه الشروط، راسلنا على{" "}
-                <a href={`mailto:${SUPPORT_EMAIL}`} className="font-black text-[var(--voltjo-orange)] transition hover:underline" dir="ltr">
+                <a href={`mailto:${SUPPORT_EMAIL}`} className="font-bold text-[var(--voltjo-orange)] transition hover:underline" dir="ltr">
                   {SUPPORT_EMAIL}
                 </a>
                 .

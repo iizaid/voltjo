@@ -64,8 +64,16 @@ export function ChatSidebar({
   const [confirmingClearAll, setConfirmingClearAll] = useState(false);
   const [sidebarWidth, setSidebarWidth] = useState<number>(DEFAULT_WIDTH);
   const [isMounted, setIsMounted] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   
   const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 1024);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   useEffect(() => {
     setIsMounted(true);
@@ -145,10 +153,10 @@ export function ChatSidebar({
 
   return (
     <aside
-      style={!collapsed ? { width: sidebarWidth } : undefined}
+      style={!collapsed && isMounted && !isMobile ? { width: sidebarWidth } : undefined}
       className={`fixed inset-y-0 right-0 z-50 flex h-full shrink-0 flex-col border-l border-[rgba(31,31,29,0.08)] bg-[#FAFAFD] transition-[transform] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] lg:static lg:translate-x-0 ${
         collapsed ? "lg:w-[76px]" : ""
-      } ${mobileOpen ? "translate-x-0 w-[288px]" : "translate-x-full lg:translate-x-0 w-[288px]"}`}
+      } ${mobileOpen ? "translate-x-0 w-[260px] sm:w-[288px]" : "translate-x-full lg:translate-x-0 w-[260px] sm:w-[288px]"}`}
       dir="rtl"
     >
       {/* ── Resize handle (desktop only) ── */}
@@ -167,9 +175,9 @@ export function ChatSidebar({
         className="flex items-center justify-between gap-3 px-4 pb-2"
         style={{ paddingTop: "calc(1.25rem + env(safe-area-inset-top, 0px))" }}
       >
-        <div className="cursor-pointer">
+        <div className="cursor-pointer shrink-0">
           <div className="lg:hidden">
-            <VoltJoLogo />
+            <VoltJoLogo compact />
           </div>
           <div className="hidden lg:block">
             {collapsed ? <VoltJoLogo compact /> : <VoltJoLogo />}
@@ -179,16 +187,17 @@ export function ChatSidebar({
           type="button"
           aria-label={collapsed ? "توسيع القائمة" : "طي القائمة"}
           onClick={onToggleCollapse}
-          className="hidden lg:flex h-8 w-8 items-center justify-center rounded-lg text-[#6F6A60] transition hover:bg-[rgba(31,31,29,0.06)]"
+          className="hidden lg:flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[#6F6A60] transition hover:bg-[rgba(31,31,29,0.06)]"
         >
           <ChevronsRight size={17} className={`transition-transform duration-300 ${collapsed ? "rotate-180" : ""}`} />
         </button>
         <button
           type="button"
           onClick={onCloseMobile}
-          className="flex h-8 w-8 items-center justify-center rounded-lg text-[#6F6A60] transition hover:bg-[rgba(31,31,29,0.06)] lg:hidden"
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-neutral-100 text-[#1F1F1D] border border-neutral-200/50 transition hover:bg-neutral-200/50 active:scale-[0.95] lg:hidden"
+          aria-label="إغلاق القائمة"
         >
-          <X size={18} />
+          <X size={15} strokeWidth={2.5} />
         </button>
       </div>
 
@@ -198,7 +207,7 @@ export function ChatSidebar({
           type="button"
           onClick={onNewChat}
           title={collapsed ? "محادثة جديدة" : undefined}
-          className={`flex h-10 w-full items-center gap-2.5 rounded-xl bg-[#1F1F1D] px-3 text-[14px] font-semibold text-white transition hover:-translate-y-0.5 hover:shadow-md ${
+          className={`flex h-10 w-full items-center gap-2.5 rounded-xl border border-[rgba(13,13,13,0.08)] bg-white px-3 text-[14px] font-semibold text-[#1F1F1D] shadow-[0_2px_8px_rgba(31,31,29,0.02)] transition hover:bg-neutral-50 active:scale-[0.98] ${
             collapsed ? "lg:justify-center lg:px-0" : ""
           }`}
         >
@@ -257,7 +266,7 @@ export function ChatSidebar({
                       title={conversation.title}
                       className={`relative flex-1 overflow-hidden rounded-xl border py-2 text-right text-[13px] font-semibold leading-5 transition-colors ${
                         activeId === conversation.id
-                          ? "border-[#1F1F1D] bg-[#1F1F1D] pl-9 pr-3.5 text-white shadow-[0_8px_18px_rgba(31,31,29,0.14)]"
+                          ? "border-neutral-200 bg-neutral-100 pl-9 pr-3.5 text-[#1F1F1D]"
                           : "border-transparent pl-9 pr-3 text-[#6F6A60] hover:border-[rgba(13,13,13,0.06)] hover:bg-[rgba(13,13,13,0.04)] hover:text-[#1F1F1D]"
                       }`}
                     >

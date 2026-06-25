@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import { ChatShell } from "@/components/chat/ChatShell";
 import { resolveAccountAvatarUrl } from "@/lib/account/avatar";
 import { getCurrentUserAndProfile } from "@/lib/auth/session";
@@ -29,6 +30,11 @@ export default async function AssistantPage({ searchParams }: Props) {
   const initialPrompt = trimmedPrompt.length > 0 ? trimmedPrompt : null;
 
   const { user, profile } = await getCurrentUserAndProfile();
+
+  if (!user) {
+    redirect("/start?next=/assistant");
+  }
+
   const label = profile?.full_name || user?.email || undefined;
   const avatarUrl = resolveAccountAvatarUrl(profile);
 

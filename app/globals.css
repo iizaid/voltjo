@@ -790,3 +790,8 @@ input {
     transition-duration: 1ms !important;
   }
 }
+
+/* Hide MapLibre Attribution */
+.maplibregl-ctrl-attrib {
+  display: none !important;
+}

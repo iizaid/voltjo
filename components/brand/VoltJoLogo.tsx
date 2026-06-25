@@ -34,7 +34,7 @@ export function VoltJoLogo({
         <Image
           src={WORDMARK_SRC}
           alt="VoltJo"
-          width={184}
+          width={137}
           height={45}
           className="h-10 w-auto object-contain"
           priority

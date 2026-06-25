@@ -52,9 +52,9 @@ function InfoCard({
   children: ReactNode;
 }) {
   return (
-    <section className="rounded-[24px] border border-[var(--voltjo-border)] bg-white p-6 shadow-[0_18px_50px_rgba(13,13,13,0.05)]">
-      <h2 className="text-2xl font-black text-[var(--voltjo-black)]">{title}</h2>
-      <div className="mt-4 text-sm font-semibold leading-8 text-[var(--voltjo-muted)]">
+    <section className="mb-10">
+      <h2 className="mb-4 text-2xl font-bold text-[var(--voltjo-black)]">{title}</h2>
+      <div className="text-base font-medium leading-relaxed text-[var(--voltjo-muted)]">
         {children}
       </div>
     </section>
@@ -63,9 +63,9 @@ function InfoCard({
 
 function BulletList({ items }: { items: string[] }) {
   return (
-    <ul className="space-y-3">
+    <ul className="list-inside list-disc space-y-3 pr-2 marker:text-[var(--voltjo-orange)]">
       {items.map((item) => (
-        <li key={item} className="rounded-[16px] border border-[var(--voltjo-border-soft)] bg-[#FBFBF9] px-4 py-3">
+        <li key={item} className="leading-relaxed text-[var(--voltjo-muted)]">
           {item}
         </li>
       ))}

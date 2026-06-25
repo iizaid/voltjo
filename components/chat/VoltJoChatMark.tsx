@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 
-const CHAT_MARK_SRC = "/brands/logo.png";
+const CHAT_MARK_SRC = "/logo/VoltJo%20logo%20shape.svg";
 
 export function VoltJoChatMark({
   className = "",

@@ -101,7 +101,13 @@ export function Navbar({ auth }: { auth?: NavbarAuthState | null }) {
         </nav>
 
         {mobileOpen ? (
-          <div className="absolute left-4 right-4 top-[calc(100%+8px)] rounded-[20px] border border-[var(--voltjo-border)] bg-white p-2 shadow-[var(--voltjo-shadow-soft)] lg:hidden">
+          <>
+            <div 
+              className="fixed inset-0 z-30 lg:hidden" 
+              onClick={() => setMobileOpen(false)}
+              aria-hidden="true"
+            />
+            <div className="absolute left-4 right-4 z-40 top-[calc(100%+8px)] rounded-[20px] border border-[var(--voltjo-border)] bg-white p-2 shadow-[var(--voltjo-shadow-soft)] lg:hidden">
             <div className="grid gap-1">
               {navItems.map((item) => (
                 <Link
@@ -156,7 +162,7 @@ export function Navbar({ auth }: { auth?: NavbarAuthState | null }) {
               )}
             </div>
           </div>
-        ) : null}
+        </>) : null}
       </div>
     </div>
   );

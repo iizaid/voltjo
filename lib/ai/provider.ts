@@ -21,7 +21,7 @@ export async function generateAiChatResponse(
   assertAiConfigured(getAiConfig());
   const chain = assertResolvableProvider();
 
-  const systemPrompt = await buildSystemPrompt(request);
+  const { systemPrompt, citations, retrievalConfidence } = await buildSystemPrompt(request);
   const context = {
     systemPrompt,
     requestId: options.requestId,
@@ -53,7 +53,10 @@ export async function generateAiChatResponse(
         actor: options.actor,
         thinkingMode: request.thinkingMode,
       });
-      return { ...response, metadata: { ...response.metadata, latencyMs } };
+      return {
+        ...response,
+        metadata: { ...response.metadata, latencyMs, citations, retrievalConfidence },
+      };
     } catch (error) {
       lastError = error instanceof AiError
         ? error

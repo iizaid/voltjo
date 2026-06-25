@@ -46,6 +46,22 @@ export type AiTokenUsage = {
   totalTokens: number;
 } | null;
 
+/** Retrieval-confidence band for a grounded answer (see retrieval gating). */
+export type RetrievalConfidence = "HIGH" | "MEDIUM" | "LOW";
+
+/**
+ * A citation surfaced alongside an answer. Mirrors the projected columns of a
+ * `vehicle_knowledge` chunk so the UI can render source/page/confidence chips.
+ */
+export type Citation = {
+  section: string;
+  sourceRef: string | null;
+  sourceFile: string | null;
+  pageRef: string | null;
+  confidence: string;
+  confidenceRaw: string | null;
+};
+
 export type AiChatResponse = {
   id: string;
   role: "assistant";
@@ -60,6 +76,10 @@ export type AiChatResponse = {
     model?: string;
     usage?: AiTokenUsage;
     latencyMs?: number;
+    /** Grounded citations injected into the prompt (RAG-lite). Empty when none. */
+    citations?: Citation[];
+    /** Confidence band of the retrieved evidence backing this answer. */
+    retrievalConfidence?: RetrievalConfidence;
   };
 };
 

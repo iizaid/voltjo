@@ -64,6 +64,17 @@ export function Map({
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
 
+    if (maplibregl.getRTLTextPluginStatus() === "unavailable") {
+      maplibregl
+        .setRTLTextPlugin(
+          "https://unpkg.com/@mapbox/mapbox-gl-rtl-text@0.2.3/mapbox-gl-rtl-text.js",
+          true
+        )
+        .catch((err) => {
+          console.error("Error loading MapLibre RTL text plugin:", err);
+        });
+    }
+
     const map = new maplibregl.Map({
       container: containerRef.current,
       style: initialOptionsRef.current.styleUrl,
@@ -87,6 +98,20 @@ export function Map({
   return (
     <MapContext.Provider value={{ map: mapRef.current, isLoaded }}>
       <div ref={containerRef} className={cn("relative h-full w-full", className)}>
+        <style dangerouslySetInnerHTML={{ __html: `
+          .maplibregl-ctrl-attrib,
+          .maplibregl-ctrl-attrib-inner,
+          .maplibregl-attrib,
+          [class*="maplibregl-ctrl-attrib"],
+          [class*="maplibre-ctrl-attrib"] {
+            display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+            height: 0 !important;
+            width: 0 !important;
+            pointer-events: none !important;
+          }
+        `}} />
         {mapRef.current ? children : null}
       </div>
     </MapContext.Provider>
@@ -113,7 +138,7 @@ export function MapControls({
         showZoom: true,
         visualizePitch: true,
       });
-      map.addControl(navigation, "top-left");
+      map.addControl(navigation, "bottom-right");
       controls.push(navigation);
     }
 
@@ -125,7 +150,7 @@ export function MapControls({
         trackUserLocation: false,
         showUserLocation: true,
       });
-      map.addControl(geolocate, "top-left");
+      map.addControl(geolocate, "bottom-right");
       controls.push(geolocate);
     }
 

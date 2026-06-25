@@ -11,9 +11,6 @@ import {
   Plus,
   X,
   Sparkles,
-  Brain,
-  Compass,
-  Cpu,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
@@ -28,23 +25,69 @@ import {
 } from "@/lib/chat/constants";
 import { CHAT_MODELS, type ModelDisplay } from "@/lib/ai/model-display";
 
-function getModelIcon(iconName: string, size = 16) {
-  const cls = "shrink-0";
+export function getModelIcon(iconName: string, size = 16) {
+  const cls = "shrink-0 object-contain rounded-[4px]";
   switch (iconName) {
     case "voltjo":
-      return <Sparkles size={size} className={`text-neutral-800 ${cls}`} />;
+      return (
+        <img
+          src="/logo/VoltJo%20logo%20shape.svg"
+          alt="VoltJo Max"
+          width={size}
+          height={size}
+          style={{ width: `${size}px`, height: `${size}px` }}
+          className={cls}
+        />
+      );
     case "google":
-      return <Sparkles size={size} className={`text-neutral-500 ${cls}`} />;
+      return (
+        <img
+          src="/ai%20models%20icons/google-gemini.svg"
+          alt="Gemini"
+          width={size}
+          height={size}
+          style={{ width: `${size}px`, height: `${size}px` }}
+          className={cls}
+        />
+      );
     case "deepseek":
-      return <Brain size={size} className={`text-neutral-500 ${cls}`} />;
+      return (
+        <img
+          src="/ai%20models%20icons/deepseek.svg"
+          alt="DeepSeek"
+          width={size}
+          height={size}
+          style={{ width: `${size}px`, height: `${size}px` }}
+          className={cls}
+        />
+      );
     case "kimi":
-      return <Compass size={size} className={`text-neutral-500 ${cls}`} />;
+      return (
+        <img
+          src="/ai%20models%20icons/kimi.svg"
+          alt="Kimi"
+          width={size}
+          height={size}
+          style={{ width: `${size}px`, height: `${size}px` }}
+          className={cls}
+        />
+      );
     case "nvidia":
-      return <Cpu size={size} className={`text-neutral-500 ${cls}`} />;
+      return (
+        <img
+          src="/ai%20models%20icons/nvidia-member.svg"
+          alt="Nvidia"
+          width={size}
+          height={size}
+          style={{ width: `${size}px`, height: `${size}px` }}
+          className={cls}
+        />
+      );
     default:
       return <Sparkles size={size} className={`text-neutral-450 ${cls}`} />;
   }
 }
+
 
 export function ChatComposer({
   value,
