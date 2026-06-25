@@ -312,7 +312,7 @@ export function AvatarCustomizer({
 
             <div className="mt-6 grid gap-6 lg:grid-cols-[280px_minmax(0,1fr)] lg:items-start">
               <div className="flex flex-col items-center gap-4">
-                <div className="relative h-64 w-64 overflow-hidden rounded-full bg-[#F4F1EC] shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_18px_42px_rgba(13,13,13,0.08)] ring-1 ring-[rgba(38,38,38,0.06)]">
+                <div className="relative h-64 w-64 overflow-hidden rounded-full bg-[#F4F1EC] shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_4px_24px_rgba(13,13,13,0.18),0_1px_4px_rgba(13,13,13,0.12)] ring-2 ring-[rgba(38,38,38,0.12)]">
                   {localPreviewUrl ? (
                     <img
                       ref={imageRef}

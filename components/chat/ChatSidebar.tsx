@@ -18,6 +18,7 @@ import type { ChatConversation } from "@/lib/chat/types";
 import { getVisibleConversations } from "@/lib/chat/conversation-utils";
 import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "motion/react";
+import { useRouter } from "next/navigation";
 
 const MIN_WIDTH = 220;
 const MAX_WIDTH = 480;
@@ -59,6 +60,7 @@ export function ChatSidebar({
   onSearchChange: (q: string) => void;
   searchInputRef: React.RefObject<HTMLInputElement | null>;
 }) {
+  const router = useRouter();
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
   const [confirmingDeleteId, setConfirmingDeleteId] = useState<string | null>(null);
   const [confirmingClearAll, setConfirmingClearAll] = useState(false);
@@ -266,7 +268,7 @@ export function ChatSidebar({
                       title={conversation.title}
                       className={`relative flex-1 overflow-hidden rounded-xl border py-2 text-right text-[13px] font-semibold leading-5 transition-colors ${
                         activeId === conversation.id
-                          ? "border-neutral-200 bg-neutral-100 pl-9 pr-3.5 text-[#1F1F1D]"
+                          ? "border-[#1F1F1D] bg-[#1F1F1D] pl-9 pr-3.5 text-white shadow-[0_2px_8px_rgba(13,13,13,0.25)]"
                           : "border-transparent pl-9 pr-3 text-[#6F6A60] hover:border-[rgba(13,13,13,0.06)] hover:bg-[rgba(13,13,13,0.04)] hover:text-[#1F1F1D]"
                       }`}
                     >
@@ -308,55 +310,67 @@ export function ChatSidebar({
         <AnimatePresence>
           {accountMenuOpen && !collapsed && (
             <motion.div
-              initial={{ opacity: 0, y: 10, scale: 0.98 }}
+              initial={{ opacity: 0, y: 8, scale: 0.97 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 10, scale: 0.98 }}
+              exit={{ opacity: 0, y: 8, scale: 0.97 }}
               transition={{ duration: 0.15, ease: "easeOut" }}
-              className="absolute bottom-full right-3 left-3 mb-2 overflow-hidden rounded-2xl border border-[rgba(31,31,29,0.08)] bg-white p-1.5 shadow-[0_12px_40px_rgba(13,13,13,0.12)]"
+              className="absolute bottom-full right-3 left-3 mb-2 rounded-2xl border border-[rgba(31,31,29,0.1)] bg-white p-1 shadow-[0_8px_32px_rgba(13,13,13,0.14),0_2px_8px_rgba(13,13,13,0.06)]"
+              dir="rtl"
             >
-              <Link
-                href={account ? "/account" : "/start"}
-                className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-[13px] font-semibold text-[#1F1F1D] transition hover:bg-[#F8F7F4]"
-                onClick={() => setAccountMenuOpen(false)}
-              >
-                <Settings size={15} className="text-[#6F6A60]" />
-                {account ? "الملف الشخصي" : "إنشاء ملف ذكي"}
-              </Link>
+              {/* All items use identical button structure for pixel-perfect consistency */}
+              {([
+                {
+                  icon: <Settings size={14} />,
+                  label: account ? "الملف الشخصي" : "إنشاء ملف ذكي",
+                  onClick: () => { setAccountMenuOpen(false); router.push(account ? "/account" : "/start"); },
+                  danger: false,
+                },
+                {
+                  icon: <Home size={14} />,
+                  label: "العودة للموقع",
+                  onClick: () => { setAccountMenuOpen(false); router.push("/"); },
+                  danger: false,
+                },
+                {
+                  icon: <Download size={14} />,
+                  label: "تصدير المحادثات",
+                  onClick: () => { setAccountMenuOpen(false); onExportConversations(); },
+                  danger: false,
+                },
+              ] as { icon: React.ReactNode; label: string; onClick: () => void; danger: boolean }[]).map((item) => (
+                <button
+                  key={item.label}
+                  type="button"
+                  onClick={item.onClick}
+                  className="flex h-11 w-full items-center gap-3 rounded-xl px-3 text-[13px] font-semibold text-[#1F1F1D] transition-colors hover:bg-[#F5F4F0]"
+                >
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#F0EFE9] text-[#4A4A42]">
+                    {item.icon}
+                  </span>
+                  <span className="flex-1 text-right text-[13px] font-semibold leading-none">{item.label}</span>
+                </button>
+              ))}
 
-              <Link
-                href="/"
-                className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-[13px] font-semibold text-[#1F1F1D] transition hover:bg-[#F8F7F4]"
-                onClick={() => setAccountMenuOpen(false)}
-              >
-                <Home size={15} className="text-[#6F6A60]" />
-                العودة للموقع
-              </Link>
-              
-              <button
-                onClick={() => { setAccountMenuOpen(false); onExportConversations(); }}
-                className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-[13px] font-semibold text-[#1F1F1D] transition hover:bg-[#F8F7F4]"
-              >
-                <Download size={15} className="text-[#6F6A60]" />
-                تصدير المحادثات
-              </button>
-
-              <div className="mx-2 my-1 h-px bg-[rgba(31,31,29,0.06)]" />
+              <div className="mx-2 my-1 h-px bg-[rgba(31,31,29,0.07)]" />
 
               {confirmingClearAll ? (
-                <div className="flex items-center justify-between gap-2 rounded-xl bg-red-50/80 px-3 py-2">
-                  <span className="text-[12px] font-bold text-red-600">تأكيد المسح؟</span>
-                  <div className="flex gap-1">
-                    <button onClick={() => { onClearConversations(); setConfirmingClearAll(false); setAccountMenuOpen(false); }} className="rounded-md bg-red-600 px-2.5 py-1 text-[11px] font-bold text-white">مسح</button>
-                    <button onClick={() => setConfirmingClearAll(false)} className="rounded-md bg-white border border-[rgba(13,13,13,0.08)] px-2.5 py-1 text-[11px] font-bold text-[#1F1F1D]">إلغاء</button>
+                <div className="flex h-11 items-center justify-between gap-2 rounded-xl bg-red-50 px-3">
+                  <div className="flex gap-1.5">
+                    <button type="button" onClick={() => { onClearConversations(); setConfirmingClearAll(false); setAccountMenuOpen(false); }} className="rounded-lg bg-red-600 px-3 py-1 text-[12px] font-bold text-white hover:bg-red-700">مسح</button>
+                    <button type="button" onClick={() => setConfirmingClearAll(false)} className="rounded-lg border border-[rgba(13,13,13,0.10)] bg-white px-3 py-1 text-[12px] font-bold text-[#1F1F1D] hover:bg-[#F5F4F0]">إلغاء</button>
                   </div>
+                  <span className="text-[13px] font-semibold text-red-600">تأكيد المسح؟</span>
                 </div>
               ) : (
                 <button
+                  type="button"
                   onClick={() => setConfirmingClearAll(true)}
-                  className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-[13px] font-semibold text-red-600 transition hover:bg-red-50"
+                  className="flex h-11 w-full items-center gap-3 rounded-xl px-3 text-[13px] font-semibold text-red-600 transition-colors hover:bg-red-50"
                 >
-                  <Trash2 size={15} />
-                  مسح جميع المحادثات
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-red-50 text-red-500">
+                    <Trash2 size={14} />
+                  </span>
+                  <span className="flex-1 text-right text-[13px] font-semibold leading-none">مسح جميع المحادثات</span>
                 </button>
               )}
             </motion.div>
@@ -385,7 +399,6 @@ export function ChatSidebar({
             {!collapsed && (
               <div className="min-w-0 text-right">
                 <p className="truncate text-[13px] font-bold text-[#1F1F1D]">{account?.label ?? "حساب VoltJo"}</p>
-                <p className="truncate text-[11px] font-semibold text-[#6F6A60]">{account?.sublabel ?? "ابدأ ملفك الذكي"}</p>
               </div>
             )}
           </div>

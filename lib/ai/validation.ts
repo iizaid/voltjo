@@ -3,7 +3,7 @@ import {
   MAX_CHAT_ATTACHMENT_SIZE_BYTES,
   MAX_CHAT_MESSAGE_LENGTH,
 } from "@/lib/chat/constants";
-import type { AiChatRequest, AiModelId } from "@/lib/ai/types";
+import type { AiChatRequest, AiChatTurn, AiModelId } from "@/lib/ai/types";
 import { CHAT_MODELS } from "@/lib/ai/model-display";
 
 type ValidationResult =
@@ -39,6 +39,9 @@ export function validateAiChatRequest(input: unknown): ValidationResult {
   const rawThinkingMode = input.thinkingMode;
   const rawConversationId = input.conversationId;
   const rawAttachment = input.attachment;
+  const rawClientHistory = input.clientHistory;
+  const rawConversationTitle = input.conversationTitle;
+  const rawMessageCount = input.messageCount;
 
   if (typeof rawMessage !== "string") {
     return {
@@ -218,6 +221,35 @@ export function validateAiChatRequest(input: unknown): ValidationResult {
     };
   }
 
+  // Validate optional client-supplied history (fallback for guest sessions)
+  let clientHistory: AiChatTurn[] | undefined;
+  if (Array.isArray(rawClientHistory)) {
+    const MAX_CLIENT_HISTORY = 20;
+    const MAX_CONTENT_LENGTH = 2000;
+    const valid = rawClientHistory
+      .slice(-MAX_CLIENT_HISTORY)
+      .filter(
+        (t): t is AiChatTurn =>
+          isRecord(t) &&
+          (t.role === "user" || t.role === "assistant") &&
+          typeof t.content === "string" &&
+          t.content.length <= MAX_CONTENT_LENGTH,
+      );
+    if (valid.length > 0) clientHistory = valid;
+  }
+
+  // Validate optional conversation context fields
+  let conversationTitle: string | undefined;
+  if (typeof rawConversationTitle === "string") {
+    const trimmed = rawConversationTitle.trim().slice(0, 160);
+    if (trimmed.length > 0) conversationTitle = trimmed;
+  }
+
+  let messageCount: number | undefined;
+  if (typeof rawMessageCount === "number" && Number.isFinite(rawMessageCount) && rawMessageCount >= 0) {
+    messageCount = Math.floor(rawMessageCount);
+  }
+
   return {
     ok: true,
     data: {
@@ -226,6 +258,9 @@ export function validateAiChatRequest(input: unknown): ValidationResult {
       thinkingMode: rawThinkingMode,
       conversationId,
       attachment,
+      clientHistory,
+      conversationTitle,
+      messageCount,
     },
   };
 }

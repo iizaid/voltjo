@@ -14,9 +14,9 @@ import {
 } from "@/lib/account/settings";
 import { resolveAccountAvatarUrl } from "@/lib/account/avatar";
 import {
-  signOutAction,
   updateAccountProfileAction,
 } from "@/lib/auth/actions";
+import { ConfirmSignOutForm } from "@/components/auth/ConfirmSignOutForm";
 import {
   getCurrentUserAndProfile,
   type CurrentProfile,
@@ -409,14 +409,11 @@ function SecuritySection() {
         title="تسجيل الخروج"
         description="إنهاء الجلسة الحالية والعودة إلى الصفحة الرئيسية."
       >
-        <form action={signOutAction}>
-          <button
-            type="submit"
-            className={primaryButtonClass}
-          >
-            تسجيل الخروج
-          </button>
-        </form>
+        <ConfirmSignOutForm
+          buttonClassName={primaryButtonClass}
+        >
+          تسجيل الخروج
+        </ConfirmSignOutForm>
       </SettingsCard>
     </div>
   );
@@ -623,14 +620,13 @@ export default async function AccountPage({ searchParams }: Props) {
             <header className="space-y-2">
               <div className="flex items-center justify-between gap-3">
                 <Link
-                  href="/assistant"
+                  href="/"
                   className="inline-flex min-h-10 items-center rounded-full bg-white/82 px-4 text-sm font-bold text-[var(--voltjo-muted)] shadow-[0_1px_0_rgba(255,255,255,0.9)] ring-1 ring-[rgba(38,38,38,0.06)] transition-[background-color,color,box-shadow,transform] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] hover:-translate-y-px hover:bg-white hover:text-[var(--voltjo-black)] hover:shadow-[0_6px_16px_rgba(13,13,13,0.05)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(38,38,38,0.16)] focus-visible:ring-offset-2"
                 >
-                  <span>العودة إلى المساعد</span>
+                  <span>العودة إلى الرئيسية</span>
                 </Link>
                 <AccountMobileNav
                   activeSection={activeSection}
-                  signOutAction={signOutAction}
                 />
               </div>
               <h1 className="text-[32px] font-extrabold leading-tight text-[var(--voltjo-black)] sm:text-[36px]">
@@ -683,15 +679,13 @@ export default async function AccountPage({ searchParams }: Props) {
               />
             </nav>
 
-            <form action={signOutAction} className="mt-6">
-              <button
-                type="submit"
-                className={`${secondaryButtonClass} w-full gap-2`}
-              >
-                <LogOut size={16} />
-                تسجيل الخروج
-              </button>
-            </form>
+            <ConfirmSignOutForm
+              className="mt-6"
+              buttonClassName={`${secondaryButtonClass} w-full gap-2`}
+            >
+              <LogOut size={16} />
+              <span>تسجيل الخروج</span>
+            </ConfirmSignOutForm>
           </aside>
         </div>
       </div>

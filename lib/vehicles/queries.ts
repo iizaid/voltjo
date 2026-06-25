@@ -4,7 +4,11 @@ import { createPublicClient } from "@/lib/supabase/server";
 import type { Database } from "@/lib/supabase/database.types";
 import type {
   ChargingCostInputs,
-  ChargingLocation,
+  ChargingStation,
+  ChargingOperator,
+  ChargingConnector,
+  StationCommunityReport,
+  StationImage,
   SupportedVehicle,
   VehicleBrand,
   VehicleCostProfile,
@@ -19,7 +23,7 @@ type VehicleFilters = {
 type RawBrandRow = Database["public"]["Tables"]["vehicle_brands"]["Row"];
 type RawVehicleRow = Database["public"]["Tables"]["supported_vehicles"]["Row"];
 type RawCostProfileRow = Database["public"]["Tables"]["vehicle_cost_profiles"]["Row"];
-type RawChargingLocationRow = Database["public"]["Tables"]["charging_locations"]["Row"];
+type RawChargingStationRow = any; // Supabase types will be regenerated later
 
 function mapBrand(row: RawBrandRow): VehicleBrand {
   return {
@@ -152,33 +156,108 @@ export async function getSupportedVehicleBySlug(
   );
 }
 
-export async function listChargingLocations(): Promise<ChargingLocation[]> {
+export async function listChargingStations(
+  userLat?: number,
+  userLng?: number,
+  maxDistanceMeters: number = 50000
+): Promise<ChargingStation[]> {
   const supabase = createPublicClient();
   if (!supabase) return [];
 
-  const { data, error } = await supabase
-    .from("charging_locations")
-    .select("*")
+  let query = supabase
+    .from("charging_stations")
+    .select(`
+      *,
+      operator:charging_operators(*),
+      connectors:charging_connectors(*),
+      images:station_images(*),
+      latestReport:station_community_reports(*)
+    `)
     .eq("is_active", true)
-    .order("city", { ascending: true })
-    .order("name_ar", { ascending: true });
+    .eq("verification_status", "published")
+    .is("deleted_at", null);
 
-  if (error || !data) return [];
+  let distancesMap = new Map<string, number>();
 
-  return data.map((row: RawChargingLocationRow) => ({
+  if (userLat && userLng) {
+    // PostGIS Proximity Query
+    const { data: nearestStations, error: rpcError } = await supabase.rpc(
+      "get_nearest_charging_stations",
+      {
+        user_lat: userLat,
+        user_lng: userLng,
+        max_distance_meters: maxDistanceMeters,
+        limit_count: 100,
+      }
+    );
+
+    if (rpcError || !nearestStations) {
+      console.error("Error executing PostGIS proximity query:", rpcError);
+      return [];
+    }
+
+    if (nearestStations.length === 0) return [];
+
+    const stationIds = nearestStations.map((s: any) => s.id);
+    query = query.in("id", stationIds);
+
+    nearestStations.forEach((s: any) => {
+      distancesMap.set(s.id, s.distance_meters);
+    });
+  }
+
+  const { data, error } = await query;
+
+  if (error || !data) {
+    console.error("Error fetching charging stations:", error);
+    return [];
+  }
+
+  // Map the raw data to the ChargingStation type
+  let stations = data.map((row: any): ChargingStation => ({
     id: row.id,
+    operatorId: row.operator_id,
     nameAr: row.name_ar,
     nameEn: row.name_en,
     city: row.city,
     area: row.area,
     latitude: row.latitude,
     longitude: row.longitude,
-    plugTypes: row.plug_types ?? [],
-    powerKw: row.power_kw,
-    isVerified: row.is_verified,
-    source: row.source,
-    notesAr: row.notes_ar,
+    verificationStatus: row.verification_status,
+    operationalStatus: row.operational_status,
+    is24h: row.is_24h,
+    openingHoursAr: row.opening_hours_ar,
+    pricingModel: row.pricing_model,
+    priceNotesAr: row.price_notes_ar,
+    paymentMethods: row.payment_methods ?? [],
+    amenities: row.amenities ?? [],
+    googleMapsUrl: row.google_maps_url,
+    dataQualityScore: row.data_quality_score,
+    sourceData: row.source_data,
+    deletedAt: row.deleted_at,
+    isActive: row.is_active,
+    
+    // Relations
+    operator: row.operator,
+    connectors: row.connectors ?? [],
+    images: row.images ?? [],
+    latestReport: row.latestReport && row.latestReport.length > 0 
+      ? row.latestReport.sort((a: any, b: any) => new Date(b.reported_at).getTime() - new Date(a.reported_at).getTime())[0] 
+      : null,
+      
+    // Geolocation distance
+    distanceMeters: distancesMap.get(row.id),
   }));
+
+  if (userLat && userLng) {
+    // Sort by distance using the mapped distances from PostGIS
+    stations.sort((a, b) => (a.distanceMeters ?? 0) - (b.distanceMeters ?? 0));
+  } else {
+    // Default sorting
+    stations.sort((a, b) => a.nameAr.localeCompare(b.nameAr));
+  }
+
+  return stations;
 }
 
 export async function getChargingCostInputs(): Promise<ChargingCostInputs> {

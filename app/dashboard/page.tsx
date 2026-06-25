@@ -7,7 +7,7 @@ import {
   UserRound,
   type LucideIcon,
 } from "lucide-react";
-import { signOutAction } from "@/lib/auth/actions";
+import { ConfirmSignOutForm } from "@/components/auth/ConfirmSignOutForm";
 import { getCurrentUserAndProfile } from "@/lib/auth/session";
 import {
   calculateProfileCompletion,
@@ -45,14 +45,11 @@ export default async function DashboardPage() {
               والتقارير عندما يتم ربط قاعدة بيانات السيارات والمحادثات لاحقًا.
             </p>
           </div>
-          <form action={signOutAction}>
-            <button
-              type="submit"
-              className="h-11 rounded-full border border-[rgba(13,13,13,0.12)] bg-white px-5 text-sm font-bold transition hover:bg-[#F5F5F3]"
-            >
-              تسجيل الخروج
-            </button>
-          </form>
+          <ConfirmSignOutForm
+            buttonClassName="h-11 rounded-full border border-[rgba(13,13,13,0.12)] bg-white px-5 text-sm font-bold transition hover:bg-[#F5F5F3]"
+          >
+            تسجيل الخروج
+          </ConfirmSignOutForm>
         </div>
 
         {!profile || !profileComplete ? (

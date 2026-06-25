@@ -9,6 +9,7 @@ import {
   Image,
   Paperclip,
   Plus,
+  Square,
   X,
   Sparkles,
 } from "lucide-react";
@@ -93,6 +94,7 @@ export function ChatComposer({
   value,
   onChange,
   onSubmit,
+  onStop,
   isLoading,
   attachment,
   onAttachmentChange,
@@ -107,6 +109,7 @@ export function ChatComposer({
   value: string;
   onChange: (value: string) => void;
   onSubmit: (text: string) => void;
+  onStop?: () => void;
   isLoading?: boolean;
   attachment?: ChatAttachment | null;
   onAttachmentChange?: (att: ChatAttachment | null) => void;
@@ -425,14 +428,16 @@ export function ChatComposer({
                   aria-haspopup="listbox"
                   aria-expanded={modelSelectorOpen}
                   aria-label={`النموذج المحدد: ${selectedModel.displayName}. اضغط لتغيير النموذج`}
-                  onClick={() => (modelSelectorOpen ? closeModelSelector() : openModelSelector())}
+                  onClick={() => {
+                    modelSelectorOpen ? closeModelSelector() : openModelSelector();
+                  }}
                   onKeyDown={(event) => {
                     if (!modelSelectorOpen && (event.key === "ArrowDown" || event.key === "Enter" || event.key === " ")) {
                       event.preventDefault();
                       openModelSelector();
                     }
                   }}
-                  className="flex h-8 items-center gap-1 rounded-lg px-2 text-[12px] font-semibold text-[#1F1F1D] transition hover:bg-[#F8F7F4] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-neutral-300"
+                  className="flex h-8 items-center gap-1 rounded-lg px-2 text-[12px] font-semibold text-[#1F1F1D] transition hover:bg-[#F8F7F4] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-neutral-300 disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   <span className="flex items-center gap-1.5">
                     {getModelIcon(selectedModel.icon, 14)}
@@ -558,19 +563,30 @@ export function ChatComposer({
                 </AnimatePresence>
               </div>
 
-              {/* Send button */}
-              <button
-                type="submit"
-                aria-label="إرسال"
-                disabled={!canSubmit}
-                className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors duration-150 active:scale-[0.98] ${
-                  canSubmit
-                    ? "bg-[#1F1F1D] text-white hover:bg-black"
-                    : "cursor-not-allowed bg-neutral-100 text-neutral-400"
-                } ${isLoading ? "animate-pulse" : ""}`}
-              >
-                <ArrowUp size={16} strokeWidth={2.5} />
-              </button>
+              {/* Send / Stop button */}
+              {isLoading ? (
+                <button
+                  type="button"
+                  aria-label="إيقاف"
+                  onClick={onStop}
+                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-red-500 text-white transition-colors duration-150 hover:bg-red-600 active:scale-[0.98]"
+                >
+                  <Square size={13} fill="currentColor" strokeWidth={0} />
+                </button>
+              ) : (
+                <button
+                  type="submit"
+                  aria-label="إرسال"
+                  disabled={!canSubmit}
+                  className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors duration-150 active:scale-[0.98] ${
+                    canSubmit
+                      ? "bg-[#1F1F1D] text-white hover:bg-black"
+                      : "cursor-not-allowed bg-neutral-100 text-neutral-400"
+                  }`}
+                >
+                  <ArrowUp size={16} strokeWidth={2.5} />
+                </button>
+              )}
             </div>
           </div>
         </div>

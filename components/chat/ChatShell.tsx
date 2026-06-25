@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import { ChatSidebar } from "@/components/chat/ChatSidebar";
 import { ChatThread } from "@/components/chat/ChatThread";
 import type { ChatConversation, ChatAttachment } from "@/lib/chat/types";
-import { sendChatMessage } from "@/lib/chat/api-client";
+import { streamChatMessage } from "@/lib/chat/api-client";
 import { CHAT_MODELS, type ModelDisplay } from "@/lib/ai/model-display";
 import {
   loadConversations,
@@ -65,6 +65,8 @@ export function ChatShell({
   const searchInputRef = useRef<HTMLInputElement>(null);
   const hasSubmittedInitialPromptRef = useRef(false);
   const submitPromptRef = useRef<((prompt: string, att?: ChatAttachment, options?: { forceNew?: boolean }) => Promise<void>) | null>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
+  const stopRequestedRef = useRef(false);
 
   // Load from local storage on mount
   useEffect(() => {
@@ -155,6 +157,16 @@ export function ChatShell({
     setTypingMessageId((current) => (current === id ? null : current));
   };
 
+  const handleStop = () => {
+    stopRequestedRef.current = true;
+    abortControllerRef.current?.abort();
+    // If response already arrived and animation is running, jump to full text immediately
+    if (typingMessageId) {
+      setTypingMessageId(null);
+    }
+    setIsLoading(false);
+  };
+
   const submitPrompt = async (
     prompt: string,
     att?: ChatAttachment,
@@ -197,6 +209,7 @@ export function ChatShell({
     const placeholder = createAssistantPlaceholder({
       modelId: requestOptions.modelId,
       thinkingMode: requestOptions.thinkingMode,
+      requestStartedAt: Date.now(),
     });
     const title = generateConversationTitle(trimmedPrompt) || (att ? att.name : "محادثة جديدة");
 
@@ -230,46 +243,133 @@ export function ChatShell({
     setIsLoading(true);
     setMobileSidebarOpen(false);
 
+    stopRequestedRef.current = false;
+    const abortController = new AbortController();
+    abortControllerRef.current = abortController;
+
+    // Build session history from current conversation messages (for guest users
+    // who have no server-side DB record, this gives the AI full context).
+    const sessionHistory = (activeConversation?.messages ?? [])
+      .filter((m) => (m.role === "user" || m.role === "assistant") && m.status === "done" && m.content)
+      .slice(-20)
+      .map((m) => ({ role: m.role as "user" | "assistant", content: m.content ?? "" }));
+
     try {
-      const response = await sendChatMessage({
+      for await (const chunk of streamChatMessage({
         message: trimmedPrompt || att?.name || "مرفق",
         modelId: requestOptions.modelId,
         thinkingMode: requestOptions.thinkingMode,
         conversationId: requestOptions.conversationId,
         attachment: requestOptions.attachment,
-      });
-      const completed = completeAssistantMessage(placeholder, response.message);
-      setTypingMessageId(completed.id);
-      setConversations((prev) =>
-        prev.map((c) => {
-          if (c.id === targetId) {
+        clientHistory: sessionHistory.length > 0 ? sessionHistory : undefined,
+        conversationTitle: activeConversation?.title,
+        messageCount: activeConversation?.messages.filter(m => m.status === "done").length,
+      }, { signal: abortController.signal })) {
+        if (stopRequestedRef.current) break;
+
+        if (chunk.type === 'token') {
+          setConversations((prev) =>
+            prev.map((c) => {
+              if (c.id !== targetId) return c;
+              return {
+                ...c,
+                messages: c.messages.map((m) =>
+                  m.id === placeholder.id
+                    ? { ...m, status: 'streaming' as const, content: (m.content ?? '') + chunk.content }
+                    : m
+                ),
+              };
+            })
+          );
+        } else if (chunk.type === 'done') {
+          setConversations((prev) =>
+            prev.map((c) => {
+              if (c.id !== targetId) return c;
+              return {
+                ...c,
+                serverId: chunk.conversationId ?? c.serverId,
+                messages: c.messages.map((m) =>
+                  m.id === placeholder.id
+                    ? {
+                        ...m,
+                        status: 'done' as const,
+                        metadata: {
+                          ...m.metadata,
+                          usage: chunk.usage ?? undefined,
+                          model: chunk.model,
+                          latencyMs: chunk.latencyMs,
+                        },
+                      }
+                    : m
+                ),
+                updatedAt: new Date().toISOString(),
+              };
+            })
+          );
+          setIsLoading(false);
+        } else if (chunk.type === 'error') {
+          setConversations((prev) =>
+            prev.map((c) => {
+              if (c.id !== targetId) return c;
+              return {
+                ...c,
+                messages: c.messages.map((m) =>
+                  m.id === placeholder.id ? failAssistantMessage(m, chunk.message) : m
+                ),
+              };
+            })
+          );
+          setIsLoading(false);
+        }
+      }
+
+      // If user stopped mid-stream, mark the message as done with partial content
+      if (stopRequestedRef.current) {
+        setConversations((prev) =>
+          prev.map((c) => {
+            if (c.id !== targetId) return c;
             return {
               ...c,
-              serverId: response.conversationId ?? c.serverId,
-              messages: c.messages.map((m) => (m.id === placeholder.id ? completed : m)),
-              updatedAt: new Date().toISOString(),
+              messages: c.messages.map((m) =>
+                m.id === placeholder.id && m.status === 'streaming'
+                  ? { ...m, status: 'done' as const }
+                  : m
+              ),
             };
-          }
-          return c;
-        })
-      );
+          })
+        );
+        setIsLoading(false);
+      }
     } catch (err) {
-      const errMsg = err instanceof Error ? err.message : undefined;
-      const failed = failAssistantMessage(placeholder, errMsg);
-      setConversations((prev) =>
-        prev.map((c) => {
-          if (c.id === targetId) {
-            return {
-              ...c,
-              messages: c.messages.map((m) => (m.id === placeholder.id ? failed : m)),
-              updatedAt: new Date().toISOString(),
-            };
-          }
-          return c;
-        })
-      );
+      if (stopRequestedRef.current) {
+        // User cancelled — remove the loading placeholder silently
+        setConversations((prev) =>
+          prev.map((c) =>
+            c.id === targetId
+              ? { ...c, messages: c.messages.filter((m) => m.id !== placeholder.id) }
+              : c,
+          ),
+        );
+      } else {
+        const errMsg = err instanceof Error ? err.message : undefined;
+        const failed = failAssistantMessage(placeholder, errMsg);
+        setConversations((prev) =>
+          prev.map((c) => {
+            if (c.id === targetId) {
+              return {
+                ...c,
+                messages: c.messages.map((m) => (m.id === placeholder.id ? failed : m)),
+                updatedAt: new Date().toISOString(),
+              };
+            }
+            return c;
+          })
+        );
+      }
     } finally {
       setIsLoading(false);
+      abortControllerRef.current = null;
+      stopRequestedRef.current = false;
     }
   };
 
@@ -324,31 +424,106 @@ export function ChatShell({
       ),
     );
 
+    const retryHistory = conversation.messages
+      .slice(0, failedIndex)
+      .filter((m) => (m.role === "user" || m.role === "assistant") && m.status === "done" && m.content)
+      .slice(-20)
+      .map((m) => ({ role: m.role as "user" | "assistant", content: m.content ?? "" }));
+
+    const abortController = new AbortController();
+    abortControllerRef.current = abortController;
+    stopRequestedRef.current = false;
+
     try {
-      const response = await sendChatMessage({
+      for await (const chunk of streamChatMessage({
         message: userMessage.content || userMessage.attachment?.name || "مرفق",
         modelId: requestModelId,
         thinkingMode: requestThinkingMode,
         conversationId: conversation.serverId ?? null,
         attachment: userMessage.attachment ?? null,
-      });
-      const completed = completeAssistantMessage(
-        { ...conversation.messages[failedIndex], status: "sending" },
-        response.message,
-      );
-      setTypingMessageId(completed.id);
-      setConversations((prev) =>
-        prev.map((c) =>
-          c.id === targetId
-            ? {
-                ...c,
-                serverId: response.conversationId ?? c.serverId,
-                messages: c.messages.map((m) => (m.id === failedMessageId ? completed : m)),
-                updatedAt: new Date().toISOString(),
-              }
-            : c,
-        ),
-      );
+        clientHistory: retryHistory.length > 0 ? retryHistory : undefined,
+      }, { signal: abortController.signal })) {
+        if (stopRequestedRef.current) break;
+
+        if (chunk.type === "token") {
+          setConversations((prev) =>
+            prev.map((c) =>
+              c.id === targetId
+                ? {
+                    ...c,
+                    messages: c.messages.map((m) =>
+                      m.id === failedMessageId
+                        ? { ...m, status: "streaming" as const, content: (m.content ?? "") + chunk.content }
+                        : m,
+                    ),
+                  }
+                : c,
+            ),
+          );
+        } else if (chunk.type === "done") {
+          setConversations((prev) =>
+            prev.map((c) =>
+              c.id === targetId
+                ? {
+                    ...c,
+                    serverId: chunk.conversationId ?? c.serverId,
+                    messages: c.messages.map((m) =>
+                      m.id === failedMessageId
+                        ? {
+                            ...m,
+                            status: "done" as const,
+                            metadata: {
+                              ...m.metadata,
+                              usage: chunk.usage ?? undefined,
+                              model: chunk.model,
+                              latencyMs: chunk.latencyMs,
+                            },
+                          }
+                        : m,
+                    ),
+                    updatedAt: new Date().toISOString(),
+                  }
+                : c,
+            ),
+          );
+          setIsLoading(false);
+        } else if (chunk.type === "error") {
+          setConversations((prev) =>
+            prev.map((c) =>
+              c.id === targetId
+                ? {
+                    ...c,
+                    messages: c.messages.map((m) =>
+                      m.id === failedMessageId
+                        ? failAssistantMessage({ ...m, status: "sending" }, chunk.message)
+                        : m,
+                    ),
+                    updatedAt: new Date().toISOString(),
+                  }
+                : c,
+            ),
+          );
+          setIsLoading(false);
+        }
+      }
+
+      if (stopRequestedRef.current) {
+        setConversations((prev) =>
+          prev.map((c) =>
+            c.id === targetId
+              ? {
+                  ...c,
+                  messages: c.messages.map((m) =>
+                    m.id === failedMessageId && m.status === "streaming"
+                      ? { ...m, status: "done" as const }
+                      : m,
+                  ),
+                }
+              : c,
+          ),
+        );
+        setIsLoading(false);
+      }
     } catch (err) {
       const errMsg = err instanceof Error ? err.message : undefined;
       setConversations((prev) =>
@@ -366,7 +541,6 @@ export function ChatShell({
             : c,
         ),
       );
-    } finally {
       setIsLoading(false);
     }
   };
@@ -425,6 +599,7 @@ export function ChatShell({
         onSuggestionSelect={(val) => submitPrompt(val, attachment || undefined)}
         onOpenSidebar={() => setMobileSidebarOpen(true)}
         isLoading={isLoading}
+        onStop={handleStop}
         attachment={attachment}
         onAttachmentChange={setAttachment}
         onNotice={setNotice}

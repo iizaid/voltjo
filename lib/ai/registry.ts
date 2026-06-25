@@ -1,6 +1,7 @@
 import "server-only";
 
 import { geminiProvider } from "@/lib/ai/providers/gemini";
+import { nvidiaProvider } from "@/lib/ai/providers/nvidia";
 import { getAiConfig } from "@/lib/ai/config";
 import { AiError } from "@/lib/ai/errors";
 import type { AiProvider, AiProviderHealth, AiProviderId } from "@/lib/ai/types";
@@ -17,6 +18,7 @@ import type { AiProvider, AiProviderHealth, AiProviderId } from "@/lib/ai/types"
  */
 const REGISTRY: Partial<Record<AiProviderId, AiProvider>> = {
   gemini: geminiProvider,
+  nvidia: nvidiaProvider,
   // openai: openaiProvider,
   // kimi: kimiProvider,
   // deepseek: deepseekProvider,
@@ -32,19 +34,23 @@ export function listRegisteredProviders(): AiProvider[] {
 }
 
 /**
- * Selection strategy: return the primary provider plus its configured fallbacks,
- * in attempt order, filtered to providers that are both registered and configured.
+ * Selection strategy: model-specific provider first, then global primary, then fallbacks.
+ * Pass a providerId override (from model-config) to route per-model.
  */
-export function resolveProviderChain(): AiProvider[] {
+export function resolveProviderChain(primaryOverride?: AiProviderId): AiProvider[] {
   const config = getAiConfig();
-  const order: AiProviderId[] = [config.primaryProvider, ...config.fallbackOrder];
+  const seen = new Set<AiProviderId>();
+  const order: AiProviderId[] = [];
+
+  if (primaryOverride) order.push(primaryOverride);
+  order.push(config.primaryProvider, ...config.fallbackOrder);
 
   const chain: AiProvider[] = [];
   for (const id of order) {
+    if (seen.has(id)) continue;
+    seen.add(id);
     const provider = REGISTRY[id];
-    if (provider && provider.isConfigured() && !chain.includes(provider)) {
-      chain.push(provider);
-    }
+    if (provider && provider.isConfigured()) chain.push(provider);
   }
   return chain;
 }
@@ -69,12 +75,12 @@ export async function healthCheckAll(): Promise<AiProviderHealth[]> {
 }
 
 /** Throws CONFIG_MISSING when no registered+configured provider can serve traffic. */
-export function assertResolvableProvider(): AiProvider[] {
-  const chain = resolveProviderChain();
+export function assertResolvableProvider(primaryOverride?: AiProviderId): AiProvider[] {
+  const chain = resolveProviderChain(primaryOverride);
   if (chain.length === 0) {
     throw new AiError(
       "CONFIG_MISSING",
-      "No AI provider is both registered and configured. Set GOOGLE_AI_API_KEY.",
+      "No AI provider is both registered and configured. Set GOOGLE_AI_API_KEY or NVIDIA_API_KEY.",
     );
   }
   return chain;

@@ -1,19 +1,20 @@
-import { generateAiChatResponse } from "@/lib/ai/provider";
+import { streamAiChatResponse } from "@/lib/ai/provider";
 import { getAiConfig } from "@/lib/ai/config";
 import { checkAiBudget, recordAiUsage } from "@/lib/ai/cost-control";
-import { AiError, userMessageForAiError, type AiErrorCode } from "@/lib/ai/errors";
+import { AiError, userMessageForAiError } from "@/lib/ai/errors";
 import { validateAiChatRequest } from "@/lib/ai/validation";
 import {
   createChatConversation,
   createChatMessage,
   findOwnedChatConversation,
+  listConversationMessages,
 } from "@/lib/chat/server-persistence";
+import type { AiChatTurn, AiTokenUsage } from "@/lib/ai/types";
 import { getCurrentUser } from "@/lib/server/auth";
-import { apiError, apiSuccess } from "@/lib/server/api-response";
+import { apiError } from "@/lib/server/api-response";
 import { checkRateLimit } from "@/lib/server/rate-limit";
 import { getClientIp } from "@/lib/server/client-ip";
 import { readJsonWithByteLimit } from "@/lib/server/request-body";
-import { combineAbortSignals, runWithAbortableTimeout } from "@/lib/server/timeout";
 
 const MAX_CHAT_API_BODY_BYTES = 12 * 1024;
 
@@ -54,20 +55,6 @@ async function tryFindOwnedConversation(conversationId: string) {
   }
 }
 
-function statusForAiError(code: AiErrorCode): number {
-  switch (code) {
-    case "RATE_LIMIT":
-    case "QUOTA":
-      return 429;
-    case "TIMEOUT":
-      return 504;
-    case "CONFIG_MISSING":
-    case "UPSTREAM":
-      return 503;
-    default:
-      return 500;
-  }
-}
 
 export async function POST(request: Request) {
   const ip = getClientIp(request);
@@ -189,110 +176,147 @@ export async function POST(request: Request) {
     });
   }
 
-  try {
-    let persistedConversationId: string | null = null;
-    let canPersistAssistantMessage = false;
+  let persistedConversationId: string | null = null;
+  let canPersistAssistantMessage = false;
+  let history: AiChatTurn[] = [];
 
-    if (user) {
-      if (validation.data.conversationId) {
-        const existingConversation = await tryFindOwnedConversation(
-          validation.data.conversationId,
-        );
-        if (existingConversation.ok && existingConversation.data?.id) {
-          persistedConversationId = existingConversation.data.id;
+  if (user) {
+    if (validation.data.conversationId) {
+      const existingConversation = await tryFindOwnedConversation(
+        validation.data.conversationId,
+      );
+      if (existingConversation.ok && existingConversation.data?.id) {
+        persistedConversationId = existingConversation.data.id;
+        const historyResult = await listConversationMessages(persistedConversationId);
+        if (historyResult.ok) {
+          history = historyResult.data
+            .slice(-10)
+            .filter((m) => m.role === "user" || m.role === "assistant")
+            .map((m) => ({ role: m.role as "user" | "assistant", content: m.content ?? "" }));
         }
-      } else {
-        const createdConversation = await tryCreateConversation({
-          title: validation.data.message.slice(0, 160),
+      }
+    } else {
+      const createdConversation = await tryCreateConversation({
+        title: validation.data.message.slice(0, 160),
+        modelId: validation.data.modelId,
+        thinkingMode: validation.data.thinkingMode,
+      });
+      if (createdConversation.ok) {
+        persistedConversationId = createdConversation.data.id;
+      }
+    }
+
+    if (persistedConversationId) {
+      const userMessageResult = await tryCreateMessage({
+        conversationId: persistedConversationId,
+        role: "user",
+        content: validation.data.message,
+        attachment: validation.data.attachment ?? null,
+        metadata: {
           modelId: validation.data.modelId,
           thinkingMode: validation.data.thinkingMode,
-        });
-
-        if (createdConversation.ok) {
-          persistedConversationId = createdConversation.data.id;
-        }
-      }
-
-      if (persistedConversationId) {
-        const userMessageResult = await tryCreateMessage({
-          conversationId: persistedConversationId,
-          role: "user",
-          content: validation.data.message,
-          attachment: validation.data.attachment ?? null,
-          metadata: {
-            modelId: validation.data.modelId,
-            thinkingMode: validation.data.thinkingMode,
-            provider: getAiConfig().primaryProvider,
-          },
-          status: "done",
-        });
-
-        if (userMessageResult.ok) {
-          canPersistAssistantMessage = true;
-        } else {
-          persistedConversationId = null;
-        }
+          provider: getAiConfig().primaryProvider,
+        },
+        status: "done",
+      });
+      if (userMessageResult.ok) {
+        canPersistAssistantMessage = true;
+      } else {
+        persistedConversationId = null;
       }
     }
-
-    const message = await runWithAbortableTimeout({
-      timeoutMs: 45_000,
-      errorMessage: "AI provider timed out",
-      work: (timeoutSignal) =>
-        generateAiChatResponse(validation.data, {
-          actor,
-          requestId,
-          // Cancel the provider when EITHER our deadline elapses OR the client
-          // disconnects — no orphaned Gemini calls survive past the request.
-          signal: combineAbortSignals(timeoutSignal, request.signal),
-        }),
-    });
-
-    // Cost accounting: charge the tokens this request actually consumed so daily
-    // budgets and the global circuit breaker stay accurate.
-    await recordAiUsage({
-      actor,
-      userId: user?.id ?? null,
-      ip,
-      tokens: message.metadata.usage?.totalTokens ?? null,
-    });
-
-    if (user && persistedConversationId && canPersistAssistantMessage) {
-      await tryCreateMessage({
-        conversationId: persistedConversationId,
-        role: "assistant",
-        content: message.content,
-        bullets: message.bullets ?? null,
-        metadata: message.metadata,
-        status: message.status,
-      });
-    }
-
-    return apiSuccess({
-      message,
-      conversationId: persistedConversationId,
-    }, {
-      headers: buildRateLimitHeaders(rateLimit.limit, rateLimit.remaining, rateLimit.resetAt),
-    });
-  } catch (error) {
-    if (error instanceof AiError) {
-      return apiError({
-        code: error.code,
-        message: userMessageForAiError(error.code),
-        status: statusForAiError(error.code),
-        headers: { "Cache-Control": "no-store, max-age=0" },
-      });
-    }
-
-    return apiError({
-      code: "CHAT_GENERATION_FAILED",
-      message: "تعذر تجهيز الرد الآن. حاول مرة أخرى.",
-      status: 500,
-      headers: {
-        "Cache-Control": "no-store, max-age=0",
-      },
-    });
   }
+
+  if (history.length === 0 && validation.data.clientHistory?.length) {
+    history = validation.data.clientHistory;
+  }
+
+  const encoder = new TextEncoder();
+
+  const stream = new ReadableStream({
+    async start(controller) {
+      const send = (chunk: object) => {
+        try {
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify(chunk)}\n\n`));
+        } catch {
+          // controller already closed
+        }
+      };
+
+      let fullContent = '';
+      let finalUsage: AiTokenUsage = null;
+      let finalModel = '';
+      let finalLatencyMs = 0;
+
+      try {
+        for await (const chunk of streamAiChatResponse(
+          { ...validation.data, history },
+          { actor, requestId, signal: request.signal },
+        )) {
+          if (chunk.type === 'token') {
+            fullContent += chunk.content;
+            send(chunk);
+          } else if (chunk.type === 'done') {
+            finalUsage = chunk.usage;
+            finalModel = chunk.model;
+            finalLatencyMs = chunk.latencyMs;
+
+            await recordAiUsage({
+              actor,
+              userId: user?.id ?? null,
+              ip,
+              tokens: finalUsage?.totalTokens ?? null,
+            });
+
+            if (user && persistedConversationId && canPersistAssistantMessage && fullContent) {
+              await tryCreateMessage({
+                conversationId: persistedConversationId,
+                role: 'assistant',
+                content: fullContent,
+                bullets: null,
+                metadata: {
+                  modelId: validation.data.modelId,
+                  thinkingMode: validation.data.thinkingMode,
+                  provider: getAiConfig().primaryProvider,
+                  model: finalModel,
+                  usage: finalUsage ?? undefined,
+                  latencyMs: finalLatencyMs,
+                },
+                status: 'done',
+              });
+            }
+
+            send({
+              type: 'done',
+              conversationId: persistedConversationId,
+              usage: finalUsage,
+              model: finalModel,
+              latencyMs: finalLatencyMs,
+            });
+          } else {
+            send(chunk);
+          }
+        }
+      } catch (error) {
+        const code = error instanceof AiError ? error.code : 'UNKNOWN';
+        const message = error instanceof AiError
+          ? userMessageForAiError(error.code)
+          : 'تعذر تجهيز الرد الآن. حاول مرة أخرى.';
+        send({ type: 'error', code, message });
+      } finally {
+        controller.close();
+      }
+    },
+  });
+
+  return new Response(stream, {
+    headers: {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache, no-transform',
+      'X-Accel-Buffering': 'no',
+      ...buildRateLimitHeaders(rateLimit.limit, rateLimit.remaining, rateLimit.resetAt),
+    },
+  });
 }
 
 export async function GET() {

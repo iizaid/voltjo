@@ -32,12 +32,23 @@ export type AiChatAttachment = {
   type: string;
 };
 
+export type AiChatTurn = {
+  role: "user" | "assistant";
+  content: string;
+};
+
 export type AiChatRequest = {
   message: string;
+  /** Previous turns fetched server-side from DB (takes priority over clientHistory). */
+  history?: AiChatTurn[];
+  /** Client-supplied session history — used as fallback for guest users with no DB record. */
+  clientHistory?: AiChatTurn[];
   modelId: AiModelId;
   thinkingMode: boolean;
   conversationId?: string | null;
   attachment?: AiChatAttachment | null;
+  conversationTitle?: string;
+  messageCount?: number;
 };
 
 export type AiTokenUsage = {
@@ -82,6 +93,11 @@ export type AiChatResponse = {
     retrievalConfidence?: RetrievalConfidence;
   };
 };
+
+export type AiStreamChunk =
+  | { type: 'token'; content: string }
+  | { type: 'done'; usage: AiTokenUsage; model: string; latencyMs: number; citations?: Citation[]; retrievalConfidence?: RetrievalConfidence }
+  | { type: 'error'; code: string; message: string };
 
 /** Static description of a provider, used for the registry and health UI. */
 export type AiProviderMetadata = {

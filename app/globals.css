@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
 :root {
   --voltjo-black: #262626;
   --voltjo-ink: #262626;
@@ -343,18 +348,10 @@ input {
 }
 
 .technical-panel::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  border-radius: inherit;
-  opacity: 0.68;
-  background:
-    linear-gradient(to right, rgba(13, 13, 13, 0.048) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(13, 13, 13, 0.044) 1px, transparent 1px);
-  background-size: 52px 52px;
-  mask-image: radial-gradient(circle at center, #000 0%, transparent 78%);
+  display: none !important;
 }
+
+
 
 .orange-highlight {
   color: var(--voltjo-orange);

@@ -55,19 +55,75 @@ export type SupportedVehicle = {
   costProfiles?: VehicleCostProfile[];
 };
 
-export type ChargingLocation = {
+export type ChargingOperator = {
   id: string;
+  nameAr: string;
+  nameEn: string | null;
+  website: string | null;
+  supportPhone: string | null;
+  logoUrl: string | null;
+  isActive: boolean;
+};
+
+export type ChargingConnector = {
+  id: string;
+  stationId: string;
+  connectorType: string;
+  powerKw: number | null;
+  maxAmps: number | null;
+  voltageType: 'AC' | 'DC' | 'unknown' | null;
+  status: string | null;
+};
+
+export type StationImage = {
+  id: string;
+  stationId: string;
+  imageUrl: string;
+  source: string | null;
+  uploadedBy: string | null;
+  isPrimary: boolean;
+};
+
+export type StationCommunityReport = {
+  id: string;
+  stationId: string;
+  userId: string | null;
+  status: 'available' | 'busy' | 'long_queue' | 'broken' | 'closed';
+  notes: string | null;
+  reportedAt: string;
+};
+
+export type ChargingStation = {
+  id: string;
+  operatorId: string | null;
   nameAr: string;
   nameEn: string | null;
   city: string | null;
   area: string | null;
-  latitude: number | null;
-  longitude: number | null;
-  plugTypes: string[];
-  powerKw: number | null;
-  isVerified: boolean;
-  source: string | null;
-  notesAr: string | null;
+  latitude: number;
+  longitude: number;
+  verificationStatus: 'discovered' | 'google_verified' | 'operator_verified' | 'admin_reviewed' | 'published';
+  operationalStatus: 'operational' | 'under_construction' | 'planned' | 'temporarily_closed' | 'permanently_closed';
+  is24h: boolean;
+  openingHoursAr: string | null;
+  pricingModel: 'per_kwh' | 'per_session' | 'free' | 'unknown';
+  priceNotesAr: string | null;
+  paymentMethods: string[];
+  amenities: string[];
+  googleMapsUrl: string | null;
+  dataQualityScore: number;
+  sourceData: any | null;
+  deletedAt: string | null;
+  isActive: boolean;
+
+  // Relations
+  operator?: ChargingOperator | null;
+  connectors?: ChargingConnector[];
+  images?: StationImage[];
+  latestReport?: StationCommunityReport | null;
+  
+  // Computed distance in meters when queried geospatially
+  distanceMeters?: number;
 };
 
 export type ChargingCalculatorVehicleOption = {

@@ -3,9 +3,11 @@ import "server-only";
 import { assertAiConfigured, getAiConfig } from "@/lib/ai/config";
 import { AiError } from "@/lib/ai/errors";
 import { logAiRequest, startTimer } from "@/lib/ai/observability";
+import { resolveProviderForModel } from "@/lib/ai/model-config";
 import { buildSystemPrompt } from "@/lib/ai/prompt";
 import { assertResolvableProvider } from "@/lib/ai/registry";
-import type { AiChatRequest, AiChatResponse } from "@/lib/ai/types";
+import { streamGeminiChatResponse } from "@/lib/ai/providers/gemini";
+import type { AiChatRequest, AiChatResponse, AiStreamChunk } from "@/lib/ai/types";
 
 /**
  * Orchestrates a chat generation: validates config, builds the system prompt,
@@ -19,7 +21,8 @@ export async function generateAiChatResponse(
   options: { actor: "user" | "anon"; requestId: string; signal?: AbortSignal },
 ): Promise<AiChatResponse> {
   assertAiConfigured(getAiConfig());
-  const chain = assertResolvableProvider();
+  const targetProvider = resolveProviderForModel(request.modelId);
+  const chain = assertResolvableProvider(targetProvider);
 
   const { systemPrompt, citations, retrievalConfidence } = await buildSystemPrompt(request);
   const context = {
@@ -89,4 +92,39 @@ export async function generateAiChatResponse(
   }
 
   throw lastError ?? new AiError("UNKNOWN", "AI generation failed.");
+}
+
+export async function* streamAiChatResponse(
+  request: AiChatRequest,
+  options: { actor: 'user' | 'anon'; requestId: string; signal?: AbortSignal },
+): AsyncGenerator<AiStreamChunk> {
+  assertAiConfigured(getAiConfig());
+
+  const { systemPrompt, citations, retrievalConfidence } = await buildSystemPrompt(request);
+  const context = {
+    systemPrompt,
+    requestId: options.requestId,
+    signal: options.signal,
+  };
+
+  for await (const chunk of streamGeminiChatResponse(request, context)) {
+    if (chunk.type === 'token') {
+      yield chunk;
+    } else if (chunk.type === 'done') {
+      yield { ...chunk, citations, retrievalConfidence };
+    } else {
+      logAiRequest({
+        event: 'ai_request',
+        requestId: options.requestId,
+        provider: 'gemini',
+        outcome: 'error',
+        latencyMs: 0,
+        attempts: 1,
+        errorCode: chunk.code as import('@/lib/ai/errors').AiErrorCode,
+        actor: options.actor,
+        thinkingMode: request.thinkingMode,
+      });
+      yield chunk;
+    }
+  }
 }

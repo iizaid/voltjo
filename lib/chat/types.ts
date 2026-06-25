@@ -11,6 +11,14 @@ export interface ChatMessageMetadata {
   modelId?: string;
   thinkingMode?: boolean;
   provider?: string;
+  requestStartedAt?: number;
+  usage?: {
+    promptTokens: number;
+    completionTokens: number;
+    totalTokens: number;
+  };
+  model?: string;
+  latencyMs?: number;
 }
 
 export interface ChatMessage {

@@ -1,7 +1,6 @@
 "use client";
 
 import { Menu, ChevronDown } from "lucide-react";
-import { VoltJoLogo } from "@/components/brand/VoltJoLogo";
 import { getModelIcon } from "@/components/chat/ChatComposer";
 
 import type { ModelDisplay } from "@/lib/ai/model-display";
@@ -10,10 +9,12 @@ export function ChatTopBar({
   onOpenSidebar,
   selectedModel,
   onToggleModelSelector,
+  isLoading = false,
 }: {
   onOpenSidebar: () => void;
   selectedModel: ModelDisplay;
   onToggleModelSelector: () => void;
+  isLoading?: boolean;
 }) {
   return (
     <header className="flex h-14 shrink-0 items-center justify-between px-4 relative z-10 border-b border-[rgba(13,13,13,0.04)] bg-white/50 backdrop-blur-sm">
@@ -28,14 +29,12 @@ export function ChatTopBar({
 
       <div className="mx-auto flex items-center justify-center">
         <div className="flex items-center gap-2" dir="rtl">
-          <div className="lg:hidden">
-            <VoltJoLogo compact />
-          </div>
           <div className="flex flex-col items-center">
             <button
               type="button"
               onClick={onToggleModelSelector}
-              className="flex items-center gap-1 rounded-lg px-2 py-0.5 hover:bg-[rgba(31,31,29,0.05)] transition-colors active:scale-[0.98]"
+              disabled={isLoading}
+              className="flex items-center gap-1 rounded-lg px-2 py-0.5 hover:bg-[rgba(31,31,29,0.05)] transition-colors active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
               aria-label={`تغيير النموذج، الحالي: ${selectedModel.displayName}`}
             >
               <span className="flex items-center gap-1.5 text-[14px] font-bold text-[#1F1F1D]" dir="ltr">

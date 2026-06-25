@@ -3,6 +3,7 @@
 import { useEffect, useId, useState, type MouseEvent } from "react";
 import Link from "next/link";
 import { LogOut, Menu, X } from "lucide-react";
+import { ConfirmSignOutForm } from "@/components/auth/ConfirmSignOutForm";
 
 type AccountSection = "profile" | "account" | "security" | "privacy";
 
@@ -38,10 +39,8 @@ const iconButtonClass =
 
 export function AccountMobileNav({
   activeSection,
-  signOutAction,
 }: {
   activeSection: AccountSection;
-  signOutAction: () => Promise<void>;
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const menuId = useId();
@@ -124,15 +123,13 @@ export function AccountMobileNav({
               })}
             </div>
 
-            <form action={signOutAction} className="mt-4 border-t border-[rgba(38,38,38,0.08)] pt-4">
-              <button
-                type="submit"
-                className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-full border border-[rgba(38,38,38,0.08)] bg-white px-5 text-sm font-bold text-[var(--voltjo-black)] shadow-[0_1px_0_rgba(255,255,255,0.8)] transition-[background-color,border-color,box-shadow,transform] duration-200 hover:-translate-y-px hover:border-[rgba(38,38,38,0.14)] hover:bg-[#F7F7F3] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(38,38,38,0.16)] focus-visible:ring-offset-2"
-              >
-                <LogOut size={16} />
-                تسجيل الخروج
-              </button>
-            </form>
+            <ConfirmSignOutForm
+              className="mt-4 border-t border-[rgba(38,38,38,0.08)] pt-4 w-full"
+              buttonClassName="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-full border border-[rgba(38,38,38,0.08)] bg-white px-5 text-sm font-bold text-[var(--voltjo-black)] shadow-[0_1px_0_rgba(255,255,255,0.8)] transition-[background-color,border-color,box-shadow,transform] duration-200 hover:-translate-y-px hover:border-[rgba(38,38,38,0.14)] hover:bg-[#F7F7F3] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(38,38,38,0.16)] focus-visible:ring-offset-2"
+            >
+              <LogOut size={16} />
+              <span>تسجيل الخروج</span>
+            </ConfirmSignOutForm>
           </nav>
         </div>
       ) : null}

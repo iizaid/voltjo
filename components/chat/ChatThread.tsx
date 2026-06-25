@@ -16,6 +16,7 @@ export function ChatThread({
   onSuggestionSelect,
   onOpenSidebar,
   isLoading,
+  onStop,
   attachment,
   onAttachmentChange,
   onNotice,
@@ -35,6 +36,7 @@ export function ChatThread({
   onSuggestionSelect: (suggestion: string) => void;
   onOpenSidebar: () => void;
   isLoading?: boolean;
+  onStop?: () => void;
   attachment: ChatAttachment | null;
   onAttachmentChange: (att: ChatAttachment | null) => void;
   onNotice: (message: string) => void;
@@ -56,12 +58,21 @@ export function ChatThread({
     }
   }, [messages, hasMessages]);
 
+  // Close the model selector the moment a request starts so the user can't
+  // switch models mid-flight.
+  useEffect(() => {
+    if (isLoading) setModelSelectorOpen(false);
+  }, [isLoading]);
+
   return (
     <section className="flex min-w-0 flex-1 flex-col bg-[#FDFDFC]" dir="rtl">
       <ChatTopBar
         onOpenSidebar={onOpenSidebar}
         selectedModel={selectedModel}
-        onToggleModelSelector={() => setModelSelectorOpen((prev) => !prev)}
+        onToggleModelSelector={() => {
+          setModelSelectorOpen((prev) => !prev);
+        }}
+        isLoading={isLoading}
       />
 
       <div
@@ -101,6 +112,7 @@ export function ChatThread({
                   value={composerValue}
                   onChange={onComposerChange}
                   onSubmit={onSubmit}
+                  onStop={onStop}
                   isLoading={isLoading}
                   attachment={attachment}
                   onAttachmentChange={onAttachmentChange}

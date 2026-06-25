@@ -101,7 +101,7 @@ export default function DataDeletionPage() {
               </div>
               <a
                 href={mailtoHref}
-                className="mt-5 inline-flex h-12 items-center justify-center rounded-[14px] bg-[var(--voltjo-orange)] px-5 text-sm font-black text-white transition hover:bg-[#e85e00]"
+                className="mt-5 inline-flex h-12 items-center justify-center rounded-[14px] bg-[var(--voltjo-orange)] px-5 text-sm font-black text-black transition hover:bg-[#e85e00]"
               >
                 إرسال طلب حذف
               </a>

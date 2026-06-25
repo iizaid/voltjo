@@ -2,6 +2,7 @@ import "server-only";
 
 import { AiError, classifyHttpStatus } from "@/lib/ai/errors";
 import { getAiConfig, getProviderApiKey } from "@/lib/ai/config";
+import { startTimer } from "@/lib/ai/observability";
 import type {
   AiChatRequest,
   AiChatResponse,
@@ -9,6 +10,7 @@ import type {
   AiProvider,
   AiProviderHealth,
   AiProviderMetadata,
+  AiStreamChunk,
   AiTokenUsage,
 } from "@/lib/ai/types";
 
@@ -47,13 +49,29 @@ function resolveModel(): string {
 }
 
 function buildRequestBody(request: AiChatRequest, context: AiGenerationContext) {
+  // Gemini uses "model" (not "assistant") for prior assistant turns.
+  const historyContents = (request.history ?? []).map((turn) => ({
+    role: turn.role === "assistant" ? "model" : "user",
+    parts: [{ text: turn.content }],
+  }));
+
   return {
     systemInstruction: { parts: [{ text: context.systemPrompt }] },
-    contents: [{ role: "user", parts: [{ text: request.message }] }],
+    contents: [...historyContents, { role: "user", parts: [{ text: request.message }] }],
     generationConfig: {
-      temperature: request.thinkingMode ? 0.7 : 0.4,
-      maxOutputTokens: request.thinkingMode ? 2048 : 1024,
+      temperature: request.thinkingMode ? 0.9 : 0.75,
+      // Gemini 2.5 Flash uses thinking tokens by default. Without an explicit
+      // budget, thinking tokens count against maxOutputTokens and starve the
+      // actual response (observed: 980 thinking + 40 output = truncated reply).
+      // Set thinkingBudget:0 for normal mode; let the model think freely in
+      // thinking mode (higher maxOutputTokens to accommodate both).
+      maxOutputTokens: request.thinkingMode ? 16384 : 8192,
       topP: 0.95,
+      // Normal mode: disable thinking entirely (thinkingBudget:0) for speed.
+      // Thinking mode: allocate a real budget so Gemini 2.5 Flash actually
+      // reasons before answering — the difference is measurable on complex
+      // multi-step questions.
+      thinkingConfig: { thinkingBudget: request.thinkingMode ? 8192 : 0 },
     },
   };
 }
@@ -123,6 +141,7 @@ async function callGeminiOnce(
         },
         body: JSON.stringify(payload),
         signal: controller.signal,
+        cache: "no-store",
       },
     );
 
@@ -243,6 +262,101 @@ async function healthCheck(): Promise<AiProviderHealth> {
     checkedAt: new Date().toISOString(),
     detail: configured ? undefined : "GOOGLE_AI_API_KEY missing",
   };
+}
+
+export async function* streamGeminiChatResponse(
+  request: AiChatRequest,
+  context: AiGenerationContext,
+): AsyncGenerator<AiStreamChunk> {
+  const apiKey = getProviderApiKey("gemini");
+  if (!apiKey) {
+    yield { type: 'error', code: 'CONFIG_MISSING', message: 'GOOGLE_AI_API_KEY is not set.' };
+    return;
+  }
+
+  const model = resolveModel();
+  const payload = buildRequestBody(request, context);
+  const elapsed = startTimer();
+
+  let res: Response;
+  try {
+    res = await fetch(
+      `${GEMINI_API_BASE}/models/${encodeURIComponent(model)}:streamGenerateContent?alt=sse`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-goog-api-key': apiKey,
+        },
+        body: JSON.stringify(payload),
+        signal: context.signal,
+        cache: 'no-store',
+      },
+    );
+  } catch (error) {
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      yield { type: 'error', code: 'TIMEOUT', message: 'Request aborted' };
+    } else {
+      yield { type: 'error', code: 'UPSTREAM', message: 'Gemini network failure' };
+    }
+    return;
+  }
+
+  if (!res.ok) {
+    yield { type: 'error', code: 'UPSTREAM', message: `Gemini HTTP ${res.status}` };
+    return;
+  }
+
+  if (!res.body) {
+    yield { type: 'error', code: 'UPSTREAM', message: 'No response body' };
+    return;
+  }
+
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = '';
+  let lastUsage: AiTokenUsage = null;
+
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop() ?? '';
+
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        const jsonStr = line.slice(6).trim();
+        if (!jsonStr) continue;
+        try {
+          const body = JSON.parse(jsonStr) as GeminiResponseBody;
+          const text = extractText(body);
+          if (text) {
+            yield { type: 'token', content: text };
+          }
+          const usage = extractUsage(body);
+          if (usage) {
+            lastUsage = usage;
+          }
+        } catch {
+          // skip malformed SSE line
+        }
+      }
+    }
+  } catch (error) {
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      yield { type: 'error', code: 'TIMEOUT', message: 'Request aborted' };
+    } else {
+      yield { type: 'error', code: 'UPSTREAM', message: 'Stream read failure' };
+    }
+    return;
+  } finally {
+    reader.releaseLock();
+  }
+
+  yield { type: 'done', usage: lastUsage, model, latencyMs: elapsed() };
 }
 
 export const geminiProvider: AiProvider = {

@@ -42,35 +42,12 @@ export function FloatingHelpWidget() {
   const buttonRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const itemsRef = useRef<HTMLAnchorElement[]>([]);
-  const pulseCtxRef = useRef<gsap.Context | null>(null);
   const panelCtxRef = useRef<gsap.Context | null>(null);
 
   // Hydration guard
   useEffect(() => {
     setMounted(true);
   }, []);
-
-  // Subtle pulse on button (idle)
-  useIsomorphicLayoutEffect(() => {
-    if (!mounted || !buttonRef.current) return;
-    const prefersReduced = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
-    ).matches;
-    if (prefersReduced) return;
-
-    const ctx = gsap.context(() => {
-      gsap.to(buttonRef.current, {
-        boxShadow:
-          "0 0 0 8px rgba(255,106,0,0.14), 0 4px 20px rgba(255,106,0,0.3)",
-        repeat: -1,
-        yoyo: true,
-        duration: 2.2,
-        ease: "sine.inOut",
-      });
-    });
-    pulseCtxRef.current = ctx;
-    return () => ctx.revert();
-  }, [mounted]);
 
   // Panel open / close animation
   useIsomorphicLayoutEffect(() => {
@@ -388,12 +365,12 @@ export function FloatingHelpWidget() {
           background: isOpen
             ? "var(--voltjo-orange-dark, #d9480f)"
             : "var(--voltjo-orange, #ff6a00)",
-          border: "1.5px solid rgba(0,0,0,0.12)",
+          border: "1.5px solid rgba(0,0,0,0.08)",
           boxShadow:
-            "0 4px 20px rgba(255,106,0,0.28), 0 1px 4px rgba(0,0,0,0.12)",
+            "0 6px 20px rgba(13,13,13,0.12), 0 1px 4px rgba(13,13,13,0.08)",
           cursor: "pointer",
           color: "#fff",
-          transition: "background 200ms, transform 180ms ease",
+          transition: "background 200ms, transform 180ms ease, box-shadow 200ms ease",
           outline: "none",
           position: "relative",
           zIndex: 1,
@@ -401,12 +378,12 @@ export function FloatingHelpWidget() {
         onMouseEnter={(e) => {
           (e.currentTarget as HTMLButtonElement).style.transform = "scale(1.08)";
           (e.currentTarget as HTMLButtonElement).style.boxShadow =
-            "0 6px 28px rgba(255,106,0,0.4), 0 2px 6px rgba(0,0,0,0.14)";
+            "0 8px 28px rgba(13,13,13,0.18), 0 2px 8px rgba(13,13,13,0.10)";
         }}
         onMouseLeave={(e) => {
           (e.currentTarget as HTMLButtonElement).style.transform = "scale(1)";
           (e.currentTarget as HTMLButtonElement).style.boxShadow =
-            "0 4px 20px rgba(255,106,0,0.28), 0 1px 4px rgba(0,0,0,0.12)";
+            "0 6px 20px rgba(13,13,13,0.12), 0 1px 4px rgba(13,13,13,0.08)";
         }}
         onFocus={(e) => {
           (e.currentTarget as HTMLButtonElement).style.outline =

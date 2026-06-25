@@ -84,10 +84,10 @@ export const MODEL_DISPLAY_CONFIG: Partial<Record<AiModelId, ModelDisplay>> = {
   },
   nvidia: {
     id: "nvidia",
-    displayName: "NVIDIA Nemotron Ultra",
-    description: "نموذج قوي للتحليل المتقدم والمهام المعقدة",
+    displayName: "MiniMax M3",
+    description: "نموذج متعدد الوسائط قوي للتحليل والاستدلال",
     recommended: false,
-    comingSoon: true,
+    comingSoon: false,
     tags: ["تحليل متقدم", "برمجة"],
     icon: "nvidia",
   },
